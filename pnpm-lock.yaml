@@ -23,6 +23,24 @@ importers:
       astro:
         specifier: ^2.0.4
         version: 2.10.15(@types/node@17.0.45)
+      datatables.net:
+        specifier: ^2.3.2
+        version: 2.3.2
+      datatables.net-buttons:
+        specifier: ^3.2.3
+        version: 3.2.3
+      datatables.net-buttons-dt:
+        specifier: ^3.2.3
+        version: 3.2.3
+      datatables.net-dt:
+        specifier: ^2.3.2
+        version: 2.3.2
+      datatables.net-responsive:
+        specifier: ^3.0.4
+        version: 3.0.4
+      datatables.net-responsive-dt:
+        specifier: ^3.0.4
+        version: 3.0.4
       firebase:
         specifier: ^11.9.1
         version: 11.9.1
@@ -1389,6 +1407,24 @@ packages:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
 
+  datatables.net-buttons-dt@3.2.3:
+    resolution: {integrity: sha512-9b/W8u7pkFdCz5IIexbjR7y/YsFf6Opkx3kOkWyx/rWOXhW/vJXN9rZwKo0cICk7xkOyxnIP70XzelwfnnEo0A==}
+
+  datatables.net-buttons@3.2.3:
+    resolution: {integrity: sha512-K+WeQWUYVGe5c3Gwb8Gfi7YpUXbJEerik3B2vynnVKpBlYBF5AHTGbrK1Psek2q/mjxeIVNHafQ9eX2otLhJVw==}
+
+  datatables.net-dt@2.3.2:
+    resolution: {integrity: sha512-2heAMe0AVqJ8nt9wE35ArLtL1zP7N7qnhM3u52bLcJfi4NStxyBsHScVggTHVQPj7r9O+qirAxox1Xcr+Bm4Dw==}
+
+  datatables.net-responsive-dt@3.0.4:
+    resolution: {integrity: sha512-0PMpLn+qEE2adKPeu7oURnmhlA0/Bq+OB3Y0HOynH2I1ejCsaNE71MeHHqSapdvfk+lBxjVdfvw41XEmO3JipA==}
+
+  datatables.net-responsive@3.0.4:
+    resolution: {integrity: sha512-d1JKaWPRp81xydZrTDqrzGTloXthDtyvwbqiSKYUhDBKWTL4wN5IW5WYr4OBPwu21Ctpi/QgOl7mt9MfyF8KxA==}
+
+  datatables.net@2.3.2:
+    resolution: {integrity: sha512-31TzwIQM0+pr2ZOEOEH6dsHd/WSAl5GDDGPezOHPI3mM2NK4lcDyOoG8xXeWmSbVfbi852LNK5C84fpp4Q+qxg==}
+
   debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
     peerDependencies:
@@ -2142,6 +2178,9 @@ packages:
 
   jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
+
+  jquery@3.7.1:
+    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -4844,6 +4883,37 @@ snapshots:
       es-errors: 1.3.0
       is-data-view: 1.0.2
 
+  datatables.net-buttons-dt@3.2.3:
+    dependencies:
+      datatables.net-buttons: 3.2.3
+      datatables.net-dt: 2.3.2
+      jquery: 3.7.1
+
+  datatables.net-buttons@3.2.3:
+    dependencies:
+      datatables.net: 2.3.2
+      jquery: 3.7.1
+
+  datatables.net-dt@2.3.2:
+    dependencies:
+      datatables.net: 2.3.2
+      jquery: 3.7.1
+
+  datatables.net-responsive-dt@3.0.4:
+    dependencies:
+      datatables.net-dt: 2.3.2
+      datatables.net-responsive: 3.0.4
+      jquery: 3.7.1
+
+  datatables.net-responsive@3.0.4:
+    dependencies:
+      datatables.net: 2.3.2
+      jquery: 3.7.1
+
+  datatables.net@2.3.2:
+    dependencies:
+      jquery: 3.7.1
+
   debug@3.2.7:
     dependencies:
       ms: 2.1.3
@@ -5790,6 +5860,8 @@ snapshots:
   jiti@1.21.7: {}
 
   jju@1.4.0: {}
+
+  jquery@3.7.1: {}
 
   js-tokens@4.0.0: {}
 

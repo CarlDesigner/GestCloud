@@ -1,5 +1,6 @@
 ---
-// Módulo de Historial de Visitantes - GestCloud
+// Módulo de Historial de Visitantes con CRUD - GestCloud
+import ToastNotification from '../components/ToastNotification.astro';
 ---
 
 <div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
@@ -25,92 +26,241 @@
 			<p class="text-gray-600 dark:text-gray-400 mt-2">Registro de todos los visitantes que han salido del conjunto residencial</p>
 		</div>
 		
-		<!-- Contador y filtros -->
-		<div class="flex items-center justify-between space-x-4">
-			<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-				<div class="text-sm text-gray-600 dark:text-gray-300">
-					Total registros: <span id="contador-historial" class="font-bold text-lg text-gray-900 dark:text-white">0</span>
-				</div>
-			</div>
-			
-			<!-- Buscador -->
-			<div class="flex items-center space-x-3">
-				<div class="relative">
-					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-						<svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-							<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
-						</svg>
+		<!-- Barra de herramientas -->
+		<div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+			<div class="w-full md:w-1/2">
+				<form class="flex items-center">
+					<label for="simple-search" class="sr-only">Buscar</label>
+					<div class="relative w-full">
+						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+							<svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+								<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+							</svg>
+						</div>
+						<input type="text" id="table-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Buscar visitantes...">
 					</div>
-					<input type="text" id="buscador-historial" placeholder="Buscar por nombre, cédula..." class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-				</div>
-				<a href="/visitantes-activos" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
-					👥 Ver Activos
+				</form>
+			</div>
+			<div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+				<!-- Filtro por fecha -->
+				<button type="button" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+					<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+					</svg>
+					Filtrar
+				</button>
+				<!-- Exportar -->
+				<button type="button" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+					<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+					</svg>
+					Exportar
+				</button>
+				<!-- Ver Activos -->
+				<a href="/visitantes-activos" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+					<svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+					</svg>
+					Ver Activos
 				</a>
 			</div>
 		</div>
 	</div>
 </div>
 
-<!-- Contenedor de la tabla de historial -->
-<div class="flex flex-col">
-	<div class="overflow-x-auto">
-		<div class="inline-block min-w-full align-middle">
-			<div class="overflow-hidden shadow">
-				<div class="p-6 bg-white dark:bg-gray-800 min-h-screen">
-					
-					<!-- Estado sin datos -->
-					<div id="sin-historial" class="text-center py-16">
-						<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-						</svg>
-						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay registros de visitantes</h3>
-						<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando los visitantes salgan aparecerán aquí</p>
-						<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
-							➕ Registrar Visitante
-						</a>
-					</div>
+<!-- Contenedor principal -->
+<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+	<!-- Estadísticas -->
+	<div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b dark:border-gray-700">
+		<div class="flex items-center space-x-6">
+			<div class="flex items-center">
+				<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total registros:</span>
+				<span id="total-registros" class="ml-2 text-lg font-bold text-gray-900 dark:text-white">0</span>
+			</div>
+			<div class="flex items-center">
+				<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Promedio permanencia:</span>
+				<span id="promedio-permanencia" class="ml-2 text-lg font-bold text-green-600 dark:text-green-400">--</span>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Estado sin datos -->
+	<div id="sin-historial" class="text-center py-16 hidden">
+		<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+		</svg>
+		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay registros de visitantes</h3>
+		<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando los visitantes salgan aparecerán aquí</p>
+		<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
+			➕ Registrar Visitante
+		</a>
+	</div>
 
-					<!-- Tabla de historial -->
-					<div id="tabla-historial" class="hidden">
-						<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-							<table class="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
-								<thead class="bg-gray-50 dark:bg-gray-700">
-									<tr>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Visitante</th>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contacto</th>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Destino</th>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Entrada</th>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Salida</th>
-										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Permanencia</th>
-									</tr>
-								</thead>
-								<tbody id="tbody-historial" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
-									<!-- Las filas se generarán dinámicamente aquí -->
-								</tbody>
-							</table>
+	<!-- Tabla de historial -->
+	<div id="tabla-historial" class="overflow-x-auto">
+		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+				<tr>
+					<th scope="col" class="px-4 py-3">Visitante</th>
+					<th scope="col" class="px-4 py-3">Contacto</th>
+					<th scope="col" class="px-4 py-3">Destino</th>
+					<th scope="col" class="px-4 py-3">Entrada</th>
+					<th scope="col" class="px-4 py-3">Salida</th>
+					<th scope="col" class="px-4 py-3">Permanencia</th>
+					<th scope="col" class="px-4 py-3">
+						<span class="sr-only">Acciones</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody id="tbody-historial">
+				<!-- Los datos se cargarán dinámicamente aquí -->
+			</tbody>
+		</table>
+	</div>
+	
+	<!-- Paginación -->
+	<nav id="paginacion" class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4 hidden" aria-label="Table navigation">
+		<span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+			Mostrando
+			<span class="font-semibold text-gray-900 dark:text-white" id="inicio-rango">1</span>
+			-
+			<span class="font-semibold text-gray-900 dark:text-white" id="fin-rango">10</span>
+			de
+			<span class="font-semibold text-gray-900 dark:text-white" id="total-items">100</span>
+		</span>
+		<ul class="inline-flex items-stretch -space-x-px">
+			<li>
+				<button id="btn-anterior" class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+					<span class="sr-only">Anterior</span>
+					<svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+					</svg>
+				</button>
+			</li>
+			<li>
+				<span id="numero-pagina" class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">1</span>
+			</li>
+			<li>
+				<button id="btn-siguiente" class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+					<span class="sr-only">Siguiente</span>
+					<svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+					</svg>
+				</button>
+			</li>
+		</ul>
+	</nav>
+</div>
+
+<!-- Modal para Ver/Editar Visitante -->
+<div id="modal-visitante" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+	<div class="relative w-full max-w-2xl max-h-full">
+		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+			<!-- Modal header -->
+			<div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+				<h3 id="modal-titulo" class="text-xl font-semibold text-gray-900 dark:text-white">
+					Detalles del Visitante
+				</h3>
+				<button type="button" id="cerrar-modal" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+					<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+					</svg>
+					<span class="sr-only">Cerrar modal</span>
+				</button>
+			</div>
+			<!-- Modal body -->
+			<div class="p-6 space-y-6">
+				<form id="form-visitante">
+					<div class="grid grid-cols-6 gap-6">
+						<div class="col-span-6 sm:col-span-3">
+							<label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre completo</label>
+							<input type="text" id="nombre" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+						</div>
+						<div class="col-span-6 sm:col-span-3">
+							<label for="cedula" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cédula</label>
+							<input type="text" id="cedula" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+						</div>
+						<div class="col-span-6 sm:col-span-3">
+							<label for="celular" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Celular</label>
+							<input type="text" id="celular" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+						</div>
+						<div class="col-span-6 sm:col-span-3">
+							<label for="apartamento" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apartamento</label>
+							<input type="text" id="apartamento" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+						</div>
+						<div class="col-span-6">
+							<label for="autorizadoPor" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Autorizado por</label>
+							<input type="text" id="autorizadoPor" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
 						</div>
 					</div>
-				</div>
+				</form>
+			</div>
+			<!-- Modal footer -->
+			<div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+				<button id="guardar-cambios" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Guardar cambios</button>
+				<button id="cancelar-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Cancelar</button>
 			</div>
 		</div>
 	</div>
 </div>
 
+<!-- Modal de confirmación para eliminar -->
+<div id="modal-eliminar" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+	<div class="relative w-full max-w-md max-h-full">
+		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+			<button type="button" id="cerrar-modal-eliminar" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+				<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+				</svg>
+			</button>
+			<div class="p-6 text-center">
+				<svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+				</svg>
+				<h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">¿Estás seguro de que quieres eliminar este registro?</h3>
+				<button id="confirmar-eliminar" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+					Sí, eliminar
+				</button>
+				<button id="cancelar-eliminar" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">No, cancelar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Incluir componente de notificaciones toast -->
+<ToastNotification />
+
 <script>
-	// Script del cliente para manejar historial de visitantes
+	// Precargar Firebase para mejorar rendimiento
+	import '../scripts/firebase-preload.js';
+	
+	// Script del cliente para manejar visitantes activos desde Firebase
 	import '../scripts/visitantes-activos.js';
+
+	// Script del cliente para manejar historial de visitantes con CRUD
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Elementos del DOM
 		const sinHistorial = document.getElementById('sin-historial');
 		const tablaHistorial = document.getElementById('tabla-historial');
 		const tbodyHistorial = document.getElementById('tbody-historial');
-		const contadorHistorial = document.getElementById('contador-historial');
-		const buscadorHistorial = document.getElementById('buscador-historial');
+		const totalRegistros = document.getElementById('total-registros');
+		const promedioPermanen = document.getElementById('promedio-permanencia');
+		const tableSearch = document.getElementById('table-search');
 		
+		// Modal elementos
+		const modalVisitante = document.getElementById('modal-visitante');
+		const modalEliminar = document.getElementById('modal-eliminar');
+		const formVisitante = document.getElementById('form-visitante');
+		const modalTitulo = document.getElementById('modal-titulo');
+		
+		// Variables de estado
 		let historialVisitantes = [];
 		let historialFiltrado = [];
 		let unsubscribe = null;
+		let visitanteEditando = null;
+		let paginaActual = 1;
+		const itemsPorPagina = 10;
 
 		// Función para capitalizar nombres
 		function capitalizarNombre(nombre) {
@@ -186,46 +336,146 @@
 
 		// Función para crear una fila de la tabla
 		function crearFilaTabla(visitante) {
-			const tr = document.createElement('tr');
-			tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
-			
-			tr.innerHTML = `
-				<td class="px-6 py-4 whitespace-nowrap">
-					<div class="flex items-center">
-						<div class="flex-shrink-0 h-10 w-10">
-							<div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-								<svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+			return `
+				<tr class="border-b dark:border-gray-700">
+					<td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+						<div class="flex items-center">
+							<div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+								<svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
 									<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
 								</svg>
 							</div>
+							<div>
+								<div class="text-base font-semibold">${capitalizarNombre(visitante.nombre)}</div>
+								<div class="font-normal text-gray-500">CC: ${formatearCedula(visitante.cedula)}</div>
+							</div>
 						</div>
-						<div class="ml-4">
-							<div class="text-sm font-medium text-gray-900 dark:text-white">${capitalizarNombre(visitante.nombre)}</div>
-							<div class="text-sm text-gray-500 dark:text-gray-400">CC: ${formatearCedula(visitante.cedula)}</div>
-						</div>
-					</div>
-				</td>
-				<td class="px-6 py-4 whitespace-nowrap">
-					<div class="text-sm text-gray-900 dark:text-white">${formatearCelular(visitante.celular)}</div>
-				</td>
-				<td class="px-6 py-4 whitespace-nowrap">
-					<div class="text-sm text-gray-900 dark:text-white">Apto: ${visitante.apartamento.toUpperCase()}</div>
-					<div class="text-sm text-gray-500 dark:text-gray-400">Por: ${capitalizarNombre(visitante.autorizadoPor)}</div>
-				</td>
-				<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-					${formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion)}
-				</td>
-				<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-					${formatearFecha(visitante.tiempoSalida || visitante.fechaSalida)}
-				</td>
-				<td class="px-6 py-4 whitespace-nowrap">
-					<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-						${calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)}
-					</span>
-				</td>
+					</td>
+					<td class="px-4 py-3">${formatearCelular(visitante.celular)}</td>
+					<td class="px-4 py-3">
+						<div class="text-base">Apto: ${visitante.apartamento.toUpperCase()}</div>
+						<div class="text-sm text-gray-500">Por: ${capitalizarNombre(visitante.autorizadoPor)}</div>
+					</td>
+					<td class="px-4 py-3">${formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion)}</td>
+					<td class="px-4 py-3">${formatearFecha(visitante.tiempoSalida || visitante.fechaSalida)}</td>
+					<td class="px-4 py-3">
+						<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+							${calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)}
+						</span>
+					</td>
+					<td class="px-4 py-3 flex items-center justify-end">
+						<button class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" onclick="mostrarMenuAcciones(event, '${visitante.id}')">
+							<svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+								<path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/>
+							</svg>
+						</button>
+					</td>
+				</tr>
+			`;
+		}
+
+		// Función para mostrar menú de acciones
+		window.mostrarMenuAcciones = function(event, visitanteId) {
+			event.stopPropagation();
+			
+			// Crear menú contextual
+			const menu = document.createElement('div');
+			menu.className = 'absolute z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600';
+			menu.innerHTML = `
+				<ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+					<li>
+						<button onclick="verVisitante('${visitanteId}')" class="block w-full text-left py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+							👁️ Ver detalles
+						</button>
+					</li>
+					<li>
+						<button onclick="editarVisitante('${visitanteId}')" class="block w-full text-left py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+							✏️ Editar
+						</button>
+					</li>
+					<li>
+						<button onclick="eliminarVisitante('${visitanteId}')" class="block w-full text-left py-2 px-4 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500">
+							🗑️ Eliminar
+						</button>
+					</li>
+				</ul>
 			`;
 			
-			return tr;
+			// Posicionar el menú
+			const rect = event.target.getBoundingClientRect();
+			menu.style.position = 'absolute';
+			menu.style.top = rect.bottom + 'px';
+			menu.style.left = rect.left + 'px';
+			
+			// Remover menús anteriores
+			document.querySelectorAll('.menu-acciones').forEach(m => m.remove());
+			menu.classList.add('menu-acciones');
+			
+			document.body.appendChild(menu);
+			
+			// Cerrar menú al hacer clic fuera
+			setTimeout(() => {
+				document.addEventListener('click', function cerrarMenu() {
+					menu.remove();
+					document.removeEventListener('click', cerrarMenu);
+				});
+			}, 100);
+		};
+
+		// Función para ver detalles del visitante
+		window.verVisitante = function(visitanteId) {
+			const visitante = historialVisitantes.find(v => v.id === visitanteId);
+			if (visitante) {
+				modalTitulo.textContent = 'Detalles del Visitante';
+				llenarFormulario(visitante);
+				deshabilitarFormulario(true);
+				document.getElementById('guardar-cambios').style.display = 'none';
+				mostrarModal(modalVisitante);
+			}
+		};
+
+		// Función para editar visitante
+		window.editarVisitante = function(visitanteId) {
+			const visitante = historialVisitantes.find(v => v.id === visitanteId);
+			if (visitante) {
+				visitanteEditando = visitante;
+				modalTitulo.textContent = 'Editar Visitante';
+				llenarFormulario(visitante);
+				deshabilitarFormulario(false);
+				document.getElementById('guardar-cambios').style.display = 'inline-flex';
+				mostrarModal(modalVisitante);
+			}
+		};
+
+		// Función para eliminar visitante
+		window.eliminarVisitante = function(visitanteId) {
+			visitanteEditando = historialVisitantes.find(v => v.id === visitanteId);
+			mostrarModal(modalEliminar);
+		};
+
+		// Función para llenar formulario
+		function llenarFormulario(visitante) {
+			document.getElementById('nombre').value = visitante.nombre;
+			document.getElementById('cedula').value = visitante.cedula;
+			document.getElementById('celular').value = visitante.celular;
+			document.getElementById('apartamento').value = visitante.apartamento;
+			document.getElementById('autorizadoPor').value = visitante.autorizadoPor;
+		}
+
+		// Función para habilitar/deshabilitar formulario
+		function deshabilitarFormulario(deshabilitar) {
+			const campos = formVisitante.querySelectorAll('input');
+			campos.forEach(campo => campo.disabled = deshabilitar);
+		}
+
+		// Función para mostrar modal
+		function mostrarModal(modal) {
+			modal.classList.remove('hidden');
+		}
+
+		// Función para ocultar modal
+		function ocultarModal(modal) {
+			modal.classList.add('hidden');
 		}
 
 		// Función para filtrar visitantes
@@ -242,43 +492,246 @@
 					visitante.autorizadoPor.toLowerCase().includes(terminoLower)
 				);
 			}
+			paginaActual = 1;
 			renderizarTabla();
+		}
+
+		// Función para calcular estadísticas
+		function calcularEstadisticas() {
+			if (historialVisitantes.length === 0) return;
+			
+			let totalMinutos = 0;
+			historialVisitantes.forEach(visitante => {
+				const entrada = visitante.tiempoEntrada?.toDate ? 
+					visitante.tiempoEntrada.toDate() : 
+					new Date(visitante.fechaCreacion);
+				const salida = visitante.tiempoSalida?.toDate ? 
+					visitante.tiempoSalida.toDate() : 
+					new Date(visitante.fechaSalida);
+				
+				totalMinutos += (salida - entrada) / (1000 * 60);
+			});
+			
+			const promedioMinutos = Math.floor(totalMinutos / historialVisitantes.length);
+			const horas = Math.floor(promedioMinutos / 60);
+			const minutos = promedioMinutos % 60;
+			
+			if (promedioPermanen) {
+				promedioPermanen.textContent = horas > 0 ? `${horas}h ${minutos}m` : `${minutos}m`;
+			}
 		}
 
 		// Función para renderizar la tabla
 		function renderizarTabla() {
-			if (contadorHistorial) {
-				contadorHistorial.textContent = String(historialFiltrado.length);
+			if (totalRegistros) {
+				totalRegistros.textContent = String(historialFiltrado.length);
 			}
+			
+			calcularEstadisticas();
 			
 			if (historialFiltrado.length === 0) {
 				if (sinHistorial && tablaHistorial) {
 					sinHistorial.classList.remove('hidden');
-					tablaHistorial.classList.add('hidden');
+					tablaHistorial.style.display = 'none';
 				}
 			} else {
 				if (sinHistorial && tablaHistorial && tbodyHistorial) {
 					sinHistorial.classList.add('hidden');
-					tablaHistorial.classList.remove('hidden');
+					tablaHistorial.style.display = 'table';
+					
+					// Calcular paginación
+					const inicio = (paginaActual - 1) * itemsPorPagina;
+					const fin = inicio + itemsPorPagina;
+					const visitantesPagina = historialFiltrado.slice(inicio, fin);
 					
 					// Limpiar tabla
 					tbodyHistorial.innerHTML = '';
 					
 					// Agregar cada visitante
-					historialFiltrado.forEach(visitante => {
-						const fila = crearFilaTabla(visitante);
-						tbodyHistorial.appendChild(fila);
+					visitantesPagina.forEach(visitante => {
+						tbodyHistorial.innerHTML += crearFilaTabla(visitante);
 					});
+					
+					actualizarPaginacion();
 				}
 			}
 		}
 
-		// Event listener para el buscador
-		if (buscadorHistorial) {
-			buscadorHistorial.addEventListener('input', (e) => {
+		// Función para actualizar paginación
+		function actualizarPaginacion() {
+			const totalPaginas = Math.ceil(historialFiltrado.length / itemsPorPagina);
+			const paginacion = document.getElementById('paginacion');
+			
+			if (totalPaginas > 1) {
+				paginacion.classList.remove('hidden');
+				
+				const inicio = (paginaActual - 1) * itemsPorPagina + 1;
+				const fin = Math.min(paginaActual * itemsPorPagina, historialFiltrado.length);
+				
+				document.getElementById('inicio-rango').textContent = inicio;
+				document.getElementById('fin-rango').textContent = fin;
+				document.getElementById('total-items').textContent = historialFiltrado.length;
+				document.getElementById('numero-pagina').textContent = paginaActual;
+				
+				// Botones de navegación
+				document.getElementById('btn-anterior').disabled = paginaActual === 1;
+				document.getElementById('btn-siguiente').disabled = paginaActual === totalPaginas;
+			} else {
+				paginacion.classList.add('hidden');
+			}
+		}
+
+		// Event listeners
+		if (tableSearch) {
+			tableSearch.addEventListener('input', (e) => {
 				filtrarVisitantes(e.target.value);
 			});
 		}
+
+		// Event listeners para modales
+		document.getElementById('cerrar-modal').addEventListener('click', () => {
+			ocultarModal(modalVisitante);
+		});
+
+		document.getElementById('cancelar-modal').addEventListener('click', () => {
+			ocultarModal(modalVisitante);
+		});
+
+		document.getElementById('cerrar-modal-eliminar').addEventListener('click', () => {
+			ocultarModal(modalEliminar);
+		});
+
+		document.getElementById('cancelar-eliminar').addEventListener('click', () => {
+			ocultarModal(modalEliminar);
+		});
+
+		// Guardar cambios
+		document.getElementById('guardar-cambios').addEventListener('click', async () => {
+			if (visitanteEditando) {
+				try {
+					const datosActualizados = {
+						nombre: document.getElementById('nombre').value,
+						cedula: document.getElementById('cedula').value,
+						celular: document.getElementById('celular').value,
+						apartamento: document.getElementById('apartamento').value,
+						autorizadoPor: document.getElementById('autorizadoPor').value
+					};
+					
+					// Actualizar en Firebase
+					const { updateDoc, doc } = await import('firebase/firestore');
+					const visitanteRef = doc(window.__firestoreDb, 'visitantes', visitanteEditando.id);
+					await updateDoc(visitanteRef, datosActualizados);
+					
+					ocultarModal(modalVisitante);
+					if (window.mostrarToast) {
+						window.mostrarToast('✅ Visitante actualizado correctamente', 'success');
+					}
+					
+				} catch (error) {
+					console.error('Error actualizando visitante:', error);
+					if (window.mostrarToast) {
+						window.mostrarToast('❌ Error al actualizar visitante', 'error');
+					}
+				}
+			}
+		});
+
+		// Confirmar eliminación
+		document.getElementById('confirmar-eliminar').addEventListener('click', async () => {
+			if (visitanteEditando) {
+				try {
+					// Eliminar de Firebase - Eliminación definitiva de ambas colecciones
+					const { deleteDoc, doc, getDoc } = await import('firebase/firestore');
+					
+					console.log('🗑️ Iniciando eliminación definitiva del visitante:', visitanteEditando.id);
+					
+					let eliminacionesExitosas = 0;
+					let erroresEliminacion = [];
+					
+					// 1. Eliminar de la colección principal 'visitantes'
+					try {
+						const visitanteRef = doc(window.__firestoreDb, 'visitantes', visitanteEditando.id);
+						const visitanteDoc = await getDoc(visitanteRef);
+						
+						if (visitanteDoc.exists()) {
+							await deleteDoc(visitanteRef);
+							console.log('✅ Eliminado de colección "visitantes"');
+							eliminacionesExitosas++;
+						} else {
+							console.log('ℹ️ No encontrado en colección "visitantes"');
+						}
+					} catch (error) {
+						console.error('❌ Error eliminando de "visitantes":', error);
+						erroresEliminacion.push(`visitantes: ${error.message}`);
+					}
+					
+					// 2. Eliminar de la colección de historial 'visitantes_historial' si existe
+					try {
+						const historialRef = doc(window.__firestoreDb, 'visitantes_historial', visitanteEditando.id);
+						const historialDoc = await getDoc(historialRef);
+						
+						if (historialDoc.exists()) {
+							await deleteDoc(historialRef);
+							console.log('✅ Eliminado de colección "visitantes_historial"');
+							eliminacionesExitosas++;
+						} else {
+							console.log('ℹ️ No encontrado en colección "visitantes_historial"');
+						}
+					} catch (error) {
+						console.error('❌ Error eliminando de "visitantes_historial":', error);
+						erroresEliminacion.push(`visitantes_historial: ${error.message}`);
+					}
+					
+					ocultarModal(modalEliminar);
+					
+					// Mostrar resultado de la eliminación
+					if (eliminacionesExitosas > 0) {
+						const mensaje = eliminacionesExitosas === 1 ? 
+							'Registro eliminado definitivamente' : 
+							`Registro eliminado definitivamente de ${eliminacionesExitosas} ubicaciones`;
+						
+						if (window.mostrarToast) {
+							window.mostrarToast(mensaje, 'success');
+						}
+						
+						// Recargar la tabla para reflejar los cambios
+						setTimeout(() => {
+							window.location.reload();
+						}, 2000);
+					} else {
+						if (window.mostrarToast) {
+							window.mostrarToast('⚠️ El registro no se encontró en ninguna colección o ya fue eliminado', 'warning');
+						}
+					}
+					
+					if (erroresEliminacion.length > 0) {
+						console.warn('⚠️ Algunos errores durante la eliminación:', erroresEliminacion);
+					}
+					
+				} catch (error) {
+					console.error('Error eliminando visitante:', error);
+					if (window.mostrarToast) {
+						window.mostrarToast('❌ Error al eliminar registro', 'error');
+					}
+				}
+			}
+		});
+
+		// Paginación
+		document.getElementById('btn-anterior').addEventListener('click', () => {
+			if (paginaActual > 1) {
+				paginaActual--;
+				renderizarTabla();
+			}
+		});
+
+		document.getElementById('btn-siguiente').addEventListener('click', () => {
+			const totalPaginas = Math.ceil(historialFiltrado.length / itemsPorPagina);
+			if (paginaActual < totalPaginas) {
+				paginaActual++;
+				renderizarTabla();
+			}
+		});
 
 		// Conectar con Firebase para obtener historial
 		if (window.escucharHistorialVisitantes) {
@@ -294,4 +747,8 @@
 			if (unsubscribe) unsubscribe();
 		});
 	});
+</script>
+
+<!-- Incluir componente de notificaciones toast -->
+<ToastNotification />
 </script>

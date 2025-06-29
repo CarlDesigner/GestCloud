@@ -152,6 +152,9 @@
 	
 	// Script del cliente para manejar visitantes activos desde Firebase
 	import '../scripts/visitantes-activos.js';
+	
+	// TEMPORAL: Script de debug para diagnosticar problemas
+	import '../scripts/debug-visitantes.js';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Elementos del DOM
@@ -309,19 +312,46 @@
 		async function darSalida(visitanteId, nombre) {
 			if (confirm(`¿Estás seguro de que quieres dar salida a ${nombre}?`)) {
 				try {
+					console.log('🚪 Iniciando proceso de salida para:', nombre);
+					
 					// Deshabilitar botón mientras se procesa
 					const card = document.querySelector(`[data-visitante-id="${visitanteId}"]`);
 					const button = card.querySelector('.btn-dar-salida');
 					button.disabled = true;
 					button.innerHTML = '⏳ Procesando...';
 					
+					// Verificar que la función existe
+					if (!window.darSalidaVisitante) {
+						throw new Error('La función darSalidaVisitante no está disponible. Recarga la página.');
+					}
+					
 					// Actualizar en Firebase
-					await window.darSalidaVisitante(visitanteId);
+					const resultado = await window.darSalidaVisitante(visitanteId);
+					
+					console.log('✅ Salida exitosa:', resultado);
+					
+					// Mostrar mensaje de éxito
+					if (resultado?.success) {
+						// Crear notificación de éxito (opcional)
+						const notification = document.createElement('div');
+						notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+						notification.innerHTML = `✅ ${nombre} ha salido exitosamente`;
+						document.body.appendChild(notification);
+						
+						// Remover notificación después de 3 segundos
+						setTimeout(() => {
+							notification.remove();
+						}, 3000);
+					}
 					
 					// Firebase actualizará automáticamente la vista a través del listener
 					
 				} catch (error) {
-					alert('❌ Error al dar salida al visitante. Intenta nuevamente.');
+					console.error('❌ Error al dar salida:', error);
+					
+					// Mostrar error específico
+					const mensajeError = error.message || 'Error desconocido al dar salida al visitante';
+					alert(`❌ ${mensajeError}`);
 					
 					// Rehabilitar botón en caso de error
 					const card = document.querySelector(`[data-visitante-id="${visitanteId}"]`);

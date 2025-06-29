@@ -5,19 +5,19 @@ service cloud.firestore {
     // Reglas para la colección de visitantes activos
     match /visitantes/{document} {
       // Permitir lectura, escritura y eliminación para todos (desarrollo)
-      allow read, write, delete: if true;
+      allow read, write, delete, create, update: if true;
     }
     
     // Reglas para la colección de historial de visitantes
     match /visitantes_historial/{document} {
-      // Permitir lectura y escritura para todos (desarrollo)
-      allow read, write: if true;
+      // Permitir lectura, escritura y creación para todos (desarrollo)
+      allow read, write, delete, create, update: if true;
     }
     
     // Reglas generales para otras colecciones
     match /{document=**} {
       // Permitir acceso completo durante desarrollo
-      allow read, write: if true;
+      allow read, write, delete, create, update: if true;
     }
   }
 }

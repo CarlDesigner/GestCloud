@@ -90,81 +90,95 @@ export function escucharVisitantesActivos(callback) {
   });
 }
 
-// Función para dar salida a un visitante (mover de activos a historial)
+// Función para dar salida a un visitante (TEMPORAL: solo cambiar activo a false)
 export async function darSalidaVisitante(visitanteId) {
+  console.log('🚪 Iniciando proceso de salida para visitante:', visitanteId);
+  
   try {
-    // Estrategia más robusta: primero verificar si la colección existe
-    // Si no existe, crear un documento de inicialización
-    const historialTest = collection(db, 'visitantes_historial');
+    // Verificar que tenemos acceso a Firestore
+    if (!db) {
+      throw new Error('Base de datos no inicializada');
+    }
+
+    console.log('📊 Método temporal: Solo marcar como inactivo...');
     
-    // Usar transacción para garantizar consistencia
-    return await runTransaction(db, async (transaction) => {
-      // 1. Obtener referencia del visitante activo
-      const visitanteRef = doc(db, 'visitantes', visitanteId);
-      const visitanteDoc = await transaction.get(visitanteRef);
-      
-      if (!visitanteDoc.exists()) {
-        throw new Error('Visitante no encontrado en la base de datos');
-      }
-      
-      const datosVisitante = visitanteDoc.data();
-      
-      // 2. Calcular tiempo de estancia
-      const tiempoEntrada = datosVisitante.tiempoEntrada?.toDate ? 
-        datosVisitante.tiempoEntrada.toDate() : 
-        new Date(datosVisitante.fechaCreacion);
-      
-      const tiempoSalida = new Date();
-      const tiempoTotal = Math.floor((tiempoSalida - tiempoEntrada) / 1000); // en segundos
-      
-      // 3. Preparar datos para el historial
-      const datosHistorial = {
-        ...datosVisitante,
-        tiempoSalida: serverTimestamp(),
-        fechaSalida: tiempoSalida.toISOString(),
-        tiempoTotal,
-        activo: false,
-        // Agregar metadatos útiles
-        fechaSalidaLegible: tiempoSalida.toLocaleString('es-ES'),
-        tiempoEstancia: formatearTiempo(tiempoTotal)
-      };
-      
-      // 4. Crear referencia para nuevo documento en historial
-      const historialRef = doc(historialTest);
-      
-      // 5. Agregar a historial primero (más seguro)
-      transaction.set(historialRef, datosHistorial);
-      
-      // 6. Luego eliminar de visitantes activos
-      transaction.delete(visitanteRef);
-      
-      return true;
-    });
+    // MÉTODO TEMPORAL: Solo actualizar el visitante existente
+    const { getDoc, updateDoc } = await import('firebase/firestore');
     
-  } catch (error) {
-    // Si el error es por colección no existente, intentar crear la colección primero
-    if (error.message.includes('not found') || error.message.includes('does not exist')) {
-      try {
-        // Crear colección con documento inicial
-        await crearColeccionHistorial();
-        // Reintentar la operación
-        return await darSalidaVisitante(visitanteId);
-      } catch (initError) {
-        throw new Error(`Error inicializando historial: ${initError.message}`);
-      }
+    console.log('🔍 Buscando visitante en la base de datos...');
+    
+    // 1. Obtener visitante activo
+    const visitanteRef = doc(db, 'visitantes', visitanteId);
+    const visitanteDoc = await getDoc(visitanteRef);
+    
+    if (!visitanteDoc.exists()) {
+      console.error('❌ Visitante no encontrado:', visitanteId);
+      throw new Error('Visitante no encontrado en la base de datos');
     }
     
-    // Proporcionar mensajes de error más específicos
+    const datosVisitante = visitanteDoc.data();
+    console.log('✅ Visitante encontrado:', datosVisitante.nombre);
+    
+    // 2. Calcular tiempo de estancia
+    const tiempoEntrada = datosVisitante.tiempoEntrada?.toDate ? 
+      datosVisitante.tiempoEntrada.toDate() : 
+      new Date(datosVisitante.fechaCreacion);
+    
+    const tiempoSalida = new Date();
+    const tiempoTotal = Math.floor((tiempoSalida - tiempoEntrada) / 1000); // en segundos
+    
+    console.log('⏱️ Tiempo de permanencia calculado:', formatearTiempo(tiempoTotal));
+    
+    // 3. Actualizar el visitante existente con datos de salida
+    const actualizacion = {
+      activo: false,
+      tiempoSalida: serverTimestamp(),
+      fechaSalida: tiempoSalida.toISOString(),
+      tiempoTotal,
+      fechaSalidaLegible: tiempoSalida.toLocaleString('es-ES'),
+      tiempoEstancia: formatearTiempo(tiempoTotal)
+    };
+    
+    console.log('💾 Actualizando visitante como inactivo...');
+    
+    // 4. Actualizar el documento existente
+    await updateDoc(visitanteRef, actualizacion);
+    
+    console.log('✅ Visitante marcado como inactivo');
+    
+    const resultado = {
+      success: true,
+      visitante: datosVisitante.nombre,
+      tiempo: formatearTiempo(tiempoTotal),
+      metodo: 'temporal_inactivo'
+    };
+    
+    console.log('✅ Salida completada exitosamente:', resultado);
+    return resultado;
+    
+  } catch (error) {
+    console.error('❌ Error en darSalidaVisitante:', error);
+    console.error('📋 Detalles completos del error:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack,
+      cause: error.cause
+    });
+    
+    // Manejo de errores específicos
     if (error.code === 'permission-denied') {
-      throw new Error('No tienes permisos para realizar esta operación.');
+      throw new Error('No tienes permisos para realizar esta operación. Verifica las reglas de Firebase.');
     } else if (error.code === 'not-found') {
-      throw new Error('El visitante no fue encontrado.');
+      throw new Error('El visitante no fue encontrado en la base de datos.');
     } else if (error.code === 'unavailable') {
-      throw new Error('Firebase no está disponible. Verifica tu conexión.');
+      throw new Error('Firebase no está disponible. Verifica tu conexión a internet.');
     } else if (error.code === 'failed-precondition') {
       throw new Error('Error de sincronización. Por favor, intenta nuevamente.');
+    } else if (error.message?.includes('Missing or insufficient permissions')) {
+      throw new Error('Permisos insuficientes para realizar esta operación.');
     } else {
-      throw new Error(`Error al dar salida: ${error.message || 'Error desconocido'}`);
+      // Error genérico con más información
+      throw new Error(`Error al procesar la salida: ${error.message || 'Error desconocido'}. Código: ${error.code || 'N/A'}`);
     }
   }
 }
