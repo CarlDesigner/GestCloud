@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Dar Salida a Visitante</title>
+    <script type="module">
+        // Configuración de Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getFirestore, 
+            collection, 
+            query, 
+            where, 
+            onSnapshot, 
+            doc, 
+            serverTimestamp, 
+            runTransaction,
+            addDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBwly1pkKYfH0tdcfnQMb1-A8sjOyuqtU",
+            authDomain: "gestcloud-9d02f.firebaseapp.com",
+            databaseURL: "https://gestcloud-9d02f-default-rtdb.firebaseio.com/",
+            projectId: "gestcloud-9d02f",
+            storageBucket: "gestcloud-9d02f.firebasestorage.app",
+            messagingSenderId: "493348332872",
+            appId: "1:493348332872:web:3e9540d0f567e4bc573f7d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Función de debug para dar salida
+        async function debugDarSalida(visitanteId) {
+            console.log('🔍 DEBUG: Iniciando dar salida a visitante:', visitanteId);
+            
+            try {
+                const resultado = await runTransaction(db, async (transaction) => {
+                    console.log('🔍 DEBUG: Iniciando transacción');
+                    
+                    // Obtener visitante
+                    const visitanteRef = doc(db, 'visitantes', visitanteId);
+                    const visitanteDoc = await transaction.get(visitanteRef);
+                    
+                    console.log('🔍 DEBUG: Visitante existe?', visitanteDoc.exists());
+                    
+                    if (!visitanteDoc.exists()) {
+                        throw new Error('Visitante no encontrado');
+                    }
+                    
+                    const datosVisitante = visitanteDoc.data();
+                    console.log('🔍 DEBUG: Datos del visitante:', datosVisitante);
+                    
+                    // Calcular tiempo de estancia
+                    const tiempoEntrada = datosVisitante.tiempoEntrada?.toDate ? 
+                        datosVisitante.tiempoEntrada.toDate() : 
+                        new Date(datosVisitante.fechaCreacion);
+                    
+                    const tiempoSalida = new Date();
+                    const tiempoTotal = Math.floor((tiempoSalida - tiempoEntrada) / 1000);
+                    
+                    console.log('🔍 DEBUG: Tiempo calculado:', {
+                        entrada: tiempoEntrada,
+                        salida: tiempoSalida,
+                        total: tiempoTotal
+                    });
+                    
+                    // Preparar datos para historial
+                    const datosHistorial = {
+                        ...datosVisitante,
+                        tiempoSalida: serverTimestamp(),
+                        fechaSalida: tiempoSalida.toISOString(),
+                        tiempoTotal,
+                        activo: false
+                    };
+                    
+                    console.log('🔍 DEBUG: Datos para historial:', datosHistorial);
+                    
+                    // Agregar a historial
+                    const historialRef = doc(collection(db, 'visitantes_historial'));
+                    console.log('🔍 DEBUG: Agregando a historial...');
+                    transaction.set(historialRef, datosHistorial);
+                    
+                    // Eliminar de activos
+                    console.log('🔍 DEBUG: Eliminando de activos...');
+                    transaction.delete(visitanteRef);
+                    
+                    console.log('🔍 DEBUG: Transacción preparada');
+                    return true;
+                });
+                
+                console.log('✅ DEBUG: Transacción completada:', resultado);
+                return resultado;
+                
+            } catch (error) {
+                console.error('❌ DEBUG: Error en transacción:', error);
+                console.error('❌ DEBUG: Error code:', error.code);
+                console.error('❌ DEBUG: Error message:', error.message);
+                throw error;
+            }
+        }
+
+        // Función para agregar visitante de prueba
+        async function agregarVisitantePrueba() {
+            try {
+                const datosVisitante = {
+                    nombre: 'Juan Pérez',
+                    cedula: '12345678',
+                    celular: '300 123 4567',
+                    apartamento: 'A-101',
+                    motivoVisita: 'Prueba de sistema',
+                    tiempoEntrada: serverTimestamp(),
+                    fechaCreacion: new Date().toISOString(),
+                    activo: true
+                };
+                
+                const docRef = await addDoc(collection(db, 'visitantes'), datosVisitante);
+                console.log('✅ Visitante de prueba agregado con ID:', docRef.id);
+                return docRef.id;
+            } catch (error) {
+                console.error('❌ Error agregando visitante de prueba:', error);
+            }
+        }
+
+        // Función para listar visitantes activos
+        function listarVisitantesActivos() {
+            const q = query(collection(db, 'visitantes'), where('activo', '==', true));
+            
+            onSnapshot(q, (querySnapshot) => {
+                const visitantes = [];
+                querySnapshot.forEach((doc) => {
+                    visitantes.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                console.log('📋 Visitantes activos:', visitantes);
+                
+                // Mostrar en la página
+                const lista = document.getElementById('visitantes-lista');
+                lista.innerHTML = '';
+                
+                visitantes.forEach(visitante => {
+                    const item = document.createElement('div');
+                    item.className = 'border p-4 mb-2 rounded';
+                    item.innerHTML = `
+                        <strong>${visitante.nombre}</strong> - ${visitante.apartamento}
+                        <button onclick="window.probarSalida('${visitante.id}')" 
+                                class="ml-4 bg-red-500 text-white px-3 py-1 rounded">
+                            Dar Salida (Debug)
+                        </button>
+                    `;
+                    lista.appendChild(item);
+                });
+            });
+        }
+
+        // Hacer funciones disponibles globalmente
+        window.debugDarSalida = debugDarSalida;
+        window.agregarVisitantePrueba = agregarVisitantePrueba;
+        window.listarVisitantesActivos = listarVisitantesActivos;
+        
+        window.probarSalida = async (id) => {
+            console.log('🚪 Iniciando prueba de salida para:', id);
+            try {
+                await debugDarSalida(id);
+                alert('Salida completada exitosamente!');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        // Inicializar cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', () => {
+            listarVisitantesActivos();
+        });
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { margin: 5px; padding: 10px; cursor: pointer; }
+        .bg-blue-500 { background-color: #3b82f6; color: white; }
+        .bg-green-500 { background-color: #10b981; color: white; }
+        .bg-red-500 { background-color: #ef4444; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug - Sistema de Visitantes</h1>
+    
+    <div>
+        <button onclick="agregarVisitantePrueba()" class="bg-blue-500">
+            ➕ Agregar Visitante de Prueba
+        </button>
+        <button onclick="listarVisitantesActivos()" class="bg-green-500">
+            🔄 Actualizar Lista
+        </button>
+    </div>
+    
+    <h2>📋 Visitantes Activos</h2>
+    <div id="visitantes-lista">
+        Cargando...
+    </div>
+    
+    <h2>📊 Console Log</h2>
+    <p>Abre las herramientas de desarrollador (F12) para ver los logs detallados.</p>
+</body>
+</html>

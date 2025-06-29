@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Reglas para la colección de visitantes activos
+    match /visitantes/{document} {
+      // Permitir lectura, escritura y eliminación para todos (desarrollo)
+      allow read, write, delete: if true;
+    }
+    
+    // Reglas para la colección de historial de visitantes
+    match /visitantes_historial/{document} {
+      // Permitir lectura y escritura para todos (desarrollo)
+      allow read, write: if true;
+    }
+    
+    // Reglas generales para otras colecciones
+    match /{document=**} {
+      // Permitir acceso completo durante desarrollo
+      allow read, write: if true;
+    }
+  }
+}

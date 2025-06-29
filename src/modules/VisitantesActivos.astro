@@ -1,0 +1,448 @@
+---
+// Módulo de Visitantes Activos - GestCloud
+---
+
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+	<div class="w-full mb-1">
+		<div class="mb-4">
+			<nav class="flex mb-5" aria-label="Breadcrumb">
+				<ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+					<li class="inline-flex items-center">
+						<a href="#" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+							<svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+							Visitantes
+						</a>
+					</li>
+					<li>
+						<div class="flex items-center">
+							<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+							<span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Activos</span>
+						</div>
+					</li>
+				</ol>
+			</nav>
+			<h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">👥 Visitantes Activos</h1>
+			<p class="text-gray-600 dark:text-gray-400 mt-2">Visitantes que se encuentran actualmente dentro del conjunto residencial</p>
+		</div>
+		
+		<!-- Contador de visitantes -->
+		<div class="flex items-center space-x-4">
+			<div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3">
+				<div class="flex items-center">
+					<div class="mr-3">
+						<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+					</div>
+					<div>
+						<p class="text-sm font-medium text-primary-600 dark:text-primary-400">En tiempo real</p>
+						<p class="text-xs text-gray-500 dark:text-gray-400">Actualización automática</p>
+					</div>
+				</div>
+			</div>
+			<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+				<div class="text-sm text-gray-600 dark:text-gray-300">
+					Total activos: <span id="contador-visitantes" class="font-bold text-lg text-gray-900 dark:text-white">0</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Contenedor de Cards de Visitantes -->
+<div class="flex flex-col">
+	<div class="overflow-x-auto">
+		<div class="inline-block min-w-full align-middle">
+			<div class="overflow-hidden shadow">
+				<div class="p-6 bg-white dark:bg-gray-800 min-h-screen">
+					
+					<!-- Estado sin visitantes -->
+					<div id="sin-visitantes" class="text-center py-16">
+						<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.196-2.121L17 20zM9 12a4 4 0 008 0 4 4 0 00-8 0zm8 0c0 1.021-.4 1.95-1.05 2.63l2.05 2.37a1 1 0 11-1.5 1.32l-2.05-2.37A5.973 5.973 0 0112 18a5.973 5.973 0 01-3.45-1.05L6.5 19.32a1 1 0 11-1.5-1.32l2.05-2.37A5.973 5.973 0 017 12a6 6 0 0110 0z"/>
+						</svg>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay visitantes activos</h3>
+						<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando se registre un visitante aparecerá aquí en tiempo real</p>
+						<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+							➕ Registrar Visitante
+						</a>
+					</div>
+
+					<!-- Grid de Cards de Visitantes -->
+					<div id="grid-visitantes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 hidden">
+						<!-- Las cards se generarán dinámicamente aquí -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Template para las cards de visitantes -->
+<template id="template-card-visitante">
+	<div class="visitante-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
+		<div class="p-6">
+			<!-- Header de la card -->
+			<div class="flex items-center justify-between mb-4">
+				<div class="flex items-center space-x-3">
+					<div class="w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+						<svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+						</svg>
+					</div>
+					<div>
+						<h3 class="visitante-nombre font-semibold text-lg text-gray-900 dark:text-white"></h3>
+						<p class="visitante-cedula text-sm text-gray-500 dark:text-gray-400"></p>
+					</div>
+				</div>
+				<div class="text-right">
+					<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse mb-1"></div>
+					<span class="text-xs text-green-600 dark:text-green-400 font-medium">Activo</span>
+				</div>
+			</div>
+
+			<!-- Información del visitante -->
+			<div class="space-y-3 mb-6">
+				<div class="flex items-center">
+					<svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+					</svg>
+					<span class="visitante-celular text-sm text-gray-700 dark:text-gray-300"></span>
+				</div>
+				<div class="flex items-center">
+					<svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+					</svg>
+					<span class="visitante-apartamento text-sm text-gray-700 dark:text-gray-300"></span>
+				</div>
+				<div class="flex items-center">
+					<svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+					</svg>
+					<span class="visitante-autorizado text-sm text-gray-700 dark:text-gray-300"></span>
+				</div>
+			</div>
+
+			<!-- Tiempo dentro - Cronómetro -->
+			<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
+				<div class="flex items-center justify-between">
+					<span class="text-sm font-medium text-gray-600 dark:text-gray-400">Tiempo dentro:</span>
+					<div class="flex items-center space-x-2">
+						<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+						<span class="visitante-tiempo text-lg font-mono font-semibold text-gray-900 dark:text-white"></span>
+					</div>
+				</div>
+				<div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+					Ingresó: <span class="visitante-hora-entrada"></span>
+				</div>
+			</div>
+
+			<!-- Botón de salida -->
+			<button class="btn-dar-salida w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+				<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+					<path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5z"/>
+				</svg>
+				Dar Salida
+			</button>
+		</div>
+	</div>
+</template>
+
+<script>
+	// Precargar Firebase para mejorar rendimiento
+	import '../scripts/firebase-preload.js';
+	
+	// Script del cliente para manejar visitantes activos desde Firebase
+	import '../scripts/visitantes-activos.js';
+
+	document.addEventListener('DOMContentLoaded', () => {
+		// Elementos del DOM
+		const sinVisitantes = document.getElementById('sin-visitantes');
+		const gridVisitantes = document.getElementById('grid-visitantes');
+		const contadorVisitantes = document.getElementById('contador-visitantes');
+		const templateCard = document.getElementById('template-card-visitante');
+		
+		let visitantesActivos = [];
+		let unsubscribe = null;
+		let intervalCronometro = null;
+		let isLoading = true;
+
+		// Mostrar indicador de carga inicial
+		function mostrarCarga() {
+			if (sinVisitantes) {
+				sinVisitantes.innerHTML = `
+					<div class="text-center py-16">
+						<div class="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mb-4"></div>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Cargando visitantes...</h3>
+						<p class="text-gray-500 dark:text-gray-400">Conectando con Firebase</p>
+					</div>
+				`;
+			}
+		}
+
+		// Restaurar estado sin visitantes
+		function restaurarEstadoVacio() {
+			if (sinVisitantes) {
+				sinVisitantes.innerHTML = `
+					<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.196-2.121L17 20zM9 12a4 4 0 008 0 4 4 0 00-8 0zm8 0c0 1.021-.4 1.95-1.05 2.63l2.05 2.37a1 1 0 11-1.5 1.32l-2.05-2.37A5.973 5.973 0 0112 18a5.973 5.973 0 01-3.45-1.05L6.5 19.32a1 1 0 11-1.5-1.32l2.05-2.37A5.973 5.973 0 017 12a6 6 0 0110 0z"/>
+					</svg>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay visitantes activos</h3>
+					<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando se registre un visitante aparecerá aquí en tiempo real</p>
+					<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+						➕ Registrar Visitante
+					</a>
+				`;
+			}
+		}
+
+		// Mostrar carga inicial
+		mostrarCarga();
+
+		// Función para capitalizar nombres (primera letra de cada palabra en mayúscula)
+		function capitalizarNombre(nombre) {
+			return nombre
+				.toLowerCase()
+				.split(' ')
+				.map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+				.join(' ');
+		}
+
+		// Función para formatear cédula con puntos separadores
+		function formatearCedula(cedula) {
+			const numero = String(cedula).replace(/[^0-9]/g, '');
+			// Agregar puntos cada 3 dígitos desde la derecha
+			return numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		}
+
+		// Función para formatear celular (formato colombiano)
+		function formatearCelular(celular) {
+			const numero = String(celular).replace(/[^0-9]/g, '');
+			// Formato: 300 123 4567
+			if (numero.length === 10) {
+				return `${numero.slice(0, 3)} ${numero.slice(3, 6)} ${numero.slice(6)}`;
+			}
+			return numero;
+		}
+
+		// Función para formatear apartamento
+		function formatearApartamento(apartamento) {
+			return String(apartamento).toUpperCase();
+		}
+
+		// Función para calcular tiempo transcurrido en formato cronómetro
+		function calcularTiempo(tiempoEntrada) {
+			const ahora = new Date();
+			let entrada;
+			
+			// Manejar diferentes formatos de fecha
+			if (tiempoEntrada?.toDate) {
+				// Timestamp de Firestore
+				entrada = tiempoEntrada.toDate();
+			} else if (typeof tiempoEntrada === 'string') {
+				// String ISO
+				entrada = new Date(tiempoEntrada);
+			} else {
+				// Fecha normal
+				entrada = new Date(tiempoEntrada);
+			}
+			
+			const diferencia = ahora - entrada;
+			
+			// Calcular horas, minutos y segundos
+			const horas = Math.floor(diferencia / (1000 * 60 * 60));
+			const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+			const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+			
+			// Formato cronómetro: HH:MM:SS o MM:SS si es menos de una hora
+			if (horas > 0) {
+				return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+			} else {
+				return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+			}
+		}
+
+		// Función para formatear fecha/hora
+		function formatearFecha(timestamp) {
+			let fecha;
+			
+			if (timestamp?.toDate) {
+				fecha = timestamp.toDate();
+			} else if (typeof timestamp === 'string') {
+				fecha = new Date(timestamp);
+			} else {
+				fecha = new Date(timestamp);
+			}
+			
+			return fecha.toLocaleString('es-CO', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit'
+			});
+		}
+
+		// Función para crear una card de visitante
+		function crearCardVisitante(visitante) {
+			const card = templateCard.content.cloneNode(true);
+			
+			// Llenar datos con formato mejorado
+			card.querySelector('.visitante-nombre').textContent = capitalizarNombre(visitante.nombre);
+			card.querySelector('.visitante-cedula').textContent = `CC: ${formatearCedula(visitante.cedula)}`;
+			card.querySelector('.visitante-celular').textContent = formatearCelular(visitante.celular);
+			card.querySelector('.visitante-apartamento').textContent = `Apto: ${formatearApartamento(visitante.apartamento)}`;
+			card.querySelector('.visitante-autorizado').textContent = `Por: ${capitalizarNombre(visitante.autorizadoPor)}`;
+			card.querySelector('.visitante-tiempo').textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
+			card.querySelector('.visitante-hora-entrada').textContent = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
+			
+			// Agregar ID para identificar la card
+			card.querySelector('.visitante-card').dataset.visitanteId = visitante.id;
+			
+			// Evento para el botón de salida
+			card.querySelector('.btn-dar-salida').addEventListener('click', async () => {
+				await darSalida(visitante.id, capitalizarNombre(visitante.nombre));
+			});
+			
+			return card;
+		}
+
+		// Función para dar salida a un visitante
+		async function darSalida(visitanteId, nombre) {
+			if (confirm(`¿Estás seguro de que quieres dar salida a ${nombre}?`)) {
+				try {
+					// Deshabilitar botón mientras se procesa
+					const card = document.querySelector(`[data-visitante-id="${visitanteId}"]`);
+					const button = card.querySelector('.btn-dar-salida');
+					button.disabled = true;
+					button.innerHTML = '⏳ Procesando...';
+					
+					// Actualizar en Firebase
+					await window.darSalidaVisitante(visitanteId);
+					
+					// Firebase actualizará automáticamente la vista a través del listener
+					
+				} catch (error) {
+					alert('❌ Error al dar salida al visitante. Intenta nuevamente.');
+					
+					// Rehabilitar botón en caso de error
+					const card = document.querySelector(`[data-visitante-id="${visitanteId}"]`);
+					if (card) {
+						const button = card.querySelector('.btn-dar-salida');
+						button.disabled = false;
+						button.innerHTML = `
+							<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5z"/>
+							</svg>
+							Dar Salida
+						`;
+					}
+				}
+			}
+		}
+
+		// Función para renderizar todos los visitantes
+		function renderizarVisitantes() {
+			// Actualizar contador
+			if (contadorVisitantes) {
+				contadorVisitantes.textContent = String(visitantesActivos.length);
+			}
+			
+			// Marcar que ya no está cargando después de la primera respuesta
+			if (isLoading) {
+				isLoading = false;
+			}
+			
+			if (visitantesActivos.length === 0) {
+				// Mostrar estado sin visitantes
+				if (sinVisitantes && gridVisitantes) {
+					restaurarEstadoVacio();
+					sinVisitantes.classList.remove('hidden');
+					gridVisitantes.classList.add('hidden');
+				}
+			} else {
+				// Mostrar grid de visitantes
+				if (sinVisitantes && gridVisitantes) {
+					sinVisitantes.classList.add('hidden');
+					gridVisitantes.classList.remove('hidden');
+					
+					// Limpiar grid
+					gridVisitantes.innerHTML = '';
+					
+					// Agregar cada visitante
+					visitantesActivos.forEach(visitante => {
+						const card = crearCardVisitante(visitante);
+						gridVisitantes.appendChild(card);
+					});
+				}
+			}
+		}
+
+		// Función para actualizar tiempos cada segundo (cronómetro en tiempo real)
+		function actualizarTiempos() {
+			visitantesActivos.forEach(visitante => {
+				const card = document.querySelector(`[data-visitante-id="${visitante.id}"]`);
+				if (card) {
+					const tiempoElement = card.querySelector('.visitante-tiempo');
+					if (tiempoElement) {
+						tiempoElement.textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
+					}
+				}
+			});
+		}
+
+		// Conectar con Firebase para obtener visitantes en tiempo real
+		if (window.escucharVisitantesActivos) {
+			unsubscribe = window.escucharVisitantesActivos((visitantes) => {
+				visitantesActivos = visitantes;
+				renderizarVisitantes();
+			});
+		} else {
+			// Si Firebase no está listo, reintentamos cada 100ms hasta un máximo de 3 segundos
+			let intentos = 0;
+			const maxIntentos = 30; // 3 segundos / 100ms
+			
+			const esperarFirebase = setInterval(() => {
+				if (window.escucharVisitantesActivos || intentos >= maxIntentos) {
+					clearInterval(esperarFirebase);
+					
+					if (window.escucharVisitantesActivos) {
+						unsubscribe = window.escucharVisitantesActivos((visitantes) => {
+							visitantesActivos = visitantes;
+							renderizarVisitantes();
+						});
+					} else {
+						// Si después de 3 segundos no hay Firebase, mostrar error
+						if (sinVisitantes) {
+							sinVisitantes.innerHTML = `
+								<div class="text-center py-16">
+									<div class="mx-auto h-24 w-24 text-red-400 mb-4">❌</div>
+									<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Error de conexión</h3>
+									<p class="text-gray-500 dark:text-gray-400 mb-6">No se pudo conectar con la base de datos</p>
+									<button onclick="location.reload()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
+										🔄 Reintentar
+									</button>
+								</div>
+							`;
+						}
+					}
+				}
+				intentos++;
+			}, 100);
+		}
+
+		// Timeout de seguridad: si después de 1 segundo no hay datos, mostrar estado vacío
+		setTimeout(() => {
+			if (isLoading && visitantesActivos.length === 0) {
+				renderizarVisitantes();
+			}
+		}, 1000);
+
+		// Actualizar cronómetros cada segundo para tiempo real
+		intervalCronometro = setInterval(actualizarTiempos, 1000);
+
+		// Cleanup cuando se cierre la página
+		window.addEventListener('beforeunload', () => {
+			if (unsubscribe) unsubscribe();
+			if (intervalCronometro) clearInterval(intervalCronometro);
+		});
+	});
+</script>

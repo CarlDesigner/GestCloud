@@ -1,0 +1,297 @@
+---
+// Módulo de Historial de Visitantes - GestCloud
+---
+
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+	<div class="w-full mb-1">
+		<div class="mb-4">
+			<nav class="flex mb-5" aria-label="Breadcrumb">
+				<ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+					<li class="inline-flex items-center">
+						<a href="#" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+							<svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+							Visitantes
+						</a>
+					</li>
+					<li>
+						<div class="flex items-center">
+							<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+							<span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Historial</span>
+						</div>
+					</li>
+				</ol>
+			</nav>
+			<h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">📋 Historial de Visitantes</h1>
+			<p class="text-gray-600 dark:text-gray-400 mt-2">Registro de todos los visitantes que han salido del conjunto residencial</p>
+		</div>
+		
+		<!-- Contador y filtros -->
+		<div class="flex items-center justify-between space-x-4">
+			<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+				<div class="text-sm text-gray-600 dark:text-gray-300">
+					Total registros: <span id="contador-historial" class="font-bold text-lg text-gray-900 dark:text-white">0</span>
+				</div>
+			</div>
+			
+			<!-- Buscador -->
+			<div class="flex items-center space-x-3">
+				<div class="relative">
+					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+						<svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+						</svg>
+					</div>
+					<input type="text" id="buscador-historial" placeholder="Buscar por nombre, cédula..." class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+				</div>
+				<a href="/visitantes-activos" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
+					👥 Ver Activos
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Contenedor de la tabla de historial -->
+<div class="flex flex-col">
+	<div class="overflow-x-auto">
+		<div class="inline-block min-w-full align-middle">
+			<div class="overflow-hidden shadow">
+				<div class="p-6 bg-white dark:bg-gray-800 min-h-screen">
+					
+					<!-- Estado sin datos -->
+					<div id="sin-historial" class="text-center py-16">
+						<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+						</svg>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay registros de visitantes</h3>
+						<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando los visitantes salgan aparecerán aquí</p>
+						<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
+							➕ Registrar Visitante
+						</a>
+					</div>
+
+					<!-- Tabla de historial -->
+					<div id="tabla-historial" class="hidden">
+						<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+							<table class="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
+								<thead class="bg-gray-50 dark:bg-gray-700">
+									<tr>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Visitante</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contacto</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Destino</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Entrada</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Salida</th>
+										<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Permanencia</th>
+									</tr>
+								</thead>
+								<tbody id="tbody-historial" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+									<!-- Las filas se generarán dinámicamente aquí -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Script del cliente para manejar historial de visitantes
+	import '../scripts/visitantes-activos.js';
+
+	document.addEventListener('DOMContentLoaded', () => {
+		// Elementos del DOM
+		const sinHistorial = document.getElementById('sin-historial');
+		const tablaHistorial = document.getElementById('tabla-historial');
+		const tbodyHistorial = document.getElementById('tbody-historial');
+		const contadorHistorial = document.getElementById('contador-historial');
+		const buscadorHistorial = document.getElementById('buscador-historial');
+		
+		let historialVisitantes = [];
+		let historialFiltrado = [];
+		let unsubscribe = null;
+
+		// Función para capitalizar nombres
+		function capitalizarNombre(nombre) {
+			return nombre
+				.toLowerCase()
+				.split(' ')
+				.map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+				.join(' ');
+		}
+
+		// Función para formatear cédula
+		function formatearCedula(cedula) {
+			const numero = String(cedula).replace(/[^0-9]/g, '');
+			return numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		}
+
+		// Función para formatear celular
+		function formatearCelular(celular) {
+			const numero = String(celular).replace(/[^0-9]/g, '');
+			if (numero.length === 10) {
+				return `${numero.slice(0, 3)} ${numero.slice(3, 6)} ${numero.slice(6)}`;
+			}
+			return numero;
+		}
+
+		// Función para formatear fecha/hora
+		function formatearFecha(timestamp) {
+			let fecha;
+			
+			if (timestamp?.toDate) {
+				fecha = timestamp.toDate();
+			} else if (typeof timestamp === 'string') {
+				fecha = new Date(timestamp);
+			} else {
+				fecha = new Date(timestamp);
+			}
+			
+			return fecha.toLocaleString('es-CO', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit'
+			});
+		}
+
+		// Función para calcular duración de permanencia
+		function calcularDuracion(tiempoEntrada, tiempoSalida) {
+			let entrada, salida;
+			
+			if (tiempoEntrada?.toDate) {
+				entrada = tiempoEntrada.toDate();
+			} else {
+				entrada = new Date(tiempoEntrada);
+			}
+			
+			if (tiempoSalida?.toDate) {
+				salida = tiempoSalida.toDate();
+			} else {
+				salida = new Date(tiempoSalida);
+			}
+			
+			const diferencia = salida - entrada;
+			const horas = Math.floor(diferencia / (1000 * 60 * 60));
+			const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+			
+			if (horas > 0) {
+				return `${horas}h ${minutos}m`;
+			} else {
+				return `${minutos}m`;
+			}
+		}
+
+		// Función para crear una fila de la tabla
+		function crearFilaTabla(visitante) {
+			const tr = document.createElement('tr');
+			tr.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
+			
+			tr.innerHTML = `
+				<td class="px-6 py-4 whitespace-nowrap">
+					<div class="flex items-center">
+						<div class="flex-shrink-0 h-10 w-10">
+							<div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+								<svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+									<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+								</svg>
+							</div>
+						</div>
+						<div class="ml-4">
+							<div class="text-sm font-medium text-gray-900 dark:text-white">${capitalizarNombre(visitante.nombre)}</div>
+							<div class="text-sm text-gray-500 dark:text-gray-400">CC: ${formatearCedula(visitante.cedula)}</div>
+						</div>
+					</div>
+				</td>
+				<td class="px-6 py-4 whitespace-nowrap">
+					<div class="text-sm text-gray-900 dark:text-white">${formatearCelular(visitante.celular)}</div>
+				</td>
+				<td class="px-6 py-4 whitespace-nowrap">
+					<div class="text-sm text-gray-900 dark:text-white">Apto: ${visitante.apartamento.toUpperCase()}</div>
+					<div class="text-sm text-gray-500 dark:text-gray-400">Por: ${capitalizarNombre(visitante.autorizadoPor)}</div>
+				</td>
+				<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+					${formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion)}
+				</td>
+				<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+					${formatearFecha(visitante.tiempoSalida || visitante.fechaSalida)}
+				</td>
+				<td class="px-6 py-4 whitespace-nowrap">
+					<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+						${calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)}
+					</span>
+				</td>
+			`;
+			
+			return tr;
+		}
+
+		// Función para filtrar visitantes
+		function filtrarVisitantes(termino) {
+			if (!termino.trim()) {
+				historialFiltrado = [...historialVisitantes];
+			} else {
+				const terminoLower = termino.toLowerCase();
+				historialFiltrado = historialVisitantes.filter(visitante => 
+					visitante.nombre.toLowerCase().includes(terminoLower) ||
+					visitante.cedula.includes(termino) ||
+					visitante.celular.includes(termino) ||
+					visitante.apartamento.toLowerCase().includes(terminoLower) ||
+					visitante.autorizadoPor.toLowerCase().includes(terminoLower)
+				);
+			}
+			renderizarTabla();
+		}
+
+		// Función para renderizar la tabla
+		function renderizarTabla() {
+			if (contadorHistorial) {
+				contadorHistorial.textContent = String(historialFiltrado.length);
+			}
+			
+			if (historialFiltrado.length === 0) {
+				if (sinHistorial && tablaHistorial) {
+					sinHistorial.classList.remove('hidden');
+					tablaHistorial.classList.add('hidden');
+				}
+			} else {
+				if (sinHistorial && tablaHistorial && tbodyHistorial) {
+					sinHistorial.classList.add('hidden');
+					tablaHistorial.classList.remove('hidden');
+					
+					// Limpiar tabla
+					tbodyHistorial.innerHTML = '';
+					
+					// Agregar cada visitante
+					historialFiltrado.forEach(visitante => {
+						const fila = crearFilaTabla(visitante);
+						tbodyHistorial.appendChild(fila);
+					});
+				}
+			}
+		}
+
+		// Event listener para el buscador
+		if (buscadorHistorial) {
+			buscadorHistorial.addEventListener('input', (e) => {
+				filtrarVisitantes(e.target.value);
+			});
+		}
+
+		// Conectar con Firebase para obtener historial
+		if (window.escucharHistorialVisitantes) {
+			unsubscribe = window.escucharHistorialVisitantes((visitantes) => {
+				historialVisitantes = visitantes;
+				historialFiltrado = [...visitantes];
+				renderizarTabla();
+			});
+		}
+
+		// Cleanup cuando se cierre la página
+		window.addEventListener('beforeunload', () => {
+			if (unsubscribe) unsubscribe();
+		});
+	});
+</script>

@@ -1,0 +1,185 @@
+---
+// Módulo para registrar visitantes - GestCloud
+---
+
+<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+	<div class="w-full mb-1">
+		<div class="mb-4">
+			<nav class="flex mb-5" aria-label="Breadcrumb">
+				<ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+					<li class="inline-flex items-center">
+						<a href="#" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+							<svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+							Inicio
+						</a>
+					</li>
+					<li>
+						<div class="flex items-center">
+							<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+							<span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Registro de Visitantes</span>
+						</div>
+					</li>
+				</ol>
+			</nav>
+			<h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">🏠 Registro de Visitantes</h1>
+			<p class="text-gray-600 dark:text-gray-400 mt-2">Registra los datos del visitante que ingresa al conjunto residencial</p>
+		</div>
+	</div>
+</div>
+
+<!-- Formulario de Registro -->
+<div class="flex flex-col">
+	<div class="overflow-x-auto">
+		<div class="inline-block min-w-full align-middle">
+			<div class="overflow-hidden shadow">
+				<div class="p-6 bg-white dark:bg-gray-800">
+					<!-- Card del formulario -->
+					<div class="max-w-2xl mx-auto">
+						<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg border border-gray-200 dark:border-gray-700">
+							<div class="flex items-center justify-between p-4 border-b dark:border-gray-600">
+								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+									👤 Nuevo Visitante
+								</h3>
+							</div>
+							
+							<form id="visitante-form" class="p-6 space-y-6">
+								<!-- Nombre -->
+								<div>
+									<label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+										Nombre Completo *
+									</label>
+									<input type="text" name="nombre" id="nombre" 
+										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+										   placeholder="Ej: Juan Pérez González" required>
+								</div>
+
+								<!-- Cédula -->
+								<div>
+									<label for="cedula" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+										Número de Cédula *
+									</label>
+									<input type="text" name="cedula" id="cedula" 
+										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+										   placeholder="Ej: 12345678" required>
+								</div>
+
+								<!-- Celular -->
+								<div>
+									<label for="celular" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+										Número de Celular *
+									</label>
+									<input type="tel" name="celular" id="celular" 
+										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+										   placeholder="Ej: 3001234567" required>
+								</div>
+
+								<!-- Apartamento -->
+								<div>
+									<label for="apartamento" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+										Apartamento a Visitar *
+									</label>
+									<input type="text" name="apartamento" id="apartamento" 
+										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+										   placeholder="Ej: 101, 205, Casa 15" required>
+								</div>
+
+								<!-- Autorizado por -->
+								<div>
+									<label for="autorizado-por" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+										Autorizado por *
+									</label>
+									<input type="text" name="autorizadoPor" id="autorizado-por" 
+										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+										   placeholder="Nombre del residente que autoriza" required>
+								</div>
+
+								<!-- Botón de envío -->
+								<div class="flex items-center pt-4">
+									<button type="submit" 
+											class="w-full text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+										✅ Registrar Visitante
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<!-- Mensaje de estado -->
+					<div id="mensaje-estado" class="hidden mt-4 max-w-2xl mx-auto">
+						<div class="p-4 mb-4 text-sm rounded-lg" role="alert">
+							<span id="mensaje-texto"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Script del cliente para manejar el formulario
+	import '../scripts/firebase-client.js';
+
+	document.addEventListener('DOMContentLoaded', () => {
+		const form = document.getElementById('visitante-form');
+		const mensajeEstado = document.getElementById('mensaje-estado');
+		const mensajeTexto = document.getElementById('mensaje-texto');
+
+		if (form) {
+			form.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				
+				// Deshabilitar el botón mientras se procesa
+				const submitButton = form.querySelector('button[type="submit"]');
+				const originalText = submitButton.textContent;
+				submitButton.disabled = true;
+				submitButton.textContent = '⏳ Registrando...';
+
+				try {
+					// Obtener datos del formulario
+					const formData = new FormData(form);
+					const visitanteData = {
+						nombre: formData.get('nombre'),
+						cedula: formData.get('cedula'),
+						celular: formData.get('celular'),
+						apartamento: formData.get('apartamento'),
+						autorizadoPor: formData.get('autorizadoPor')
+					};
+
+					// Registrar en Firebase
+					await window.registrarVisitante(visitanteData);
+
+					// Mostrar mensaje de éxito
+					mostrarMensaje('✅ Visitante registrado exitosamente en Firebase', 'success');
+					
+					// Limpiar formulario
+					form.reset();
+
+				} catch (error) {
+					// Mostrar mensaje de error
+					mostrarMensaje('❌ Error al registrar visitante. Intenta nuevamente.', 'error');
+					console.error('Error:', error);
+				} finally {
+					// Rehabilitar botón
+					submitButton.disabled = false;
+					submitButton.textContent = originalText;
+				}
+			});
+		}
+
+		function mostrarMensaje(mensaje, tipo) {
+			mensajeTexto.textContent = mensaje;
+			mensajeEstado.className = `mt-4 max-w-2xl mx-auto p-4 mb-4 text-sm rounded-lg ${
+				tipo === 'success' 
+					? 'text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400' 
+					: 'text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400'
+			}`;
+			mensajeEstado.classList.remove('hidden');
+
+			// Ocultar mensaje después de 5 segundos
+			setTimeout(() => {
+				mensajeEstado.classList.add('hidden');
+			}, 5000);
+		}
+	});
+</script>
