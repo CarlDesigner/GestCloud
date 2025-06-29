@@ -42,6 +42,7 @@
 		"apexcharts": "^3.37.2",
 		"astro": "^2.0.4",
 		"flowbite": "^2.1.1",
+		"flowbite-datepicker": "^1.3.2",
 		"flowbite-typography": "^1.0.3",
 		"shiki": "^0.14.1",
 		"tailwind-scrollbar": "^3.0.0",
@@ -61,5 +62,6 @@
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-prettier": "^4.2.1",
 		"eslint-plugin-tsdoc": "^0.2.17"
-	}
+	},
+	"packageManager": "pnpm@9.1.2+sha1.907f57a52517de34399d66401bf220a549e47b57"
 }
