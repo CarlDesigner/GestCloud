@@ -35,7 +35,7 @@ window.debugVisitantes = async function() {
         console.log(`📊 Total visitantes activos: ${snapshot.size}`);
         
         snapshot.forEach((doc) => {
-            console.log(`👤 ${doc.id}:`, doc.data());
+            console.log(` ${doc.id}:`, doc.data());
         });
         
     } catch (error) {

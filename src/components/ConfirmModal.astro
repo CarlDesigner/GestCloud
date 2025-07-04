@@ -1,0 +1,137 @@
+---
+// Componente modal de confirmación elegante - GestCloud
+const { id = 'confirm-modal' } = Astro.props;
+---
+
+<!-- Modal de confirmación -->
+<div id={id} class="fixed inset-0 z-50 hidden">
+	<!-- Overlay oscuro -->
+	<div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onclick="cerrarConfirmModal()"></div>
+	
+	<!-- Modal container -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+		<div class="relative w-full max-w-md mx-auto bg-white rounded-lg shadow-xl dark:bg-gray-800 transform transition-all">
+			<!-- Header del modal -->
+			<div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600">
+				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+					Confirmar Salida
+				</h3>
+				<button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onclick="cerrarConfirmModal()">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			
+			<!-- Contenido del modal -->
+			<div class="p-6">
+				<div class="flex items-center mb-4">
+					<div class="flex-shrink-0 w-10 h-10 mx-auto bg-red-100 rounded-full dark:bg-red-900/20 flex items-center justify-center">
+						<svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+						</svg>
+					</div>
+				</div>
+				
+				<div class="text-center">
+					<h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+						¿Está seguro de dar salida al visitante?
+					</h4>
+					<p id="confirm-visitante-nombre" class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+						<!-- El nombre del visitante se insertará aquí -->
+					</p>
+					<p class="text-xs text-gray-500 dark:text-gray-500">
+						Esta acción registrará la salida del visitante y calculará el tiempo de permanencia.
+					</p>
+				</div>
+			</div>
+			
+			<!-- Footer con botones -->
+			<div class="flex items-center justify-end space-x-3 p-4 border-t border-gray-200 dark:border-gray-600">
+				<button 
+					type="button" 
+					class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+					onclick="cerrarConfirmModal()"
+				>
+					Cancelar
+				</button>
+				<button 
+					type="button" 
+					id="confirm-btn-salida"
+					class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+					onclick="ejecutarSalidaConfirmada()"
+				>
+					<!-- <svg class="w-4 h-4 mr-2 inline-block" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5z"/>
+					</svg> -->
+					Confirmar Salida
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Variables globales para el modal
+	let pendingSalidaData = null;
+	
+	// Función para mostrar modal de confirmación
+	window.mostrarConfirmSalida = function(visitanteId, visitanteNombre, callbackSalida) {
+		const modal = document.getElementById('confirm-modal');
+		const nombreElement = document.getElementById('confirm-visitante-nombre');
+		
+		if (!modal || !nombreElement) return;
+		
+		// Guardar datos para ejecutar después de confirmación
+		pendingSalidaData = {
+			id: visitanteId,
+			nombre: visitanteNombre,
+			callback: callbackSalida
+		};
+		
+		// Mostrar nombre del visitante
+		nombreElement.innerHTML = `<strong class="text-gray-900 dark:text-white">${visitanteNombre}</strong>`;
+		
+		// Mostrar modal
+		modal.classList.remove('hidden');
+		
+		// Focus en el botón de cancelar por seguridad
+		setTimeout(() => {
+			const cancelBtn = modal.querySelector('button[onclick="cerrarConfirmModal()"]');
+			if (cancelBtn) cancelBtn.focus();
+		}, 100);
+	};
+	
+	// Función para cerrar modal
+	window.cerrarConfirmModal = function() {
+		const modal = document.getElementById('confirm-modal');
+		if (modal) {
+			modal.classList.add('hidden');
+		}
+		
+		// Limpiar datos pendientes
+		pendingSalidaData = null;
+	};
+	
+	// Función para ejecutar la salida confirmada
+	window.ejecutarSalidaConfirmada = function() {
+		if (!pendingSalidaData) return;
+		
+		const { id, nombre, callback } = pendingSalidaData;
+		
+		// Cerrar modal
+		cerrarConfirmModal();
+		
+		// Ejecutar callback de salida
+		if (callback && typeof callback === 'function') {
+			callback(id, nombre);
+		}
+	};
+	
+	// Cerrar modal con ESC
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') {
+			cerrarConfirmModal();
+		}
+	});
+</script>

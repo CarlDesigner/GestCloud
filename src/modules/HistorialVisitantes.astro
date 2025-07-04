@@ -1,6 +1,6 @@
 ---
-// Módulo de Historial de Visitantes con CRUD - GestCloud
-import ToastNotification from '../components/ToastNotification.astro';
+/// Módulo de Historial de Visitantes con CRUD - GestCloud
+import AlertNotification from '../components/AlertNotification.astro';
 ---
 
 <div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
@@ -22,7 +22,7 @@ import ToastNotification from '../components/ToastNotification.astro';
 					</li>
 				</ol>
 			</nav>
-			<h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">📋 Historial de Visitantes</h1>
+			<h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Historial de Visitantes</h1>
 			<p class="text-gray-600 dark:text-gray-400 mt-2">Registro de todos los visitantes que han salido del conjunto residencial</p>
 		</div>
 		
@@ -50,7 +50,7 @@ import ToastNotification from '../components/ToastNotification.astro';
 					Filtrar
 				</button>
 				<!-- Exportar -->
-				<button type="button" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+				<button type="button" id="btn-exportar" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
 					<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
 						<path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
 					</svg>
@@ -85,29 +85,30 @@ import ToastNotification from '../components/ToastNotification.astro';
 	</div>
 	
 	<!-- Estado sin datos -->
-	<div id="sin-historial" class="text-center py-16 hidden">
-		<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-		</svg>
-		<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay registros de visitantes</h3>
-		<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando los visitantes salgan aparecerán aquí</p>
-		<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
-			➕ Registrar Visitante
-		</a>
-	</div>
+		<div id="sin-historial" class="text-center py-16 hidden">
+			<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+			</svg>
+			<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay registros de visitantes</h3>
+			<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando los visitantes salgan aparecerán aquí</p>
+			<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
+	Registrar Visitante &nbsp;
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus-icon lucide-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+			</a>
+		</div>
 
 	<!-- Tabla de historial -->
 	<div id="tabla-historial" class="overflow-x-auto">
-		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table-fixed">
 			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 				<tr>
-					<th scope="col" class="px-4 py-3">Visitante</th>
-					<th scope="col" class="px-4 py-3">Contacto</th>
-					<th scope="col" class="px-4 py-3">Destino</th>
-					<th scope="col" class="px-4 py-3">Entrada</th>
-					<th scope="col" class="px-4 py-3">Salida</th>
-					<th scope="col" class="px-4 py-3">Permanencia</th>
-					<th scope="col" class="px-4 py-3">
+					<th scope="col" class="px-4 py-3 w-1/4">Visitante</th>
+					<th scope="col" class="px-4 py-3 w-1/6">Contacto</th>
+					<th scope="col" class="px-4 py-3 w-1/6">Destino</th>
+					<th scope="col" class="px-4 py-3 w-1/6">Entrada</th>
+					<th scope="col" class="px-4 py-3 w-1/6">Salida</th>
+					<th scope="col" class="px-4 py-3 w-1/8">Permanencia</th>
+					<th scope="col" class="px-4 py-3 w-16">
 						<span class="sr-only">Acciones</span>
 					</th>
 				</tr>
@@ -227,8 +228,50 @@ import ToastNotification from '../components/ToastNotification.astro';
 	</div>
 </div>
 
-<!-- Incluir componente de notificaciones toast -->
-<ToastNotification />
+<!-- Modal de exportación -->
+<div id="modal-exportar" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+	<div class="relative w-full max-w-md max-h-full">
+		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+			<!-- Modal header -->
+			<div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+					Exportar Historial
+				</h3>
+				<button type="button" id="cerrar-modal-exportar" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+					<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+					</svg>
+					<span class="sr-only">Cerrar modal</span>
+				</button>
+			</div>
+			<!-- Modal body -->
+			<div class="p-6 space-y-4">
+				<p class="text-sm text-gray-500 dark:text-gray-400">
+					Selecciona el formato en el que deseas exportar el historial de visitantes:
+				</p>
+				
+				<!-- Opción PDF -->
+				<button id="exportar-pdf" type="button" class="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+					<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+					</svg>
+					Exportar como PDF
+				</button>
+				
+				<!-- Opción Excel -->
+				<button id="exportar-excel" type="button" class="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+					<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+					</svg>
+					Exportar como Excel
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Incluir componente de notificaciones alert -->
+<AlertNotification />
 
 <script>
 	// Precargar Firebase para mejorar rendimiento
@@ -338,37 +381,45 @@ import ToastNotification from '../components/ToastNotification.astro';
 		function crearFilaTabla(visitante) {
 			return `
 				<tr class="border-b dark:border-gray-700">
-					<td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+					<td class="px-4 py-3 font-medium text-gray-900 dark:text-white w-1/4">
 						<div class="flex items-center">
-							<div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+							<div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
 								<svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
 									<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
 								</svg>
 							</div>
-							<div>
-								<div class="text-base font-semibold">${capitalizarNombre(visitante.nombre)}</div>
-								<div class="font-normal text-gray-500">CC: ${formatearCedula(visitante.cedula)}</div>
+							<div class="min-w-0">
+								<div class="text-base font-semibold truncate">${capitalizarNombre(visitante.nombre)}</div>
+								<div class="font-normal text-gray-500 truncate">CC: ${formatearCedula(visitante.cedula)}</div>
 							</div>
 						</div>
 					</td>
-					<td class="px-4 py-3">${formatearCelular(visitante.celular)}</td>
-					<td class="px-4 py-3">
-						<div class="text-base">Apto: ${visitante.apartamento.toUpperCase()}</div>
-						<div class="text-sm text-gray-500">Por: ${capitalizarNombre(visitante.autorizadoPor)}</div>
+					<td class="px-4 py-3 w-1/6">
+						<span class="truncate block">${formatearCelular(visitante.celular)}</span>
 					</td>
-					<td class="px-4 py-3">${formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion)}</td>
-					<td class="px-4 py-3">${formatearFecha(visitante.tiempoSalida || visitante.fechaSalida)}</td>
-					<td class="px-4 py-3">
-						<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+					<td class="px-4 py-3 w-1/6">
+						<div class="text-base truncate">Apto: ${visitante.apartamento.toUpperCase()}</div>
+						<div class="text-sm text-gray-500 truncate">Por: ${capitalizarNombre(visitante.autorizadoPor)}</div>
+					</td>
+					<td class="px-4 py-3 w-1/6">
+						<span class="text-sm truncate block">${formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion)}</span>
+					</td>
+					<td class="px-4 py-3 w-1/6">
+						<span class="text-sm truncate block">${formatearFecha(visitante.tiempoSalida || visitante.fechaSalida)}</span>
+					</td>
+					<td class="px-4 py-3 w-1/8">
+						<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 inline-block">
 							${calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)}
 						</span>
 					</td>
-					<td class="px-4 py-3 flex items-center justify-end">
-						<button class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" onclick="mostrarMenuAcciones(event, '${visitante.id}')">
-							<svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-								<path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/>
-							</svg>
-						</button>
+					<td class="px-4 py-3 w-16">
+						<div class="flex items-center justify-end">
+							<button class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" onclick="mostrarMenuAcciones(event, '${visitante.id}')">
+								<svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+									<path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/>
+								</svg>
+							</button>
+						</div>
 					</td>
 				</tr>
 			`;
@@ -378,9 +429,21 @@ import ToastNotification from '../components/ToastNotification.astro';
 		window.mostrarMenuAcciones = function(event, visitanteId) {
 			event.stopPropagation();
 			
+			// Verificar si ya existe un menú abierto para este visitante
+			const menuExistente = document.querySelector(`.menu-acciones[data-visitante-id="${visitanteId}"]`);
+			if (menuExistente) {
+				// Si ya está abierto, cerrarlo (toggle)
+				menuExistente.remove();
+				return;
+			}
+			
+			// Remover cualquier otro menú abierto
+			document.querySelectorAll('.menu-acciones').forEach(m => m.remove());
+			
 			// Crear menú contextual
 			const menu = document.createElement('div');
 			menu.className = 'absolute z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600';
+			menu.setAttribute('data-visitante-id', visitanteId); // Para identificar el menú
 			menu.innerHTML = `
 				<ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
 					<li>
@@ -401,24 +464,66 @@ import ToastNotification from '../components/ToastNotification.astro';
 				</ul>
 			`;
 			
-			// Posicionar el menú
-			const rect = event.target.getBoundingClientRect();
-			menu.style.position = 'absolute';
-			menu.style.top = rect.bottom + 'px';
-			menu.style.left = rect.left + 'px';
-			
-			// Remover menús anteriores
-			document.querySelectorAll('.menu-acciones').forEach(m => m.remove());
 			menu.classList.add('menu-acciones');
 			
+			// Agregar el menú al DOM temporalmente para obtener sus dimensiones
+			menu.style.visibility = 'hidden';
 			document.body.appendChild(menu);
 			
-			// Cerrar menú al hacer clic fuera
+			// Obtener dimensiones del menú y del viewport
+			const menuRect = menu.getBoundingClientRect();
+			const buttonRect = event.target.getBoundingClientRect();
+			const viewportWidth = window.innerWidth;
+			const viewportHeight = window.innerHeight;
+			
+			// Calcular posición inteligente
+			let top = buttonRect.bottom + 5; // 5px de margen
+			let left = buttonRect.left;
+			
+			// Ajustar si el menú se sale por la derecha
+			if (left + menuRect.width > viewportWidth) {
+				left = buttonRect.right - menuRect.width;
+			}
+			
+			// Ajustar si el menú se sale por la izquierda
+			if (left < 0) {
+				left = 10; // Margen mínimo desde el borde izquierdo
+			}
+			
+			// Ajustar si el menú se sale por abajo
+			if (top + menuRect.height > viewportHeight) {
+				top = buttonRect.top - menuRect.height - 5; // Mostrar arriba del botón
+			}
+			
+			// Ajustar si el menú se sale por arriba
+			if (top < 0) {
+				top = 10; // Margen mínimo desde el borde superior
+			}
+			
+			// Aplicar posición final
+			menu.style.position = 'fixed';
+			menu.style.top = top + 'px';
+			menu.style.left = left + 'px';
+			menu.style.visibility = 'visible';
+			
+			// Función para cerrar el menú
+			function cerrarMenu() {
+				menu.remove();
+				document.removeEventListener('click', cerrarMenu);
+				document.removeEventListener('keydown', manejarTeclaEscape);
+			}
+			
+			// Función para manejar la tecla Escape
+			function manejarTeclaEscape(event) {
+				if (event.key === 'Escape') {
+					cerrarMenu();
+				}
+			}
+			
+			// Event listeners para cerrar el menú
 			setTimeout(() => {
-				document.addEventListener('click', function cerrarMenu() {
-					menu.remove();
-					document.removeEventListener('click', cerrarMenu);
-				});
+				document.addEventListener('click', cerrarMenu);
+				document.addEventListener('keydown', manejarTeclaEscape);
 			}, 100);
 		};
 
@@ -605,6 +710,405 @@ import ToastNotification from '../components/ToastNotification.astro';
 			ocultarModal(modalEliminar);
 		});
 
+		// Event listeners para modal de exportación
+		const modalExportar = document.getElementById('modal-exportar');
+		
+		document.getElementById('btn-exportar').addEventListener('click', () => {
+			if (historialFiltrado.length === 0) {
+				if (window.mostrarAlert) {
+					window.mostrarAlert('No hay datos para exportar', 'warning');
+				}
+				return;
+			}
+			mostrarModal(modalExportar);
+		});
+
+		document.getElementById('cerrar-modal-exportar').addEventListener('click', () => {
+			ocultarModal(modalExportar);
+		});
+
+		// Funciones de exportación
+		async function exportarPDF() {
+			try {
+				// Mostrar indicador de carga
+				const btnPDF = document.getElementById('exportar-pdf');
+				const textoOriginal = btnPDF.innerHTML;
+				btnPDF.innerHTML = `
+					<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+					</svg>
+					Generando PDF...
+				`;
+				btnPDF.disabled = true;
+
+				// Importar jsPDF y autoTable para tablas profesionales
+				const { jsPDF } = await import('jspdf');
+				
+				// Crear nuevo documento PDF en formato horizontal para mejor distribución
+				const doc = new jsPDF('landscape'); // Volver a landscape
+				
+				// Configuración optimizada para formato horizontal
+				const pageWidth = doc.internal.pageSize.width; // 297mm para A4 landscape
+				const pageHeight = doc.internal.pageSize.height; // 210mm para A4 landscape
+				const margin = 10; // Márgenes adecuados para horizontal
+				let yPosition = margin;
+				
+				// Título principal bien legible para horizontal
+				doc.setFontSize(16); // Buen tamaño para landscape
+				doc.setFont('helvetica', 'bold');
+				doc.setTextColor(44, 82, 130); // Color azul
+				doc.text('HISTORIAL DE VISITANTES - GESTCLOUD', pageWidth / 2, yPosition, { align: 'center' });
+				yPosition += 15; // Espacio adecuado
+				
+				// Información del reporte legible
+				doc.setFontSize(10); // Tamaño legible
+				doc.setTextColor(100, 100, 100);
+				doc.setFont('helvetica', 'normal');
+				const fechaGeneracion = new Date().toLocaleString('es-CO', {
+					year: 'numeric',
+					month: 'short',
+					day: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit'
+				});
+				doc.text(`Generado: ${fechaGeneracion}`, pageWidth / 2, yPosition, { align: 'center' });
+				yPosition += 18; // Espacio generoso
+				doc.text(`Total de registros: ${historialFiltrado.length}`, pageWidth - margin - 50, yPosition);
+				yPosition += 15;
+				
+				// Función para formatear fecha específicamente para PDF (más compacta pero completa)
+				function formatearFechaPDF(timestamp) {
+					let fecha;
+					
+					if (timestamp?.toDate) {
+						fecha = timestamp.toDate();
+					} else if (typeof timestamp === 'string') {
+						fecha = new Date(timestamp);
+					} else {
+						fecha = new Date(timestamp);
+					}
+					
+					return fecha.toLocaleString('es-CO', {
+						day: '2-digit',
+						month: '2-digit',
+						year: '2-digit',
+						hour: '2-digit',
+						minute: '2-digit'
+					});
+				}
+				
+				// Preparar datos para la tabla (SIN TRUNCAR)
+				const tableData = historialFiltrado.map((visitante, index) => [
+					index + 1, // Número de fila
+					capitalizarNombre(visitante.nombre), // Nombre completo
+					formatearCedula(visitante.cedula), // Cédula formateada
+					formatearCelular(visitante.celular), // Celular formateado
+					visitante.apartamento.toUpperCase(), // Apartamento
+					capitalizarNombre(visitante.autorizadoPor), // Autorizado por completo
+					formatearFechaPDF(visitante.tiempoEntrada || visitante.fechaCreacion), // Fecha compacta
+					formatearFechaPDF(visitante.tiempoSalida || visitante.fechaSalida), // Fecha compacta
+					calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)
+				]);
+				
+				// Configuración de columnas perfecta para formato horizontal
+				const tableHeaders = ['#', 'Nombre Completo', 'Cédula', 'Celular', 'Apto', 'Autorizado Por', 'Entrada', 'Salida', 'Tiempo'];
+				const colWidths = [12, 48, 30, 28, 16, 45, 26, 26, 20]; // Total: 251mm (perfecto para 297mm)
+				
+				// Función para dibujar líneas de la tabla (más delgadas)
+				function dibujarLineaHorizontal(y, xStart = margin, xEnd = pageWidth - margin) {
+					doc.setLineWidth(0.2); // Súper delgada
+					doc.setDrawColor(220, 220, 220); // Más suave
+					doc.line(xStart, y, xEnd, y);
+				}
+				
+				function dibujarLineaVertical(x, yStart, yEnd) {
+					doc.setLineWidth(0.2); // Súper delgada
+					doc.setDrawColor(220, 220, 220); // Más suave
+					doc.line(x, yStart, x, yEnd);
+				}
+				
+				// Dibujar encabezado de la tabla (bien legible)
+				const headerHeight = 12; // Altura adecuada
+				
+				// Fondo del encabezado
+				doc.setFillColor(248, 249, 250);
+				doc.rect(margin, yPosition, pageWidth - 2 * margin, headerHeight, 'F');
+				
+				// Texto del encabezado
+				doc.setFont('helvetica', 'bold');
+				doc.setFontSize(8); // Tamaño legible para encabezados
+				doc.setTextColor(50, 50, 50);
+				
+				let xPos = margin + 2; // Margen cómodo
+				tableHeaders.forEach((header, index) => {
+					// Centrar texto en la celda
+					const textWidth = doc.getTextWidth(header);
+					const cellCenter = xPos + (colWidths[index] / 2) - (textWidth / 2);
+					doc.text(header, cellCenter, yPosition + 8); // Centrado vertical cómodo
+					xPos += colWidths[index];
+				});
+				
+				// Línea superior del encabezado
+				dibujarLineaHorizontal(yPosition);
+				yPosition += headerHeight;
+				
+				// Línea inferior del encabezado
+				dibujarLineaHorizontal(yPosition);
+				
+				// Líneas verticales del encabezado
+				xPos = margin;
+				for (let i = 0; i <= colWidths.length; i++) {
+					dibujarLineaVertical(xPos, yPosition - headerHeight, yPosition);
+					if (i < colWidths.length) xPos += colWidths[i];
+				}
+				
+				// Dibujar filas de datos (bien legibles y organizadas)
+				doc.setFont('helvetica', 'normal');
+				doc.setFontSize(7); // Tamaño óptimo para lectura
+				
+				tableData.forEach((row, rowIndex) => {
+					// Altura fija cómoda
+					const rowHeight = 8; // Altura cómoda para lectura
+					
+					// Verificar si necesitamos nueva página
+					if (yPosition + rowHeight > pageHeight - 25) { // Margen inferior adecuado
+						doc.addPage('landscape'); // Mantener orientación horizontal
+						yPosition = margin;
+						
+						// Redibujar encabezado en nueva página
+						doc.setFillColor(248, 249, 250);
+						doc.rect(margin, yPosition, pageWidth - 2 * margin, headerHeight, 'F');
+						
+						doc.setFont('helvetica', 'bold');
+						doc.setFontSize(8);
+						doc.setTextColor(50, 50, 50);
+						xPos = margin + 2;
+						tableHeaders.forEach((header, index) => {
+							const textWidth = doc.getTextWidth(header);
+							const cellCenter = xPos + (colWidths[index] / 2) - (textWidth / 2);
+							doc.text(header, cellCenter, yPosition + 8);
+							xPos += colWidths[index];
+						});
+						
+						dibujarLineaHorizontal(yPosition);
+						yPosition += headerHeight;
+						dibujarLineaHorizontal(yPosition);
+						
+						xPos = margin;
+						for (let i = 0; i <= colWidths.length; i++) {
+							dibujarLineaVertical(xPos, yPosition - headerHeight, yPosition);
+							if (i < colWidths.length) xPos += colWidths[i];
+						}
+						
+						doc.setFont('helvetica', 'normal');
+						doc.setFontSize(7);
+					}
+					
+					// Alternar color de fondo para mejor lectura
+					if (rowIndex % 2 === 0) {
+						doc.setFillColor(252, 252, 252);
+						doc.rect(margin, yPosition, pageWidth - 2 * margin, rowHeight, 'F');
+					}
+					
+					// Dibujar contenido de la celda optimizado para horizontal
+					doc.setTextColor(0, 0, 0);
+					xPos = margin + 2;
+					row.forEach((cellData, cellIndex) => {
+						let texto = String(cellData);
+						
+						// Verificar que no esté vacío
+						if (!texto || texto === 'undefined' || texto === 'null') {
+							texto = '-';
+						}
+						
+						// Truncar de manera inteligente según el ancho de columna
+						if (cellIndex === 0 || cellIndex === 4 || cellIndex === 8) { // #, Apto, Tiempo
+							if (texto.length > 12) texto = texto.substring(0, 12);
+						} else if (cellIndex === 1 || cellIndex === 5) { // Nombre completo y autorizado por
+							if (texto.length > 35) texto = texto.substring(0, 32) + '...';
+						} else { // Resto de columnas
+							if (texto.length > 20) texto = texto.substring(0, 17) + '...';
+						}
+						
+						// Alineación optimizada por tipo de columna
+						if (cellIndex === 0 || cellIndex === 4 || cellIndex === 8) { // #, Apto, Tiempo - centrados
+							const textWidth = doc.getTextWidth(texto);
+							const cellCenter = xPos + (colWidths[cellIndex] / 2) - (textWidth / 2);
+							doc.text(texto, cellCenter, yPosition + 5.5); // Centrado vertical
+						} else {
+							// Resto de columnas - alineadas a la izquierda con margen
+							doc.text(texto, xPos + 1, yPosition + 5.5);
+						}
+						
+						xPos += colWidths[cellIndex];
+					});
+					
+					yPosition += rowHeight;
+					
+					// Línea horizontal después de cada fila
+					dibujarLineaHorizontal(yPosition);
+					
+					// Líneas verticales para esta fila
+					xPos = margin;
+					for (let i = 0; i <= colWidths.length; i++) {
+						dibujarLineaVertical(xPos, yPosition - rowHeight, yPosition);
+						if (i < colWidths.length) xPos += colWidths[i];
+					}
+				});
+				
+				// Pie de página bien legible
+				yPosition += 10; // Espacio adecuado
+				if (yPosition > pageHeight - 20) { // Margen inferior adecuado
+					doc.addPage('landscape');
+					yPosition = margin;
+				}
+				
+				doc.setFont('helvetica', 'italic');
+				doc.setFontSize(9); // Tamaño legible
+				doc.setTextColor(120, 120, 120);
+				doc.text(`Total de visitantes: ${historialFiltrado.length}`, margin, yPosition);
+				doc.text(`GestCloud © ${new Date().getFullYear()}`, pageWidth - margin - 40, yPosition);
+				
+				// Guardar el PDF
+				const fechaActual = new Date().toLocaleDateString('es-CO').replace(/\//g, '-');
+				doc.save(`historial-visitantes-${fechaActual}.pdf`);
+				
+				// Restaurar botón
+				btnPDF.innerHTML = textoOriginal;
+				btnPDF.disabled = false;
+				
+				// Cerrar modal y mostrar éxito
+				ocultarModal(modalExportar);
+				if (window.mostrarAlert) {
+					window.mostrarAlert('PDF exportado exitosamente', 'success');
+				}
+				
+			} catch (error) {
+				console.error('Error exportando PDF:', error);
+				
+				// Restaurar botón en caso de error
+				const btnPDF = document.getElementById('exportar-pdf');
+				btnPDF.innerHTML = `
+					<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+					</svg>
+					Exportar como PDF
+				`;
+				btnPDF.disabled = false;
+				
+				if (window.mostrarAlert) {
+					window.mostrarAlert('Error al generar PDF: ' + error.message, 'error');
+				}
+			}
+		}
+
+		async function exportarExcel() {
+			try {
+				// Mostrar indicador de carga
+				const btnExcel = document.getElementById('exportar-excel');
+				const textoOriginal = btnExcel.innerHTML;
+				btnExcel.innerHTML = `
+					<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+					</svg>
+					Generando Excel...
+				`;
+				btnExcel.disabled = true;
+
+				// Importar XLSX dinámicamente
+				const XLSX = await import('xlsx');
+				
+				// Preparar datos para Excel
+				const datosExcel = historialFiltrado.map(visitante => ({
+					'Nombre': capitalizarNombre(visitante.nombre),
+					'Cédula': visitante.cedula,
+					'Celular': visitante.celular,
+					'Apartamento': visitante.apartamento.toUpperCase(),
+					'Autorizado por': capitalizarNombre(visitante.autorizadoPor),
+					'Fecha de Entrada': formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion),
+					'Fecha de Salida': formatearFecha(visitante.tiempoSalida || visitante.fechaSalida),
+					'Tiempo de Permanencia': calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)
+				}));
+				
+				// Crear libro de trabajo
+				const libro = XLSX.utils.book_new();
+				
+				// Crear hoja de cálculo
+				const hoja = XLSX.utils.json_to_sheet(datosExcel);
+				
+				// Configurar anchos de columna
+				const anchosColumna = [
+					{ wch: 25 }, // Nombre
+					{ wch: 15 }, // Cédula
+					{ wch: 15 }, // Celular
+					{ wch: 12 }, // Apartamento
+					{ wch: 25 }, // Autorizado por
+					{ wch: 20 }, // Fecha Entrada
+					{ wch: 20 }, // Fecha Salida
+					{ wch: 18 }  // Permanencia
+				];
+				hoja['!cols'] = anchosColumna;
+				
+				// Agregar información del reporte
+				const infoReporte = [
+					['Historial de Visitantes - GestCloud'],
+					[`Generado el: ${new Date().toLocaleString('es-CO')}`],
+					[`Total de registros: ${historialFiltrado.length}`],
+					[''], // Fila vacía
+				];
+				
+				// Insertar información al inicio
+				XLSX.utils.sheet_add_aoa(hoja, infoReporte, { origin: 'A1' });
+				
+				// Mover los datos principales 4 filas hacia abajo
+				const range = XLSX.utils.decode_range(hoja['!ref']);
+				range.s.r = 4; // Comenzar desde la fila 5 (índice 4)
+				hoja['!ref'] = XLSX.utils.encode_range(range);
+				
+				// Agregar la hoja al libro
+				XLSX.utils.book_append_sheet(libro, hoja, 'Historial Visitantes');
+				
+				// Generar y descargar archivo
+				const fechaActual = new Date().toLocaleDateString('es-CO').replace(/\//g, '-');
+				const nombreArchivo = `historial-visitantes-${fechaActual}.xlsx`;
+				
+				XLSX.writeFile(libro, nombreArchivo);
+				
+				// Restaurar botón
+				btnExcel.innerHTML = textoOriginal;
+				btnExcel.disabled = false;
+				
+				// Cerrar modal y mostrar éxito
+				ocultarModal(modalExportar);
+				if (window.mostrarAlert) {
+					window.mostrarAlert('Excel exportado exitosamente', 'success');
+				}
+				
+			} catch (error) {
+				console.error('Error exportando Excel:', error);
+				
+				// Restaurar botón en caso de error
+				const btnExcel = document.getElementById('exportar-excel');
+				btnExcel.innerHTML = `
+					<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+					</svg>
+					Exportar como Excel
+				`;
+				btnExcel.disabled = false;
+				
+				if (window.mostrarAlert) {
+					window.mostrarAlert('Error al generar Excel: ' + error.message, 'error');
+				}
+			}
+		}
+
+		// Conectar botones del modal de exportación
+		document.getElementById('exportar-pdf').addEventListener('click', exportarPDF);
+		document.getElementById('exportar-excel').addEventListener('click', exportarExcel);
+
 		// Guardar cambios
 		document.getElementById('guardar-cambios').addEventListener('click', async () => {
 			if (visitanteEditando) {
@@ -623,14 +1127,14 @@ import ToastNotification from '../components/ToastNotification.astro';
 					await updateDoc(visitanteRef, datosActualizados);
 					
 					ocultarModal(modalVisitante);
-					if (window.mostrarToast) {
-						window.mostrarToast('✅ Visitante actualizado correctamente', 'success');
+					if (window.mostrarAlert) {
+						window.mostrarAlert('Visitante actualizado correctamente', 'success');
 					}
 					
 				} catch (error) {
 					console.error('Error actualizando visitante:', error);
-					if (window.mostrarToast) {
-						window.mostrarToast('❌ Error al actualizar visitante', 'error');
+					if (window.mostrarAlert) {
+						window.mostrarAlert('Error al actualizar visitante', 'error');
 					}
 				}
 			}
@@ -690,8 +1194,8 @@ import ToastNotification from '../components/ToastNotification.astro';
 							'Registro eliminado definitivamente' : 
 							`Registro eliminado definitivamente de ${eliminacionesExitosas} ubicaciones`;
 						
-						if (window.mostrarToast) {
-							window.mostrarToast(mensaje, 'success');
+						if (window.mostrarAlert) {
+							window.mostrarAlert(mensaje, 'success');
 						}
 						
 						// Recargar la tabla para reflejar los cambios
@@ -699,8 +1203,8 @@ import ToastNotification from '../components/ToastNotification.astro';
 							window.location.reload();
 						}, 2000);
 					} else {
-						if (window.mostrarToast) {
-							window.mostrarToast('⚠️ El registro no se encontró en ninguna colección o ya fue eliminado', 'warning');
+						if (window.mostrarAlert) {
+							window.mostrarAlert('El registro no se encontró en ninguna colección o ya fue eliminado', 'warning');
 						}
 					}
 					
@@ -710,8 +1214,8 @@ import ToastNotification from '../components/ToastNotification.astro';
 					
 				} catch (error) {
 					console.error('Error eliminando visitante:', error);
-					if (window.mostrarToast) {
-						window.mostrarToast('❌ Error al eliminar registro', 'error');
+					if (window.mostrarAlert) {
+						window.mostrarAlert('Error al eliminar registro', 'error');
 					}
 				}
 			}
@@ -749,6 +1253,5 @@ import ToastNotification from '../components/ToastNotification.astro';
 	});
 </script>
 
-<!-- Incluir componente de notificaciones toast -->
-<ToastNotification />
-</script>
+<!-- Incluir componente de notificaciones alert -->
+<AlertNotification />
