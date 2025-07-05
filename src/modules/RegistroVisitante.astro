@@ -106,6 +106,69 @@ import AlertNotification from '../components/AlertNotification.astro';
 										   placeholder="Nombre del residente que autoriza" required>
 								</div>
 
+								<!-- Sección de Vehículo -->
+								<div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+									<!-- Checkbox para agregar vehículo -->
+									<div class="flex items-center mb-4">
+										<input id="agregar-vehiculo" name="tieneVehiculo" type="checkbox" 
+											   class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+										<label for="agregar-vehiculo" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+											Agregar vehículo
+										</label>
+									</div>
+
+									<!-- Campos del vehículo (ocultos por defecto) -->
+									<div id="vehiculo-campos" class="hidden space-y-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+										<!-- Tipo de Vehículo -->
+										<div>
+											<label for="tipo-vehiculo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+												Tipo de Vehículo <span class="text-red-500">*</span>
+											</label>
+											<select name="tipoVehiculo" id="tipo-vehiculo" 
+													class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+												<option value="">Seleccionar tipo</option>
+												<option value="carro">Carro - $100/minuto</option>
+												<option value="moto">Moto - $150/minuto</option>
+											</select>
+										</div>
+
+										<!-- Placa del Vehículo -->
+										<div>
+											<label for="placa-vehiculo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+												Placa del Vehículo <span class="text-red-500">*</span>
+											</label>
+											<input type="text" name="placa" id="placa-vehiculo" 
+												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+												   placeholder="Ej: ABC123"
+												   maxlength="6"
+												   style="text-transform: uppercase;">
+											<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formato: ABC123 (3 letras + 3 números)</p>
+										</div>
+
+										<!-- Color del Vehículo -->
+										<div>
+											<label for="color-vehiculo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+												Color del Vehículo <span class="text-red-500">*</span>
+											</label>
+											<input type="text" name="color" id="color-vehiculo" 
+												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+												   placeholder="Ej: Blanco, Negro, Azul">
+										</div>
+
+										<!-- Información de tarifa -->
+										<div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+											<div class="flex items-center">
+												<svg class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+													<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+												</svg>
+												<span class="text-sm text-blue-800 dark:text-blue-200">
+													<strong>Tarifa:</strong> Se cobrará por minuto según el tipo de vehículo. El costo se calculará automáticamente al momento de la salida.
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
 								<!-- Botón de envío -->
 								<div class="flex items-center pt-4">
 									<button type="submit" 
@@ -138,6 +201,42 @@ import AlertNotification from '../components/AlertNotification.astro';
 		const celularInput = document.getElementById('celular');
 		const cedulaError = document.getElementById('cedula-error');
 		const celularError = document.getElementById('celular-error');
+
+		// Elementos del vehículo
+		const agregarVehiculoCheckbox = document.getElementById('agregar-vehiculo');
+		const vehiculoCampos = document.getElementById('vehiculo-campos');
+		const tipoVehiculoSelect = document.getElementById('tipo-vehiculo');
+		const placaVehiculoInput = document.getElementById('placa-vehiculo');
+		const colorVehiculoInput = document.getElementById('color-vehiculo');
+
+		// Manejar mostrar/ocultar campos del vehículo
+		if (agregarVehiculoCheckbox && vehiculoCampos) {
+			agregarVehiculoCheckbox.addEventListener('change', function() {
+				if (this.checked) {
+					vehiculoCampos.classList.remove('hidden');
+					// Hacer campos requeridos
+					tipoVehiculoSelect.required = true;
+					placaVehiculoInput.required = true;
+					colorVehiculoInput.required = true;
+				} else {
+					vehiculoCampos.classList.add('hidden');
+					// Remover required y limpiar campos
+					tipoVehiculoSelect.required = false;
+					placaVehiculoInput.required = false;
+					colorVehiculoInput.required = false;
+					tipoVehiculoSelect.value = '';
+					placaVehiculoInput.value = '';
+					colorVehiculoInput.value = '';
+				}
+			});
+		}
+
+		// Formatear placa en tiempo real
+		if (placaVehiculoInput) {
+			placaVehiculoInput.addEventListener('input', function() {
+				this.value = this.value.toUpperCase();
+			});
+		}
 
 		// Función para permitir solo números y mostrar mensaje si se intenta escribir letras
 		function soloNumeros(event, errorElement, campoNombre) {
@@ -294,6 +393,22 @@ import AlertNotification from '../components/AlertNotification.astro';
 						autorizadoPor: formData.get('autorizadoPor')
 					};
 
+					// Agregar datos del vehículo si está marcado
+					const tieneVehiculo = formData.get('tieneVehiculo');
+					if (tieneVehiculo && agregarVehiculoCheckbox.checked) {
+						const tipoVehiculo = formData.get('tipoVehiculo');
+						const placa = formData.get('placa');
+						const color = formData.get('color');
+						
+						if (tipoVehiculo && placa && color) {
+							visitanteData.vehiculo = {
+								tipo: tipoVehiculo,
+								placa: placa.toString().toUpperCase(),
+								color: color
+							};
+						}
+					}
+
 					// Registrar en Firebase
 					await window.registrarVisitante(visitanteData);
 
@@ -307,6 +422,14 @@ import AlertNotification from '../components/AlertNotification.astro';
 					// Ocultar errores al limpiar
 					ocultarError(cedulaInput, cedulaError);
 					ocultarError(celularInput, celularError);
+					
+					// Ocultar campos del vehículo
+					if (vehiculoCampos) {
+						vehiculoCampos.classList.add('hidden');
+						tipoVehiculoSelect.required = false;
+						placaVehiculoInput.required = false;
+						colorVehiculoInput.required = false;
+					}
 
 				} catch (error) {
 					// Mostrar notificación de error con toast

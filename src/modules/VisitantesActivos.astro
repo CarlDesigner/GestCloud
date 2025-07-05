@@ -46,6 +46,38 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				</div>
 			</div>
 		</div>
+		
+		<!-- Filtros de visitantes -->
+		<div class="mt-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+			<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+				<div class="flex items-center space-x-2">
+					<svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+						<path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+					</svg>
+					<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por:</span>
+				</div>
+				<div class="flex flex-wrap gap-2">
+					<button id="filtro-todos" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 bg-primary-600 text-white border-primary-600" data-filtro="todos">
+						<svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+						</svg>
+						Todos (<span id="contador-todos">0</span>)
+					</button>
+					<button id="filtro-con-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700" data-filtro="con-vehiculo">
+						<svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 15c-.83 0-1.5-.67-1.5-1.5S5.67 12 6.5 12s1.5.67 1.5 1.5S7.33 15 6.5 15zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 10l1.5-4.5h11L19 10H5z"/>
+						</svg>
+						Con Vehículo (<span id="contador-con-vehiculo">0</span>)
+					</button>
+					<button id="filtro-sin-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700" data-filtro="sin-vehiculo">
+						<svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+						</svg>
+						Sin Vehículo (<span id="contador-sin-vehiculo">0</span>)
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -141,6 +173,41 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				<div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
 					Ingresó: <span class="visitante-hora-entrada"></span>
 				</div>
+				<!-- Costo acumulado del vehículo (solo si tiene vehículo) -->
+				<div class="vehiculo-costo hidden mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-gray-600 dark:text-gray-400">Costo acumulado:</span>
+						<span class="costo-valor text-lg font-semibold text-orange-600 dark:text-orange-400"></span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Información del vehículo (solo si tiene vehículo) -->
+			<div class="vehiculo-info hidden bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 mb-4 border border-blue-200 dark:border-blue-800">
+				<div class="flex items-center mb-2">
+					<svg class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 15c-.83 0-1.5-.67-1.5-1.5S5.67 12 6.5 12s1.5.67 1.5 1.5S7.33 15 6.5 15zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 10l1.5-4.5h11L19 10H5z"/>
+					</svg>
+					<span class="text-sm font-medium text-blue-800 dark:text-blue-200">Vehículo</span>
+				</div>
+				<div class="space-y-1 text-sm">
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Tipo:</span>
+						<span class="vehiculo-tipo font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Placa:</span>
+						<span class="vehiculo-placa font-mono font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Color:</span>
+						<span class="vehiculo-color font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Tarifa:</span>
+						<span class="vehiculo-tarifa font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+				</div>
 			</div>
 
 			<!-- Botón de salida -->
@@ -178,7 +245,17 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		const contadorVisitantes = document.getElementById('contador-visitantes');
 		const templateCard = document.getElementById('template-card-visitante');
 		
+		// Elementos de filtros
+		const filtroTodos = document.getElementById('filtro-todos');
+		const filtroConVehiculo = document.getElementById('filtro-con-vehiculo');
+		const filtroSinVehiculo = document.getElementById('filtro-sin-vehiculo');
+		const contadorTodos = document.getElementById('contador-todos');
+		const contadorConVehiculo = document.getElementById('contador-con-vehiculo');
+		const contadorSinVehiculo = document.getElementById('contador-sin-vehiculo');
+		
 		let visitantesActivos = [];
+		let visitantesFiltrados = [];
+		let filtroActivo = 'todos'; // todos, con-vehiculo, sin-vehiculo
 		let unsubscribe = null;
 		let intervalCronometro = null;
 		let isLoading = true;
@@ -219,6 +296,56 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 
 		// Mostrar carga inicial
 		mostrarCarga();
+
+		// Función para filtrar visitantes según el tipo seleccionado
+		function aplicarFiltro(filtro) {
+			filtroActivo = filtro;
+			
+			switch (filtro) {
+				case 'con-vehiculo':
+					visitantesFiltrados = visitantesActivos.filter(visitante => visitante.vehiculo);
+					break;
+				case 'sin-vehiculo':
+					visitantesFiltrados = visitantesActivos.filter(visitante => !visitante.vehiculo);
+					break;
+				case 'todos':
+				default:
+					visitantesFiltrados = [...visitantesActivos];
+					break;
+			}
+			
+			actualizarBotonesFiltro();
+			renderizarVisitantes();
+		}
+		
+		// Función para actualizar el estado visual de los botones de filtro
+		function actualizarBotonesFiltro() {
+			const botones = document.querySelectorAll('.filtro-btn');
+			
+			botones.forEach(boton => {
+				const filtroBoton = boton.getAttribute('data-filtro');
+				
+				if (filtroBoton === filtroActivo) {
+					// Botón activo
+					boton.className = 'filtro-btn px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 bg-primary-600 text-white border-primary-600';
+				} else {
+					// Botón inactivo
+					boton.className = 'filtro-btn px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700';
+				}
+			});
+		}
+		
+		// Función para actualizar los contadores de los filtros
+		function actualizarContadores() {
+			const conVehiculo = visitantesActivos.filter(visitante => visitante.vehiculo).length;
+			const sinVehiculo = visitantesActivos.filter(visitante => !visitante.vehiculo).length;
+			const total = visitantesActivos.length;
+			
+			if (contadorTodos) contadorTodos.textContent = String(total);
+			if (contadorConVehiculo) contadorConVehiculo.textContent = String(conVehiculo);
+			if (contadorSinVehiculo) contadorSinVehiculo.textContent = String(sinVehiculo);
+			if (contadorVisitantes) contadorVisitantes.textContent = String(visitantesFiltrados.length);
+		}
 
 		// Función para capitalizar nombres (primera letra de cada palabra en mayúscula)
 		function capitalizarNombre(nombre) {
@@ -329,11 +456,14 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				
 				// Mostrar notificación de éxito con toast
 				if (window.mostrarToast) {
-					window.mostrarToast(
-						`${nombre} ha salido exitosamente. Tiempo: ${resultado.tiempo || 'No disponible'}`, 
-						'success', 
-						5000
-					);
+					let mensaje = `${nombre} ha salido exitosamente. Tiempo: ${resultado.tiempo || 'No disponible'}`;
+					
+					// Agregar información de costo si tiene vehículo
+					if (resultado.costoVehiculo && resultado.costoVehiculo > 0) {
+						mensaje += `. Costo vehículo: $${resultado.costoVehiculo.toLocaleString('es-CO')}`;
+					}
+					
+					window.mostrarToast(mensaje, 'success', 6000);
 				}
 				
 			} catch (error) {
@@ -379,6 +509,27 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			card.querySelector('.visitante-tiempo').textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
 			card.querySelector('.visitante-hora-entrada').textContent = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
 			
+			// Manejar información del vehículo
+			if (visitante.vehiculo) {
+				// Mostrar sección del vehículo
+				const vehiculoInfo = card.querySelector('.vehiculo-info');
+				const vehiculoCosto = card.querySelector('.vehiculo-costo');
+				
+				if (vehiculoInfo) {
+					vehiculoInfo.classList.remove('hidden');
+					card.querySelector('.vehiculo-tipo').textContent = visitante.vehiculo.tipo.toUpperCase();
+					card.querySelector('.vehiculo-placa').textContent = visitante.vehiculo.placa;
+					card.querySelector('.vehiculo-color').textContent = visitante.vehiculo.color;
+					card.querySelector('.vehiculo-tarifa').textContent = `$${visitante.vehiculo.tarifa}/min`;
+				}
+				
+				if (vehiculoCosto) {
+					vehiculoCosto.classList.remove('hidden');
+					// El costo se actualizará con el cronómetro
+					card.querySelector('.costo-valor').textContent = calcularCostoVehiculo(visitante);
+				}
+			}
+			
 			// Agregar ID para identificar la card
 			card.querySelector('.visitante-card').dataset.visitanteId = visitante.id;
 			
@@ -386,7 +537,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			card.querySelector('.btn-dar-salida').addEventListener('click', async () => {
 				// Mostrar modal de confirmación en lugar de ejecutar directamente
 				if (window.mostrarConfirmSalida) {
-					window.mostrarConfirmSalida(visitante.id, capitalizarNombre(visitante.nombre), ejecutarSalidaVisitante);
+					window.mostrarConfirmSalida(visitante.id, capitalizarNombre(visitante.nombre), ejecutarSalidaVisitante, visitante);
 				} else {
 					// Fallback si el modal no está disponible
 					await ejecutarSalidaVisitante(visitante.id, capitalizarNombre(visitante.nombre));
@@ -396,22 +547,43 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			return card;
 		}
 
+		// Función para calcular el costo acumulado del vehículo
+		function calcularCostoVehiculo(visitante) {
+			if (!visitante.vehiculo) return '$0';
+			
+			const ahora = new Date();
+			let entrada;
+			
+			// Manejar diferentes formatos de fecha
+			if (visitante.tiempoEntrada?.toDate) {
+				entrada = visitante.tiempoEntrada.toDate();
+			} else if (typeof visitante.tiempoEntrada === 'string') {
+				entrada = new Date(visitante.tiempoEntrada);
+			} else {
+				entrada = new Date(visitante.tiempoEntrada || visitante.fechaCreacion);
+			}
+			
+			const diferenciaMilis = ahora - entrada;
+			const minutos = Math.floor(diferenciaMilis / (1000 * 60));
+			const costo = minutos * visitante.vehiculo.tarifa;
+			
+			return `$${costo.toLocaleString('es-CO')}`;
+		}
+
 		// Función para renderizar todos los visitantes
 		function renderizarVisitantes() {
-			// Actualizar contador
-			if (contadorVisitantes) {
-				contadorVisitantes.textContent = String(visitantesActivos.length);
-			}
+			// Actualizar contadores
+			actualizarContadores();
 			
 			// Marcar que ya no está cargando después de la primera respuesta
 			if (isLoading) {
 				isLoading = false;
 			}
 			
-			if (visitantesActivos.length === 0) {
-				// Mostrar estado sin visitantes
+			if (visitantesFiltrados.length === 0) {
+				// Mostrar estado sin visitantes (personalizado según el filtro)
 				if (sinVisitantes && gridVisitantes) {
-					restaurarEstadoVacio();
+					mostrarEstadoSinResultados();
 					sinVisitantes.classList.remove('hidden');
 					gridVisitantes.classList.add('hidden');
 				}
@@ -424,23 +596,92 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					// Limpiar grid
 					gridVisitantes.innerHTML = '';
 					
-					// Agregar cada visitante
-					visitantesActivos.forEach(visitante => {
+					// Agregar cada visitante filtrado
+					visitantesFiltrados.forEach(visitante => {
 						const card = crearCardVisitante(visitante);
 						gridVisitantes.appendChild(card);
 					});
 				}
 			}
 		}
+		
+		// Función para mostrar estado sin resultados personalizado según el filtro
+		function mostrarEstadoSinResultados() {
+			let mensaje, descripcion, icono;
+			
+			if (visitantesActivos.length === 0) {
+				// No hay visitantes en absoluto
+				icono = `<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.196-2.121L17 20zM9 12a4 4 0 008 0 4 4 0 00-8 0zm8 0c0 1.021-.4 1.95-1.05 2.63l2.05 2.37a1 1 0 11-1.5 1.32l-2.05-2.37A5.973 5.973 0 0112 18a5.973 5.973 0 01-3.45-1.05L6.5 19.32a1 1 0 11-1.5-1.32l2.05-2.37A5.973 5.973 0 017 12a6 6 0 0110 0z"/>
+				</svg>`;
+				mensaje = "No hay visitantes activos";
+				descripcion = "Cuando se registre un visitante aparecerá aquí en tiempo real";
+			} else {
+				// Hay visitantes pero no coinciden con el filtro
+				switch (filtroActivo) {
+					case 'con-vehiculo':
+						icono = `<svg class="mx-auto h-24 w-24 text-blue-400 dark:text-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 15c-.83 0-1.5-.67-1.5-1.5S5.67 12 6.5 12s1.5.67 1.5 1.5S7.33 15 6.5 15zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 10l1.5-4.5h11L19 10H5z"/>
+						</svg>`;
+						mensaje = "No hay visitantes con vehículo";
+						descripcion = "Actualmente no hay visitantes activos que hayan registrado vehículo";
+						break;
+					case 'sin-vehiculo':
+						icono = `<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+						</svg>`;
+						mensaje = "No hay visitantes sin vehículo";
+						descripcion = "Todos los visitantes activos actualmente tienen vehículo registrado";
+						break;
+					default:
+						icono = `<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.196-2.121L17 20zM9 12a4 4 0 008 0 4 4 0 00-8 0zm8 0c0 1.021-.4 1.95-1.05 2.63l2.05 2.37a1 1 0 11-1.5 1.32l-2.05-2.37A5.973 5.973 0 0112 18a5.973 5.973 0 01-3.45-1.05L6.5 19.32a1 1 0 11-1.5-1.32l2.05-2.37A5.973 5.973 0 017 12a6 6 0 0110 0z"/>
+						</svg>`;
+						mensaje = "No hay visitantes activos";
+						descripcion = "Cuando se registre un visitante aparecerá aquí en tiempo real";
+						break;
+				}
+			}
+			
+			if (sinVisitantes) {
+				sinVisitantes.innerHTML = `
+					${icono}
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">${mensaje}</h3>
+					<p class="text-gray-500 dark:text-gray-400 mb-6">${descripcion}</p>
+					${visitantesActivos.length === 0 ? `
+						<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+							 Registrar Visitante &nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus">
+								<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+								<circle cx="9" cy="7" r="4"/>
+								<line x1="19" x2="19" y1="8" y2="14"/>
+								<line x1="22" x2="16" y1="11" y2="11"/>
+							</svg>
+						</a>
+					` : `
+						<button onclick="document.getElementById('filtro-todos').click()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+							Ver Todos los Visitantes
+						</button>
+					`}
+				`;
+			}
+		}
 
 		// Función para actualizar tiempos cada segundo (cronómetro en tiempo real)
 		function actualizarTiempos() {
-			visitantesActivos.forEach(visitante => {
+			visitantesFiltrados.forEach(visitante => {
 				const card = document.querySelector(`[data-visitante-id="${visitante.id}"]`);
 				if (card) {
 					const tiempoElement = card.querySelector('.visitante-tiempo');
 					if (tiempoElement) {
 						tiempoElement.textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
+					}
+					
+					// Actualizar costo del vehículo si tiene vehículo
+					if (visitante.vehiculo) {
+						const costoElement = card.querySelector('.costo-valor');
+						if (costoElement) {
+							costoElement.textContent = calcularCostoVehiculo(visitante);
+						}
 					}
 				}
 			});
@@ -450,7 +691,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		if (window.escucharVisitantesActivos) {
 			unsubscribe = window.escucharVisitantesActivos((visitantes) => {
 				visitantesActivos = visitantes;
-				renderizarVisitantes();
+				aplicarFiltro(filtroActivo); // Aplicar filtro actual y renderizar
 			});
 		} else {
 			// Si Firebase no está listo, reintentamos cada 100ms hasta un máximo de 3 segundos
@@ -464,7 +705,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					if (window.escucharVisitantesActivos) {
 						unsubscribe = window.escucharVisitantesActivos((visitantes) => {
 							visitantesActivos = visitantes;
-							renderizarVisitantes();
+							aplicarFiltro(filtroActivo); // Aplicar filtro actual y renderizar
 						});
 					} else {
 						// Si después de 3 segundos no hay Firebase, mostrar error
@@ -489,9 +730,20 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		// Timeout de seguridad: si después de 1 segundo no hay datos, mostrar estado vacío
 		setTimeout(() => {
 			if (isLoading && visitantesActivos.length === 0) {
-				renderizarVisitantes();
+				aplicarFiltro(filtroActivo);
 			}
 		}, 1000);
+
+		// Event listeners para los botones de filtro
+		if (filtroTodos) {
+			filtroTodos.addEventListener('click', () => aplicarFiltro('todos'));
+		}
+		if (filtroConVehiculo) {
+			filtroConVehiculo.addEventListener('click', () => aplicarFiltro('con-vehiculo'));
+		}
+		if (filtroSinVehiculo) {
+			filtroSinVehiculo.addEventListener('click', () => aplicarFiltro('sin-vehiculo'));
+		}
 
 		// Actualizar cronómetros cada segundo para tiempo real
 		intervalCronometro = setInterval(actualizarTiempos, 1000);

@@ -24,8 +24,34 @@ const { id = 'alert-notification' } = Astro.props;
 </div>
 
 <script>
-	// Función para mostrar alert siguiendo exactamente el diseño de Flowbite
-	window.mostrarAlert = function(mensaje, tipo = 'info', duracion = 4000) {
+	/**
+	 * @typedef {'info'|'success'|'error'|'warning'} AlertType
+	 */
+
+	/**
+	 * Función para cerrar alert con animación
+	 */
+	function cerrarAlert() {
+		const alert = document.getElementById('alert-notification');
+		const container = document.getElementById('alert-container');
+		if (alert && container) {
+			container.style.transition = 'all 0.2s ease-in';
+			container.style.transform = 'translateX(100%)';
+			container.style.opacity = '0';
+			
+			setTimeout(() => {
+				alert.classList.add('hidden');
+			}, 200);
+		}
+	}
+
+	/**
+	 * Función para mostrar alert siguiendo exactamente el diseño de Flowbite
+	 * @param {string} mensaje 
+	 * @param {AlertType} tipo 
+	 * @param {number} duracion 
+	 */
+	function mostrarAlert(mensaje, tipo = 'info', duracion = 4000) {
 		const alert = document.getElementById('alert-notification');
 		const container = document.getElementById('alert-container');
 		const icon = document.getElementById('alert-icon');
@@ -98,26 +124,15 @@ const { id = 'alert-notification' } = Astro.props;
 				cerrarAlert();
 			}, duracion);
 		}
-	};
-	
-	// Función para cerrar alert con animación
-	window.cerrarAlert = function() {
-		const alert = document.getElementById('alert-notification');
-		const container = document.getElementById('alert-container');
-		if (alert && container) {
-			container.style.transition = 'all 0.2s ease-in';
-			container.style.transform = 'translateX(100%)';
-			container.style.opacity = '0';
-			
-			setTimeout(() => {
-				alert.classList.add('hidden');
-			}, 200);
-		}
-	};
+	}
+
+	// Asignar funciones a window para acceso global
+	window.mostrarAlert = mostrarAlert;
+	window.cerrarAlert = cerrarAlert;
 	
 	// También crear un alias para mantener compatibilidad
-	window.mostrarToast = window.mostrarAlert;
-	window.cerrarToast = window.cerrarAlert;
+	window.mostrarToast = mostrarAlert;
+	window.cerrarToast = cerrarAlert;
 </script>
 
 <style>

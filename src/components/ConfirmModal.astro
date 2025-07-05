@@ -40,6 +40,31 @@ const { id = 'confirm-modal' } = Astro.props;
 					<p id="confirm-visitante-nombre" class="text-sm text-gray-600 dark:text-gray-400 mb-4">
 						<!-- El nombre del visitante se insertará aquí -->
 					</p>
+					
+					<!-- Información del costo del vehículo (solo si tiene vehículo) -->
+					<div id="confirm-vehiculo-info" class="hidden bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3 mb-4">
+						<div class="flex items-center justify-center mb-2">
+							<svg class="w-4 h-4 text-orange-600 dark:text-orange-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 15c-.83 0-1.5-.67-1.5-1.5S5.67 12 6.5 12s1.5.67 1.5 1.5S7.33 15 6.5 15zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 10l1.5-4.5h11L19 10H5z"/>
+							</svg>
+							<span class="text-sm font-medium text-orange-800 dark:text-orange-200">Costo de Vehículo</span>
+						</div>
+						<div class="space-y-1 text-sm">
+							<div class="flex justify-between">
+								<span class="text-orange-700 dark:text-orange-300">Placa:</span>
+								<span id="confirm-vehiculo-placa" class="font-mono font-medium text-orange-900 dark:text-orange-100"></span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-orange-700 dark:text-orange-300">Tiempo:</span>
+								<span id="confirm-vehiculo-tiempo" class="font-medium text-orange-900 dark:text-orange-100"></span>
+							</div>
+							<div class="flex justify-between border-t border-orange-200 dark:border-orange-700 pt-1">
+								<span class="text-orange-700 dark:text-orange-300 font-medium">Total a cobrar:</span>
+								<span id="confirm-vehiculo-costo" class="font-bold text-lg text-orange-900 dark:text-orange-100"></span>
+							</div>
+						</div>
+					</div>
+					
 					<p class="text-xs text-gray-500 dark:text-gray-500">
 						Esta acción registrará la salida del visitante y calculará el tiempo de permanencia.
 					</p>
@@ -72,13 +97,44 @@ const { id = 'confirm-modal' } = Astro.props;
 </div>
 
 <script>
+	/**
+	 * @typedef {Object} VisitanteVehiculo
+	 * @property {string} placa
+	 * @property {number} tarifa
+	 */
+
+	/**
+	 * @typedef {Object} VisitanteData
+	 * @property {string} id
+	 * @property {string} nombre
+	 * @property {VisitanteVehiculo} [vehiculo]
+	 * @property {Date|{toDate(): Date}} [tiempoEntrada]
+	 * @property {Date} [fechaCreacion]
+	 */
+
+	/**
+	 * @typedef {Object} PendingSalidaData
+	 * @property {string} id
+	 * @property {string} nombre
+	 * @property {function(string, string): void} callback
+	 * @property {VisitanteData|null} visitante
+	 */
+
 	// Variables globales para el modal
+	/** @type {PendingSalidaData|null} */
 	let pendingSalidaData = null;
 	
-	// Función para mostrar modal de confirmación
-	window.mostrarConfirmSalida = function(visitanteId, visitanteNombre, callbackSalida) {
+	/**
+	 * Función para mostrar modal de confirmación
+	 * @param {string} visitanteId 
+	 * @param {string} visitanteNombre 
+	 * @param {function(string, string): void} callbackSalida 
+	 * @param {VisitanteData|null} visitanteData 
+	 */
+	function mostrarConfirmSalida(visitanteId, visitanteNombre, callbackSalida, visitanteData = null) {
 		const modal = document.getElementById('confirm-modal');
 		const nombreElement = document.getElementById('confirm-visitante-nombre');
+		const vehiculoInfo = document.getElementById('confirm-vehiculo-info');
 		
 		if (!modal || !nombreElement) return;
 		
@@ -86,11 +142,49 @@ const { id = 'confirm-modal' } = Astro.props;
 		pendingSalidaData = {
 			id: visitanteId,
 			nombre: visitanteNombre,
-			callback: callbackSalida
+			callback: callbackSalida,
+			visitante: visitanteData
 		};
 		
 		// Mostrar nombre del visitante
 		nombreElement.innerHTML = `<strong class="text-gray-900 dark:text-white">${visitanteNombre}</strong>`;
+		
+		// Mostrar información del vehículo si aplica
+		if (visitanteData && visitanteData.vehiculo && vehiculoInfo) {
+			// Calcular costo actual
+			let tiempoEntrada;
+			if (visitanteData.tiempoEntrada && typeof visitanteData.tiempoEntrada === 'object' && 'toDate' in visitanteData.tiempoEntrada) {
+				tiempoEntrada = visitanteData.tiempoEntrada.toDate();
+			} else {
+				// Manejar diferentes tipos de entrada de tiempo
+				const timeValue = visitanteData.tiempoEntrada || visitanteData.fechaCreacion;
+				if (timeValue instanceof Date) {
+					tiempoEntrada = timeValue;
+				} else if (typeof timeValue === 'string' || typeof timeValue === 'number') {
+					tiempoEntrada = new Date(timeValue);
+				} else {
+					tiempoEntrada = new Date();
+				}
+			}
+			
+			const ahora = new Date();
+			const diferenciaMilis = ahora.getTime() - tiempoEntrada.getTime();
+			const minutos = Math.floor(diferenciaMilis / (1000 * 60));
+			const costo = minutos * visitanteData.vehiculo.tarifa;
+			
+			// Mostrar información del vehículo
+			const placaElement = document.getElementById('confirm-vehiculo-placa');
+			const tiempoElement = document.getElementById('confirm-vehiculo-tiempo');
+			const costoElement = document.getElementById('confirm-vehiculo-costo');
+			
+			if (placaElement) placaElement.textContent = visitanteData.vehiculo.placa;
+			if (tiempoElement) tiempoElement.textContent = `${minutos} minutos`;
+			if (costoElement) costoElement.textContent = `$${costo.toLocaleString('es-CO')}`;
+			
+			vehiculoInfo.classList.remove('hidden');
+		} else if (vehiculoInfo) {
+			vehiculoInfo.classList.add('hidden');
+		}
 		
 		// Mostrar modal
 		modal.classList.remove('hidden');
@@ -98,12 +192,19 @@ const { id = 'confirm-modal' } = Astro.props;
 		// Focus en el botón de cancelar por seguridad
 		setTimeout(() => {
 			const cancelBtn = modal.querySelector('button[onclick="cerrarConfirmModal()"]');
-			if (cancelBtn) cancelBtn.focus();
+			if (cancelBtn && cancelBtn instanceof HTMLButtonElement) {
+				cancelBtn.focus();
+			}
 		}, 100);
-	};
+	}
+
+	// Asignar función global
+	window.mostrarConfirmSalida = mostrarConfirmSalida;
 	
-	// Función para cerrar modal
-	window.cerrarConfirmModal = function() {
+	/**
+	 * Función para cerrar modal
+	 */
+	function cerrarConfirmModal() {
 		const modal = document.getElementById('confirm-modal');
 		if (modal) {
 			modal.classList.add('hidden');
@@ -111,10 +212,15 @@ const { id = 'confirm-modal' } = Astro.props;
 		
 		// Limpiar datos pendientes
 		pendingSalidaData = null;
-	};
+	}
+
+	// Asignar función global
+	window.cerrarConfirmModal = cerrarConfirmModal;
 	
-	// Función para ejecutar la salida confirmada
-	window.ejecutarSalidaConfirmada = function() {
+	/**
+	 * Función para ejecutar la salida confirmada
+	 */
+	function ejecutarSalidaConfirmada() {
 		if (!pendingSalidaData) return;
 		
 		const { id, nombre, callback } = pendingSalidaData;
@@ -126,7 +232,10 @@ const { id = 'confirm-modal' } = Astro.props;
 		if (callback && typeof callback === 'function') {
 			callback(id, nombre);
 		}
-	};
+	}
+
+	// Asignar función global
+	window.ejecutarSalidaConfirmada = ejecutarSalidaConfirmada;
 	
 	// Cerrar modal con ESC
 	document.addEventListener('keydown', (e) => {

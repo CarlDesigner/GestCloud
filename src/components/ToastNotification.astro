@@ -22,8 +22,30 @@ const { id = 'toast-notification' } = Astro.props;
 </div>
 
 <script>
-	// Función para mostrar toast siguiendo exactamente el diseño de Flowbite
-	window.mostrarToast = function(mensaje, tipo = 'info', duracion = 4000) {
+	/**
+	 * Función para cerrar toast con animación
+	 */
+	function cerrarToast() {
+		const toast = document.getElementById('toast-notification');
+		const container = document.getElementById('toast-container');
+		if (toast && container) {
+			container.style.transition = 'all 0.2s ease-in';
+			container.style.transform = 'translateX(100%)';
+			container.style.opacity = '0';
+			
+			setTimeout(() => {
+				toast.classList.add('hidden');
+			}, 200);
+		}
+	}
+
+	/**
+	 * Función para mostrar toast siguiendo exactamente el diseño de Flowbite
+	 * @param {string} mensaje
+	 * @param {'info'|'success'|'error'|'warning'} tipo
+	 * @param {number} duracion
+	 */
+	function mostrarToast(mensaje, tipo = 'info', duracion = 4000) {
 		const toast = document.getElementById('toast-notification');
 		const icono = document.getElementById('toast-icon');
 		const mensajeEl = document.getElementById('toast-message');
@@ -98,22 +120,11 @@ const { id = 'toast-notification' } = Astro.props;
 				cerrarToast();
 			}, duracion);
 		}
-	};
-	
-	// Función para cerrar toast con animación
-	window.cerrarToast = function() {
-		const toast = document.getElementById('toast-notification');
-		const container = document.getElementById('toast-container');
-		if (toast && container) {
-			container.style.transition = 'all 0.2s ease-in';
-			container.style.transform = 'translateX(100%)';
-			container.style.opacity = '0';
-			
-			setTimeout(() => {
-				toast.classList.add('hidden');
-			}, 200);
-		}
-	};
+	}
+
+	// Asignar funciones globales
+	window.mostrarToast = mostrarToast;
+	window.cerrarToast = cerrarToast;
 </script>
 
 <style>

@@ -21,12 +21,32 @@ const db = getFirestore(app);
 export async function registrarVisitante(visitanteData) {
   try {
     const nuevoVisitante = {
-      ...visitanteData,
+      nombre: visitanteData.nombre,
+      cedula: visitanteData.cedula,
+      celular: visitanteData.celular,
+      apartamento: visitanteData.apartamento,
+      autorizadoPor: visitanteData.autorizadoPor,
       tiempoEntrada: serverTimestamp(), // Usa el timestamp del servidor
       tiempoSalida: null,
       activo: true,
       fechaCreacion: new Date().toISOString() // Para mostrar fecha legible
     };
+
+    // Agregar información del vehículo si existe
+    if (visitanteData.vehiculo) {
+      // Definir tarifas por tipo de vehículo (pesos por minuto)
+      const tarifas = {
+        'carro': 100,
+        'moto': 150
+      };
+
+      nuevoVisitante.vehiculo = {
+        tipo: visitanteData.vehiculo.tipo,
+        placa: visitanteData.vehiculo.placa.toUpperCase(),
+        color: visitanteData.vehiculo.color,
+        tarifa: tarifas[visitanteData.vehiculo.tipo] || 100
+      };
+    }
     
     const docRef = await addDoc(collection(db, 'visitantes'), nuevoVisitante);
     

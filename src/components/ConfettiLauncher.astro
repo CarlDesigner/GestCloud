@@ -22,20 +22,31 @@
 </style>
 
 <script>
-	// @ts-ignore
+	// Elementos del DOM
+	/** @type {HTMLCanvasElement|null} */
 	const confettiElement = document.querySelector('#confettis');
+	/** @type {HTMLElement|null} */
 	const triggerConfettis = document.querySelector('[data-trigger-confettis]');
 
-	triggerConfettis.addEventListener('click', popIt);
-
+	/**
+	 * Función para generar confetti
+	 */
 	function popIt() {
+		if (!confettiElement || !window.ConfettiGenerator) return;
+		
 		const confettiSettings = {
 			target: confettiElement,
 			start_from_edge: true,
 		};
-		const confetti = new ConfettiGenerator(confettiSettings);
+		
+		// ConfettiGenerator es cargado por el script externo
+		// @ts-ignore - Cast necesario para compatibilidad de tipos
+		const confetti = new window.ConfettiGenerator(confettiSettings);
 		confetti.render();
 	}
 
-	console.log('Pop 🎉!');
+	// Agregar event listener después de definir la función
+	if (triggerConfettis) {
+		triggerConfettis.addEventListener('click', popIt);
+	}
 </script>

@@ -129,7 +129,22 @@ export async function darSalidaVisitante(visitanteId) {
     
     console.log('⏱️ Tiempo de permanencia calculado:', formatearTiempo(tiempoTotal));
     
-    // 3. Actualizar el visitante existente con datos de salida
+    // 3. Calcular costo del vehículo si tiene vehículo
+    let costoVehiculo = 0;
+    let infoVehiculo = null;
+    
+    if (datosVisitante.vehiculo) {
+      const minutos = Math.floor(tiempoTotal / 60); // Convertir segundos a minutos
+      costoVehiculo = minutos * datosVisitante.vehiculo.tarifa;
+      infoVehiculo = {
+        ...datosVisitante.vehiculo,
+        minutosEstacionado: minutos,
+        costoTotal: costoVehiculo
+      };
+      console.log(`💰 Costo calculado para vehículo ${datosVisitante.vehiculo.tipo}: $${costoVehiculo.toLocaleString('es-CO')} (${minutos} minutos x $${datosVisitante.vehiculo.tarifa})`);
+    }
+    
+    // 4. Actualizar el visitante existente con datos de salida
     const actualizacion = {
       activo: false,
       tiempoSalida: serverTimestamp(),
@@ -138,6 +153,12 @@ export async function darSalidaVisitante(visitanteId) {
       fechaSalidaLegible: tiempoSalida.toLocaleString('es-ES'),
       tiempoEstancia: formatearTiempo(tiempoTotal)
     };
+
+    // Agregar información del vehículo si aplica
+    if (infoVehiculo) {
+      actualizacion.vehiculoFinal = infoVehiculo;
+      actualizacion.costoVehiculo = costoVehiculo;
+    }
     
     console.log('💾 Actualizando visitante como inactivo...');
     
@@ -150,7 +171,9 @@ export async function darSalidaVisitante(visitanteId) {
       success: true,
       visitante: datosVisitante.nombre,
       tiempo: formatearTiempo(tiempoTotal),
-      metodo: 'temporal_inactivo'
+      metodo: 'temporal_inactivo',
+      costoVehiculo: costoVehiculo,
+      vehiculo: infoVehiculo
     };
     
     console.log('✅ Salida completada exitosamente:', resultado);
@@ -244,4 +267,3 @@ export function escucharHistorialVisitantes(callback) {
 window.escucharVisitantesActivos = escucharVisitantesActivos;
 window.escucharHistorialVisitantes = escucharHistorialVisitantes;
 window.darSalidaVisitante = darSalidaVisitante;
-window.escucharHistorialVisitantes = escucharHistorialVisitantes;
