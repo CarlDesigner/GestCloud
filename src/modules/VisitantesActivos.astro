@@ -75,7 +75,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					</div>
 
 					<!-- Grid de Cards de Visitantes -->
-					<div id="grid-visitantes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 hidden">
+					<div id="grid-visitantes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 						<!-- Las cards se generarán dinámicamente aquí -->
 					</div>
 				</div>
@@ -162,14 +162,15 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 <ConfirmModal />
 
 <script>
+	// @ts-nocheck
 	// Precargar Firebase para mejorar rendimiento
-	import '../scripts/firebase-preload.js';
+	import '../scripts/firebase-preload';
 	
 	// Script del cliente para manejar visitantes activos desde Firebase
-	import '../scripts/visitantes-activos.js';
+	import '../scripts/visitantes-activos';
 	
 	// TEMPORAL: Script de debug para diagnosticar problemas
-	import '../scripts/debug-visitantes.js';
+	import '../scripts/debug-visitantes';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Elementos del DOM
@@ -278,9 +279,8 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			// Formato cronómetro: HH:MM:SS o MM:SS si es menos de una hora
 			if (horas > 0) {
 				return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-			} else {
-				return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
 			}
+			return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
 		}
 
 		// Función para formatear fecha/hora
@@ -307,7 +307,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		// Función para ejecutar la salida del visitante (llamada después de confirmación)
 		async function ejecutarSalidaVisitante(visitanteId, nombre) {
 			try {
-				console.log('🚪 Iniciando proceso de salida para:', nombre);
+				// console.log('🚪 Iniciando proceso de salida para:', nombre);
 				
 				// Deshabilitar botón mientras se procesa
 				const card = document.querySelector(`[data-visitante-id="${visitanteId}"]`);
@@ -325,7 +325,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				// Actualizar en Firebase
 				const resultado = await window.darSalidaVisitante(visitanteId);
 				
-				console.log('✅ Salida exitosa:', resultado);
+				// console.log('✅ Salida exitosa:', resultado);
 				
 				// Mostrar notificación de éxito con toast
 				if (window.mostrarToast) {
@@ -337,7 +337,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				}
 				
 			} catch (error) {
-				console.error('❌ Error al dar salida:', error);
+				// console.error('❌ Error al dar salida:', error);
 				
 				// Mostrar notificación de error con toast
 				const mensajeError = error.message || 'Error desconocido al dar salida al visitante';
@@ -415,21 +415,19 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					sinVisitantes.classList.remove('hidden');
 					gridVisitantes.classList.add('hidden');
 				}
-			} else {
+			} else if (sinVisitantes && gridVisitantes) {
 				// Mostrar grid de visitantes
-				if (sinVisitantes && gridVisitantes) {
-					sinVisitantes.classList.add('hidden');
-					gridVisitantes.classList.remove('hidden');
-					
-					// Limpiar grid
-					gridVisitantes.innerHTML = '';
-					
-					// Agregar cada visitante
-					visitantesActivos.forEach(visitante => {
-						const card = crearCardVisitante(visitante);
-						gridVisitantes.appendChild(card);
-					});
-				}
+				sinVisitantes.classList.add('hidden');
+				gridVisitantes.classList.remove('hidden');
+				
+				// Limpiar grid
+				gridVisitantes.innerHTML = '';
+				
+				// Agregar cada visitante
+				visitantesActivos.forEach(visitante => {
+					const card = crearCardVisitante(visitante);
+					gridVisitantes.appendChild(card);
+				});
 			}
 		}
 
@@ -466,23 +464,21 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 							visitantesActivos = visitantes;
 							renderizarVisitantes();
 						});
-					} else {
+					} else if (sinVisitantes) {
 						// Si después de 3 segundos no hay Firebase, mostrar error
-						if (sinVisitantes) {
-							sinVisitantes.innerHTML = `
-								<div class="text-center py-16">
-									<div class="mx-auto h-24 w-24 text-red-400 mb-4">❌</div>
-									<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Error de conexión</h3>
-									<p class="text-gray-500 dark:text-gray-400 mb-6">No se pudo conectar con la base de datos</p>
-									<button onclick="location.reload()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
-										🔄 Reintentar
-									</button>
-								</div>
-							`;
-						}
+						sinVisitantes.innerHTML = `
+							<div class="text-center py-16">
+								<div class="mx-auto h-24 w-24 text-red-400 mb-4">❌</div>
+								<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Error de conexión</h3>
+								<p class="text-gray-500 dark:text-gray-400 mb-6">No se pudo conectar con la base de datos</p>
+								<button onclick="location.reload()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
+									🔄 Reintentar
+								</button>
+							</div>
+						`;
 					}
 				}
-				intentos++;
+				intentos += 1;
 			}, 100);
 		}
 

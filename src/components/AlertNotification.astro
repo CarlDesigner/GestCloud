@@ -25,7 +25,7 @@ const { id = 'alert-notification' } = Astro.props;
 
 <script>
 	// Función para mostrar alert siguiendo exactamente el diseño de Flowbite
-	window.mostrarAlert = function(mensaje, tipo = 'info', duracion = 4000) {
+	window.mostrarAlert = function mostrarAlert(mensaje, tipo = 'info', duracion = 4000) {
 		const alert = document.getElementById('alert-notification');
 		const container = document.getElementById('alert-container');
 		const icon = document.getElementById('alert-icon');
@@ -46,8 +46,8 @@ const { id = 'alert-notification' } = Astro.props;
 				container.className = 'flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800';
 				closeBtn.className = 'ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700';
 				icon.innerHTML = iconoInfo;
-				srText.textContent = 'Info';
-				title.textContent = 'Success alert!';
+				if (srText) srText.textContent = 'Info';
+				if (title) title.textContent = 'Success alert!';
 				break;
 				
 			case 'error':
@@ -55,8 +55,8 @@ const { id = 'alert-notification' } = Astro.props;
 				container.className = 'flex items-center p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800';
 				closeBtn.className = 'ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700';
 				icon.innerHTML = iconoInfo;
-				srText.textContent = 'Info';
-				title.textContent = 'Danger alert!';
+				if (srText) srText.textContent = 'Info';
+				if (title) title.textContent = 'Danger alert!';
 				break;
 				
 			case 'warning':
@@ -64,8 +64,8 @@ const { id = 'alert-notification' } = Astro.props;
 				container.className = 'flex items-center p-4 mb-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 dark:border-yellow-800';
 				closeBtn.className = 'ms-auto -mx-1.5 -my-1.5 bg-yellow-50 text-yellow-500 rounded-lg focus:ring-2 focus:ring-yellow-400 p-1.5 hover:bg-yellow-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-yellow-300 dark:hover:bg-gray-700';
 				icon.innerHTML = iconoInfo;
-				srText.textContent = 'Info';
-				title.textContent = 'Warning alert!';
+				if (srText) srText.textContent = 'Info';
+				if (title) title.textContent = 'Warning alert!';
 				break;
 				
 			default: // info
@@ -73,8 +73,8 @@ const { id = 'alert-notification' } = Astro.props;
 				container.className = 'flex items-center p-4 mb-4 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800';
 				closeBtn.className = 'ms-auto -mx-1.5 -my-1.5 bg-blue-50 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-blue-400 dark:hover:bg-gray-700';
 				icon.innerHTML = iconoInfo;
-				srText.textContent = 'Info';
-				title.textContent = 'Info alert!';
+				if (srText) srText.textContent = 'Info';
+				if (title) title.textContent = 'Info alert!';
 		}
 		
 		// Establecer mensaje
@@ -95,13 +95,13 @@ const { id = 'alert-notification' } = Astro.props;
 		// Auto-ocultar después de la duración especificada
 		if (duracion > 0) {
 			setTimeout(() => {
-				cerrarAlert();
+				window.cerrarAlert();
 			}, duracion);
 		}
 	};
 	
 	// Función para cerrar alert con animación
-	window.cerrarAlert = function() {
+	window.cerrarAlert = function cerrarAlert() {
 		const alert = document.getElementById('alert-notification');
 		const container = document.getElementById('alert-container');
 		if (alert && container) {

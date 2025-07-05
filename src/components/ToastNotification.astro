@@ -23,7 +23,7 @@ const { id = 'toast-notification' } = Astro.props;
 
 <script>
 	// Función para mostrar toast siguiendo exactamente el diseño de Flowbite
-	window.mostrarToast = function(mensaje, tipo = 'info', duracion = 4000) {
+	window.mostrarToast = function mostrarToast(mensaje, tipo = 'info', duracion = 4000) {
 		const toast = document.getElementById('toast-notification');
 		const icono = document.getElementById('toast-icon');
 		const mensajeEl = document.getElementById('toast-message');
@@ -95,13 +95,13 @@ const { id = 'toast-notification' } = Astro.props;
 		// Auto-ocultar después de la duración especificada
 		if (duracion > 0) {
 			setTimeout(() => {
-				cerrarToast();
+				window.cerrarToast();
 			}, duracion);
 		}
 	};
 	
 	// Función para cerrar toast con animación
-	window.cerrarToast = function() {
+	window.cerrarToast = function cerrarToast() {
 		const toast = document.getElementById('toast-notification');
 		const container = document.getElementById('toast-container');
 		if (toast && container) {

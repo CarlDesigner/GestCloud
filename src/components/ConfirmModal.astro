@@ -72,11 +72,12 @@ const { id = 'confirm-modal' } = Astro.props;
 </div>
 
 <script>
+	// @ts-nocheck
 	// Variables globales para el modal
 	let pendingSalidaData = null;
 	
 	// Función para mostrar modal de confirmación
-	window.mostrarConfirmSalida = function(visitanteId, visitanteNombre, callbackSalida) {
+	window.mostrarConfirmSalida = function mostrarConfirmSalida(visitanteId, visitanteNombre, callbackSalida) {
 		const modal = document.getElementById('confirm-modal');
 		const nombreElement = document.getElementById('confirm-visitante-nombre');
 		
@@ -98,12 +99,14 @@ const { id = 'confirm-modal' } = Astro.props;
 		// Focus en el botón de cancelar por seguridad
 		setTimeout(() => {
 			const cancelBtn = modal.querySelector('button[onclick="cerrarConfirmModal()"]');
-			if (cancelBtn) cancelBtn.focus();
+			if (cancelBtn && cancelBtn.focus) {
+				cancelBtn.focus();
+			}
 		}, 100);
 	};
 	
 	// Función para cerrar modal
-	window.cerrarConfirmModal = function() {
+	window.cerrarConfirmModal = function cerrarConfirmModal() {
 		const modal = document.getElementById('confirm-modal');
 		if (modal) {
 			modal.classList.add('hidden');
@@ -114,24 +117,24 @@ const { id = 'confirm-modal' } = Astro.props;
 	};
 	
 	// Función para ejecutar la salida confirmada
-	window.ejecutarSalidaConfirmada = function() {
+	window.ejecutarSalidaConfirmada = function ejecutarSalidaConfirmada() {
 		if (!pendingSalidaData) return;
 		
-		const { id, nombre, callback } = pendingSalidaData;
+		const data = pendingSalidaData;
 		
 		// Cerrar modal
-		cerrarConfirmModal();
+		window.cerrarConfirmModal();
 		
 		// Ejecutar callback de salida
-		if (callback && typeof callback === 'function') {
-			callback(id, nombre);
+		if (data && data.callback && typeof data.callback === 'function') {
+			data.callback(data.id, data.nombre);
 		}
 	};
 	
 	// Cerrar modal con ESC
 	document.addEventListener('keydown', (e) => {
 		if (e.key === 'Escape') {
-			cerrarConfirmModal();
+			window.cerrarConfirmModal();
 		}
 	});
 </script>

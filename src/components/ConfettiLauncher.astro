@@ -22,18 +22,20 @@
 </style>
 
 <script>
-	// @ts-ignore
+	// @ts-nocheck
 	const confettiElement = document.querySelector('#confettis');
 	const triggerConfettis = document.querySelector('[data-trigger-confettis]');
 
-	triggerConfettis.addEventListener('click', popIt);
+	if (triggerConfettis) {
+		triggerConfettis.addEventListener('click', popIt);
+	}
 
 	function popIt() {
 		const confettiSettings = {
 			target: confettiElement,
 			start_from_edge: true,
 		};
-		const confetti = new ConfettiGenerator(confettiSettings);
+		const confetti = new window.ConfettiGenerator(confettiSettings);
 		confetti.render();
 	}
 
