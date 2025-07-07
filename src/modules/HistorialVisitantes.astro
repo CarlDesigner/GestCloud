@@ -42,13 +42,48 @@ import AlertNotification from '../components/AlertNotification.astro';
 				</form>
 			</div>
 			<div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-				<!-- Filtro por fecha -->
-				<button type="button" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-					<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-						<path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-					</svg>
-					Filtrar
-				</button>
+				<!-- Filtro por tipo de visitante -->
+				<div class="relative">
+					<button type="button" id="btn-filtrar" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+						<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+							<path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+						</svg>
+						Filtrar <span id="filtro-contador" class="hidden ml-1 text-xs bg-primary-600 text-white px-2 py-0.5 rounded-full">0</span>
+						<svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+						</svg>
+					</button>
+					
+					<!-- Dropdown de filtros -->
+					<div id="dropdown-filtros" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-10">
+						<div class="p-3">
+							<h6 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Filtrar por tipo</h6>
+							<ul class="space-y-2">
+								<li>
+									<label class="flex items-center">
+										<input type="radio" name="filtro-tipo" value="todos" checked class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+										<span class="ml-2 text-sm text-gray-900 dark:text-white">Todos los visitantes</span>
+										<span id="contador-historial-todos" class="ml-auto text-xs text-gray-500 dark:text-gray-400">(0)</span>
+									</label>
+								</li>
+								<li>
+									<label class="flex items-center">
+										<input type="radio" name="filtro-tipo" value="con-vehiculo" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+										<span class="ml-2 text-sm text-gray-900 dark:text-white">Con vehículo</span>
+										<span id="contador-historial-con-vehiculo" class="ml-auto text-xs text-gray-500 dark:text-gray-400">(0)</span>
+									</label>
+								</li>
+								<li>
+									<label class="flex items-center">
+										<input type="radio" name="filtro-tipo" value="sin-vehiculo" class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+										<span class="ml-2 text-sm text-gray-900 dark:text-white">Sin vehículo</span>
+										<span id="contador-historial-sin-vehiculo" class="ml-auto text-xs text-gray-500 dark:text-gray-400">(0)</span>
+									</label>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
 				<!-- Exportar -->
 				<button type="button" id="btn-exportar" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
 					<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -102,12 +137,14 @@ import AlertNotification from '../components/AlertNotification.astro';
 		<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table-fixed">
 			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
 				<tr>
-					<th scope="col" class="px-4 py-3 w-1/4">Visitante</th>
-					<th scope="col" class="px-4 py-3 w-1/6">Contacto</th>
-					<th scope="col" class="px-4 py-3 w-1/6">Destino</th>
-					<th scope="col" class="px-4 py-3 w-1/6">Entrada</th>
-					<th scope="col" class="px-4 py-3 w-1/6">Salida</th>
-					<th scope="col" class="px-4 py-3 w-1/8">Permanencia</th>
+					<th scope="col" class="px-4 py-3 w-1/5">Visitante</th>
+					<th scope="col" class="px-4 py-3 w-1/8">Contacto</th>
+					<th scope="col" class="px-4 py-3 w-1/8">Destino</th>
+					<th scope="col" class="px-4 py-3 w-1/6">Vehículo</th>
+					<th scope="col" class="px-4 py-3 w-1/8">Costo</th>
+					<th scope="col" class="px-4 py-3 w-1/8">Entrada</th>
+					<th scope="col" class="px-4 py-3 w-1/8">Salida</th>
+					<th scope="col" class="px-4 py-3 w-1/12">Permanencia</th>
 					<th scope="col" class="px-4 py-3 w-16">
 						<span class="sr-only">Acciones</span>
 					</th>
@@ -155,7 +192,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 
 <!-- Modal para Ver/Editar Visitante -->
 <div id="modal-visitante" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-	<div class="relative w-full max-w-2xl max-h-full">
+	<div class="relative w-full max-w-2xl max-h-full mx-auto my-auto">
 		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
 			<!-- Modal header -->
 			<div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
@@ -193,6 +230,77 @@ import AlertNotification from '../components/AlertNotification.astro';
 							<label for="autorizadoPor" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Autorizado por</label>
 							<input type="text" id="autorizadoPor" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
 						</div>
+						
+						<!-- Información del vehículo (solo visible si el visitante tiene vehículo) -->
+						<div id="seccion-vehiculo" class="col-span-6 hidden">
+							<!-- Banner azul suave para "Ver detalles" -->
+							<div id="banner-vehiculo-ver" class="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50 border border-blue-200 rounded-lg shadow-md p-5 mb-4 hidden dark:from-blue-900/50 dark:via-indigo-900/40 dark:to-cyan-900/30 dark:border-blue-500">
+								<div class="flex items-center mb-4">
+									<div class="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-lg mr-3 shadow-sm">
+										<svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+											<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/>
+										</svg>
+									</div>
+									<h4 class="text-lg font-semibold text-blue-700 dark:text-blue-200">Información del Vehículo</h4>
+								</div>
+								<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+									<div class="bg-white/80 dark:bg-slate-700/50 rounded-md p-3 border border-slate-200/60 dark:border-slate-600/40">
+										<span class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide block mb-1">Placa</span>
+										<p id="vehiculo-placa-ver" class="text-slate-800 dark:text-slate-100 font-semibold text-lg"></p>
+									</div>
+									<div class="bg-white/80 dark:bg-slate-700/50 rounded-md p-3 border border-slate-200/60 dark:border-slate-600/40">
+										<span class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide block mb-1">Tipo</span>
+										<p id="vehiculo-tipo-ver" class="text-slate-800 dark:text-slate-100 font-semibold text-lg capitalize"></p>
+									</div>
+									<div class="bg-white/80 dark:bg-slate-700/50 rounded-md p-3 border border-slate-200/60 dark:border-slate-600/40">
+										<span class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide block mb-1">Color</span>
+										<p id="vehiculo-color-ver" class="text-slate-800 dark:text-slate-100 font-semibold text-lg capitalize"></p>
+									</div>
+									<div class="bg-white/80 dark:bg-slate-700/50 rounded-md p-3 border border-slate-200/60 dark:border-slate-600/40">
+										<span class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide block mb-1">Costo Total</span>
+										<p id="vehiculo-costo-ver" class="text-emerald-600 dark:text-emerald-400 font-semibold text-lg"></p>
+									</div>
+								</div>
+							</div>
+							
+							<!-- Banner gris-rojizo suave para "Editar" -->
+							<div id="banner-vehiculo-editar" class="relative overflow-hidden bg-gradient-to-br from-red-50 via-orange-50 to-rose-50 border border-red-200 rounded-lg shadow-md p-5 mb-4 hidden dark:from-red-900/40 dark:via-orange-900/30 dark:to-rose-900/30 dark:border-red-500">
+								<div class="flex items-center justify-between mb-4">
+									<div class="flex items-center">
+										<div class="flex items-center justify-center w-10 h-10 bg-red-500 rounded-lg mr-3 shadow-sm">
+											<svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+												<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/>
+											</svg>
+										</div>
+										<h4 class="text-lg font-semibold text-red-700 dark:text-red-200">Información del Vehículo</h4>
+									</div>
+									<div class="flex items-center bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-md">
+										<svg class="w-3 h-3 text-red-500 dark:text-red-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+										</svg>
+										<span class="text-xs font-medium text-red-600 dark:text-red-400">Solo lectura</span>
+									</div>
+								</div>
+								<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+									<div class="bg-white/80 dark:bg-gray-700/50 rounded-md p-3 border border-gray-200/60 dark:border-gray-600/40">
+										<span class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide block mb-1">Placa</span>
+										<input type="text" id="vehiculo-placa" disabled class="bg-transparent border-none text-gray-800 dark:text-gray-100 font-semibold text-lg p-0 w-full cursor-not-allowed focus:ring-0" readonly>
+									</div>
+									<div class="bg-white/80 dark:bg-gray-700/50 rounded-md p-3 border border-gray-200/60 dark:border-gray-600/40">
+										<span class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide block mb-1">Tipo</span>
+										<input type="text" id="vehiculo-tipo" disabled class="bg-transparent border-none text-gray-800 dark:text-gray-100 font-semibold text-lg p-0 w-full cursor-not-allowed focus:ring-0 capitalize" readonly>
+									</div>
+									<div class="bg-white/80 dark:bg-gray-700/50 rounded-md p-3 border border-gray-200/60 dark:border-gray-600/40">
+										<span class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide block mb-1">Color</span>
+										<input type="text" id="vehiculo-color" disabled class="bg-transparent border-none text-gray-800 dark:text-gray-100 font-semibold text-lg p-0 w-full cursor-not-allowed focus:ring-0 capitalize" readonly>
+									</div>
+									<div class="bg-white/80 dark:bg-gray-700/50 rounded-md p-3 border border-gray-200/60 dark:border-gray-600/40">
+										<span class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide block mb-1">Costo Total</span>
+										<input type="text" id="vehiculo-costo" disabled class="bg-transparent border-none text-emerald-600 dark:text-emerald-400 font-semibold text-lg p-0 w-full cursor-not-allowed focus:ring-0" readonly>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</form>
 			</div>
@@ -207,7 +315,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 
 <!-- Modal de confirmación para eliminar -->
 <div id="modal-eliminar" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-	<div class="relative w-full max-w-md max-h-full">
+	<div class="relative w-full max-w-md max-h-full mx-auto my-auto">
 		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
 			<button type="button" id="cerrar-modal-eliminar" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
 				<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -230,7 +338,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 
 <!-- Modal de exportación -->
 <div id="modal-exportar" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-	<div class="relative w-full max-w-md max-h-full">
+	<div class="relative w-full max-w-md max-h-full mx-auto my-auto">
 		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
 			<!-- Modal header -->
 			<div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
@@ -304,6 +412,120 @@ import AlertNotification from '../components/AlertNotification.astro';
 		let visitanteEditando = null;
 		let paginaActual = 1;
 		const itemsPorPagina = 10;
+		let filtroTipoActual = 'todos'; // Nuevo filtro por tipo de visitante
+
+		// Elementos del dropdown de filtros
+		const btnFiltrar = document.getElementById('btn-filtrar');
+		const dropdownFiltros = document.getElementById('dropdown-filtros');
+		const filtroContador = document.getElementById('filtro-contador');
+
+		// Función para actualizar el contador del botón de filtrar
+		function actualizarContadorBotonFiltrar() {
+			let cantidad = 0;
+			let texto = '';
+			
+			switch(filtroTipoActual) {
+				case 'con-vehiculo':
+					cantidad = historialVisitantes.filter(v => v.vehiculo).length;
+					texto = cantidad.toString();
+					break;
+				case 'sin-vehiculo':
+					cantidad = historialVisitantes.filter(v => !v.vehiculo).length;
+					texto = cantidad.toString();
+					break;
+				default:
+					cantidad = historialVisitantes.length;
+					texto = cantidad.toString();
+			}
+			
+			if (filtroTipoActual !== 'todos') {
+				filtroContador.textContent = texto;
+				filtroContador.classList.remove('hidden');
+			} else {
+				filtroContador.classList.add('hidden');
+			}
+		}
+
+		// Función para actualizar contadores de filtros en el historial
+		function actualizarContadoresFiltrosHistorial() {
+			const totalVisitantes = historialVisitantes.length;
+			const conVehiculo = historialVisitantes.filter(v => v.vehiculo).length;
+			const sinVehiculo = historialVisitantes.filter(v => !v.vehiculo).length;
+			
+			const contadorTodos = document.getElementById('contador-historial-todos');
+			const contadorConVehiculo = document.getElementById('contador-historial-con-vehiculo');
+			const contadorSinVehiculo = document.getElementById('contador-historial-sin-vehiculo');
+			
+			if (contadorTodos) contadorTodos.textContent = `(${totalVisitantes})`;
+			if (contadorConVehiculo) contadorConVehiculo.textContent = `(${conVehiculo})`;
+			if (contadorSinVehiculo) contadorSinVehiculo.textContent = `(${sinVehiculo})`;
+		}
+
+		// Función para aplicar filtro por tipo de visitante
+		function aplicarFiltroHistorial() {
+			let resultado = [...historialVisitantes];
+			
+			// Aplicar filtro por tipo
+			switch(filtroTipoActual) {
+				case 'con-vehiculo':
+					resultado = resultado.filter(v => v.vehiculo);
+					break;
+				case 'sin-vehiculo':
+					resultado = resultado.filter(v => !v.vehiculo);
+					break;
+				default:
+					// 'todos' - no filtrar
+					break;
+			}
+			
+			// Aplicar filtro de búsqueda si existe
+			const termino = tableSearch?.value?.toLowerCase() || '';
+			if (termino) {
+				resultado = resultado.filter(visitante =>
+					visitante.nombre.toLowerCase().includes(termino) ||
+					visitante.cedula.toString().includes(termino) ||
+					visitante.apartamento.toLowerCase().includes(termino) ||
+					visitante.autorizadoPor.toLowerCase().includes(termino) ||
+					(visitante.vehiculo && visitante.vehiculo.placa.toLowerCase().includes(termino))
+				);
+			}
+			
+			historialFiltrado = resultado;
+			paginaActual = 1; // Resetear paginación
+			renderizarTabla();
+			
+			// Actualizar contador del botón de filtrar
+			actualizarContadorBotonFiltrar();
+		}
+
+		// Event listeners para el dropdown de filtros
+		if (btnFiltrar && dropdownFiltros) {
+			// Toggle dropdown
+			btnFiltrar.addEventListener('click', (e) => {
+				e.stopPropagation();
+				dropdownFiltros.classList.toggle('hidden');
+			});
+
+			// Cerrar dropdown al hacer click fuera
+			document.addEventListener('click', (e) => {
+				if (!dropdownFiltros.contains(e.target) && !btnFiltrar.contains(e.target)) {
+					dropdownFiltros.classList.add('hidden');
+				}
+			});
+
+			// Manejar cambios en los radio buttons
+			const radioButtons = dropdownFiltros.querySelectorAll('input[name="filtro-tipo"]');
+			console.log('Radio buttons encontrados:', radioButtons.length);
+			radioButtons.forEach(radio => {
+				radio.addEventListener('change', (e) => {
+					console.log('Filtro cambiado a:', e.target.value);
+					filtroTipoActual = e.target.value;
+					console.log('filtroTipoActual ahora es:', filtroTipoActual);
+					aplicarFiltroHistorial();
+					dropdownFiltros.classList.add('hidden');
+				});
+			});
+		}
 
 		// Función para capitalizar nombres
 		function capitalizarNombre(nombre) {
@@ -377,11 +599,50 @@ import AlertNotification from '../components/AlertNotification.astro';
 			return `${minutos}m`;
 		}
 
+		// Función para calcular el costo total del vehículo
+		function calcularCostoTotal(visitante) {
+			if (!visitante.vehiculo || !visitante.vehiculo.tarifa) return 0;
+			
+			// Si el visitante ya tiene un costo calculado (costoVehiculo), usarlo
+			if (visitante.costoVehiculo !== undefined) {
+				return visitante.costoVehiculo;
+			}
+			
+			// Si tiene información del vehículo final con costo total, usarla
+			if (visitante.vehiculoFinal && visitante.vehiculoFinal.costoTotal !== undefined) {
+				return visitante.vehiculoFinal.costoTotal;
+			}
+			
+			// Calcular basado en el tiempo de estancia
+			let entrada;
+			let salida;
+			
+			if (visitante.tiempoEntrada?.toDate) {
+				entrada = visitante.tiempoEntrada.toDate();
+			} else {
+				entrada = new Date(visitante.tiempoEntrada || visitante.fechaCreacion);
+			}
+			
+			if (visitante.tiempoSalida?.toDate) {
+				salida = visitante.tiempoSalida.toDate();
+			} else {
+				salida = new Date(visitante.tiempoSalida || visitante.fechaSalida);
+			}
+			
+			const diferencia = salida - entrada;
+			const minutos = Math.floor(diferencia / (1000 * 60)); // Convertir a minutos
+			
+			return minutos * visitante.vehiculo.tarifa;
+		}
+
 		// Función para crear una fila de la tabla
 		function crearFilaTabla(visitante) {
+			// Calcular costo total del vehículo
+			const costoTotal = visitante.vehiculo ? calcularCostoTotal(visitante) : 0;
+			
 			return `
 				<tr class="border-b dark:border-gray-700">
-					<td class="px-4 py-3 font-medium text-gray-900 dark:text-white w-1/4">
+					<td class="px-4 py-3 font-medium text-gray-900 dark:text-white w-1/5">
 						<div class="flex items-center">
 							<div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
 								<svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
@@ -394,20 +655,44 @@ import AlertNotification from '../components/AlertNotification.astro';
 							</div>
 						</div>
 					</td>
-					<td class="px-4 py-3 w-1/6">
+					<td class="px-4 py-3 w-1/8">
 						<span class="truncate block">${formatearCelular(visitante.celular)}</span>
 					</td>
-					<td class="px-4 py-3 w-1/6">
+					<td class="px-4 py-3 w-1/8">
 						<div class="text-base truncate">Apto: ${visitante.apartamento.toUpperCase()}</div>
 						<div class="text-sm text-gray-500 truncate">Por: ${capitalizarNombre(visitante.autorizadoPor)}</div>
 					</td>
 					<td class="px-4 py-3 w-1/6">
-						<span class="text-sm truncate block">${formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion)}</span>
-					</td>
-					<td class="px-4 py-3 w-1/6">
-						<span class="text-sm truncate block">${formatearFecha(visitante.tiempoSalida || visitante.fechaSalida)}</span>
+						${visitante.vehiculo ? `
+							<div class="flex items-center">
+								<svg class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+									<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/>
+								</svg>
+								<div class="min-w-0">
+									<div class="text-sm font-medium text-gray-900 dark:text-white truncate">${visitante.vehiculo.placa}</div>
+									<div class="text-xs text-gray-500 dark:text-gray-400 truncate">${visitante.vehiculo.tipo} • ${visitante.vehiculo.color}</div>
+								</div>
+							</div>
+						` : `
+							<span class="text-gray-400 dark:text-gray-500 text-sm">Sin vehículo</span>
+						`}
 					</td>
 					<td class="px-4 py-3 w-1/8">
+						${visitante.vehiculo ? `
+							<span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded dark:bg-green-900 dark:text-green-300">
+								$${costoTotal.toLocaleString('es-CO')}
+							</span>
+						` : `
+							<span class="text-gray-400 dark:text-gray-500 text-sm">—</span>
+						`}
+					</td>
+					<td class="px-4 py-3 w-1/8">
+						<span class="text-sm truncate block">${formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion)}</span>
+					</td>
+					<td class="px-4 py-3 w-1/8">
+						<span class="text-sm truncate block">${formatearFecha(visitante.tiempoSalida || visitante.fechaSalida)}</span>
+					</td>
+					<td class="px-4 py-3 w-1/12">
 						<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300 inline-block">
 							${calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)}
 						</span>
@@ -533,7 +818,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 			const visitante = historialVisitantes.find(v => v.id === visitanteId);
 			if (visitante) {
 				modalTitulo.textContent = 'Detalles del Visitante';
-				llenarFormulario(visitante);
+				llenarFormulario(visitante, false); // false = solo ver
 				deshabilitarFormulario(true);
 				document.getElementById('guardar-cambios').style.display = 'none';
 				mostrarModal(modalVisitante);
@@ -546,7 +831,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 			if (visitante) {
 				visitanteEditando = visitante;
 				modalTitulo.textContent = 'Editar Visitante';
-				llenarFormulario(visitante);
+				llenarFormulario(visitante, true); // true = es edición
 				deshabilitarFormulario(false);
 				document.getElementById('guardar-cambios').style.display = 'inline-flex';
 				mostrarModal(modalVisitante);
@@ -560,30 +845,73 @@ import AlertNotification from '../components/AlertNotification.astro';
 		};
 
 		// Función para llenar formulario
-		function llenarFormulario(visitante) {
+		function llenarFormulario(visitante, esEdicion = false) {
 			document.getElementById('nombre').value = visitante.nombre;
 			document.getElementById('cedula').value = visitante.cedula;
 			document.getElementById('celular').value = visitante.celular;
 			document.getElementById('apartamento').value = visitante.apartamento;
 			document.getElementById('autorizadoPor').value = visitante.autorizadoPor;
+			
+			// Mostrar/ocultar sección de vehículo
+			const seccionVehiculo = document.getElementById('seccion-vehiculo');
+			const bannerVer = document.getElementById('banner-vehiculo-ver');
+			const bannerEditar = document.getElementById('banner-vehiculo-editar');
+			
+			if (visitante.vehiculo) {
+				seccionVehiculo.classList.remove('hidden');
+				
+				// Calcular el costo total
+				const costoTotal = calcularCostoTotal(visitante);
+				const costoFormateado = costoTotal ? `$${costoTotal.toLocaleString('es-CO')}` : '$0';
+				
+				if (esEdicion) {
+					// Mostrar banner rojo para edición
+					bannerVer.classList.add('hidden');
+					bannerEditar.classList.remove('hidden');
+					
+					// Llenar campos del formulario de edición
+					document.getElementById('vehiculo-placa').value = visitante.vehiculo.placa || '';
+					document.getElementById('vehiculo-tipo').value = visitante.vehiculo.tipo || '';
+					document.getElementById('vehiculo-color').value = visitante.vehiculo.color || '';
+					document.getElementById('vehiculo-costo').value = costoFormateado;
+				} else {
+					// Mostrar banner azul para solo ver
+					bannerEditar.classList.add('hidden');
+					bannerVer.classList.remove('hidden');
+					
+					// Llenar elementos de solo lectura
+					document.getElementById('vehiculo-placa-ver').textContent = visitante.vehiculo.placa || '';
+					document.getElementById('vehiculo-tipo-ver').textContent = visitante.vehiculo.tipo || '';
+					document.getElementById('vehiculo-color-ver').textContent = visitante.vehiculo.color || '';
+					document.getElementById('vehiculo-costo-ver').textContent = costoFormateado;
+				}
+			} else {
+				seccionVehiculo.classList.add('hidden');
+			}
 		}
 
 		// Función para habilitar/deshabilitar formulario
 		function deshabilitarFormulario(deshabilitar) {
-			const campos = formVisitante.querySelectorAll('input');
-			campos.forEach(campo => {
-				campo.disabled = deshabilitar;
+			// Solo deshabilitar campos básicos del visitante, no los del vehículo
+			const camposBasicos = ['nombre', 'cedula', 'celular', 'apartamento', 'autorizadoPor'];
+			camposBasicos.forEach(campoId => {
+				const campo = document.getElementById(campoId);
+				if (campo) {
+					campo.disabled = deshabilitar;
+				}
 			});
 		}
 
 		// Función para mostrar modal
 		function mostrarModal(modal) {
 			modal.classList.remove('hidden');
+			modal.classList.add('flex', 'items-center', 'justify-center');
 		}
 
 		// Función para ocultar modal
 		function ocultarModal(modal) {
 			modal.classList.add('hidden');
+			modal.classList.remove('flex', 'items-center', 'justify-center');
 		}
 
 		// Función para filtrar visitantes
@@ -745,53 +1073,93 @@ import AlertNotification from '../components/AlertNotification.astro';
 				`;
 				btnPDF.disabled = true;
 
-				// Importar jsPDF y autoTable para tablas profesionales
+				// Importar jsPDF
 				const { jsPDF } = await import('jspdf');
 				
-				// Crear nuevo documento PDF en formato horizontal para mejor distribución
-				const doc = new jsPDF('landscape'); // Volver a landscape
+				// Crear documento PDF horizontal
+				const doc = new jsPDF('landscape');
+				const pageWidth = doc.internal.pageSize.width; // 297mm
+				const pageHeight = doc.internal.pageSize.height; // 210mm
+				const margin = 10;
+				let yPosition = margin + 10;
 				
-				// Configuración optimizada para formato horizontal
-				const pageWidth = doc.internal.pageSize.width; // 297mm para A4 landscape
-				const pageHeight = doc.internal.pageSize.height; // 210mm para A4 landscape
-				const margin = 10; // Márgenes adecuados para horizontal
-				let yPosition = margin;
-				
-				// Título principal bien legible para horizontal
-				doc.setFontSize(16); // Buen tamaño para landscape
+				// TÍTULO PRINCIPAL - CENTRADO
+				doc.setFontSize(18);
 				doc.setFont('helvetica', 'bold');
-				doc.setTextColor(44, 82, 130); // Color azul
+				doc.setTextColor(0, 0, 0);
 				doc.text('HISTORIAL DE VISITANTES - GESTCLOUD', pageWidth / 2, yPosition, { align: 'center' });
-				yPosition += 15; // Espacio adecuado
+				yPosition += 15;
 				
-				// Información del reporte legible
-				doc.setFontSize(10); // Tamaño legible
-				doc.setTextColor(100, 100, 100);
+				// INFORMACIÓN DEL FILTRO
+				doc.setFontSize(12);
 				doc.setFont('helvetica', 'normal');
+				doc.setTextColor(80, 80, 80);
+				
+				let textoFiltro = '';
+				switch(filtroTipoActual) {
+					case 'con-vehiculo':
+						textoFiltro = `Filtro aplicado: Visitantes CON vehículo (${historialFiltrado.length} registros)`;
+						break;
+					case 'sin-vehiculo':
+						textoFiltro = `Filtro aplicado: Visitantes SIN vehículo (${historialFiltrado.length} registros)`;
+						break;
+					default:
+						textoFiltro = `Filtro aplicado: TODOS los visitantes (${historialFiltrado.length} registros)`;
+				}
+				
+				doc.text(textoFiltro, pageWidth / 2, yPosition, { align: 'center' });
+				yPosition += 8;
+				
+				// Fecha de generación
 				const fechaGeneracion = new Date().toLocaleString('es-CO', {
 					year: 'numeric',
-					month: 'short',
+					month: 'long',
 					day: 'numeric',
 					hour: '2-digit',
 					minute: '2-digit'
 				});
-				doc.text(`Generado: ${fechaGeneracion}`, pageWidth / 2, yPosition, { align: 'center' });
-				yPosition += 18; // Espacio generoso
-				doc.text(`Total de registros: ${historialFiltrado.length}`, pageWidth - margin - 50, yPosition);
-				yPosition += 15;
+				doc.setFontSize(10);
+				doc.text(`Generado el: ${fechaGeneracion}`, pageWidth / 2, yPosition, { align: 'center' });
+				yPosition += 20;
 				
-				// Función para formatear fecha específicamente para PDF (más compacta pero completa)
+				// CONFIGURAR COLUMNAS SEGÚN EL FILTRO
+				let tableHeaders = [];
+				let colWidths = [];
+				let incluirVehiculo = false;
+				let incluirCosto = false;
+				
+				// Determinar qué columnas incluir
+				if (filtroTipoActual === 'sin-vehiculo') {
+					// Para visitantes SIN vehículo: NO mostrar columnas de vehículo ni costo
+					tableHeaders = ['#', 'Nombre Completo', 'Cédula', 'Apto', 'Entrada', 'Salida', 'Tiempo', 'Autorizado por'];
+					colWidths = [12, 50, 28, 15, 32, 32, 20, 45];
+				} else if (filtroTipoActual === 'con-vehiculo') {
+					// Para visitantes CON vehículo: mostrar todas las columnas
+					incluirVehiculo = true;
+					incluirCosto = true;
+					tableHeaders = ['#', 'Nombre Completo', 'Cédula', 'Apto', 'Vehículo', 'Entrada', 'Salida', 'Tiempo', 'Costo', 'Autorizado por'];
+					colWidths = [10, 40, 24, 12, 35, 28, 28, 18, 20, 35];
+				} else {
+					// Para TODOS: mostrar vehículo y costo solo si hay visitantes con vehículo
+					if (historialFiltrado.some(v => v.vehiculo)) {
+						incluirVehiculo = true;
+						incluirCosto = true;
+						tableHeaders = ['#', 'Nombre Completo', 'Cédula', 'Apto', 'Vehículo', 'Entrada', 'Salida', 'Tiempo', 'Costo', 'Autorizado por'];
+						colWidths = [10, 40, 24, 12, 35, 28, 28, 18, 20, 35];
+					} else {
+						tableHeaders = ['#', 'Nombre Completo', 'Cédula', 'Apto', 'Entrada', 'Salida', 'Tiempo', 'Autorizado por'];
+						colWidths = [12, 50, 28, 15, 32, 32, 20, 45];
+					}
+				}
+				
+				// Función para formatear fecha
 				function formatearFechaPDF(timestamp) {
 					let fecha;
-					
 					if (timestamp?.toDate) {
 						fecha = timestamp.toDate();
-					} else if (typeof timestamp === 'string') {
-						fecha = new Date(timestamp);
 					} else {
 						fecha = new Date(timestamp);
 					}
-					
 					return fecha.toLocaleString('es-CO', {
 						day: '2-digit',
 						month: '2-digit',
@@ -801,181 +1169,202 @@ import AlertNotification from '../components/AlertNotification.astro';
 					});
 				}
 				
-				// Preparar datos para la tabla (SIN TRUNCAR)
-				const tableData = historialFiltrado.map((visitante, index) => [
-					index + 1, // Número de fila
-					capitalizarNombre(visitante.nombre), // Nombre completo
-					formatearCedula(visitante.cedula), // Cédula formateada
-					formatearCelular(visitante.celular), // Celular formateado
-					visitante.apartamento.toUpperCase(), // Apartamento
-					capitalizarNombre(visitante.autorizadoPor), // Autorizado por completo
-					formatearFechaPDF(visitante.tiempoEntrada || visitante.fechaCreacion), // Fecha compacta
-					formatearFechaPDF(visitante.tiempoSalida || visitante.fechaSalida), // Fecha compacta
-					calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)
-				]);
+				// PREPARAR DATOS DE LA TABLA
+				let totalCosto = 0;
+				const tableData = historialFiltrado.map((visitante, index) => {
+					const row = [];
+					
+					// Columnas básicas
+					row.push(
+						index + 1,
+						capitalizarNombre(visitante.nombre),
+						formatearCedula(visitante.cedula),
+						visitante.apartamento.toUpperCase()
+					);
+					
+					// Agregar vehículo si corresponde
+					if (incluirVehiculo) {
+						if (visitante.vehiculo) {
+							row.push(`${visitante.vehiculo.placa} - ${visitante.vehiculo.tipo} ${visitante.vehiculo.color}`);
+						} else {
+							row.push('Sin vehículo');
+						}
+					}
+					
+					// Tiempos
+					row.push(
+						formatearFechaPDF(visitante.tiempoEntrada || visitante.fechaCreacion),
+						formatearFechaPDF(visitante.tiempoSalida || visitante.fechaSalida),
+						calcularDuracion(visitante.tiempoEntrada || visitante.fechaCreacion, visitante.tiempoSalida || visitante.fechaSalida)
+					);
+					
+					// Agregar costo si corresponde
+					if (incluirCosto) {
+						const costo = visitante.vehiculo ? calcularCostoTotal(visitante) : 0;
+						totalCosto += costo;
+						row.push(costo > 0 ? `$${costo.toLocaleString('es-CO')}` : '-');
+					}
+					
+					// Autorizado por (siempre al final)
+					row.push(capitalizarNombre(visitante.autorizadoPor));
+					
+					return row;
+				});
 				
-				// Configuración de columnas perfecta para formato horizontal
-				const tableHeaders = ['#', 'Nombre Completo', 'Cédula', 'Celular', 'Apto', 'Autorizado Por', 'Entrada', 'Salida', 'Tiempo'];
-				const colWidths = [12, 48, 30, 28, 16, 45, 26, 26, 20]; // Total: 251mm (perfecto para 297mm)
-				
-				// Función para dibujar líneas de la tabla (más delgadas)
-				function dibujarLineaHorizontal(y, xStart = margin, xEnd = pageWidth - margin) {
-					doc.setLineWidth(0.2); // Súper delgada
-					doc.setDrawColor(220, 220, 220); // Más suave
-					doc.line(xStart, y, xEnd, y);
-				}
-				
-				function dibujarLineaVertical(x, yStart, yEnd) {
-					doc.setLineWidth(0.2); // Súper delgada
-					doc.setDrawColor(220, 220, 220); // Más suave
-					doc.line(x, yStart, x, yEnd);
-				}
-				
-				// Dibujar encabezado de la tabla (bien legible)
-				const headerHeight = 12; // Altura adecuada
-				
-				// Fondo del encabezado
-				doc.setFillColor(248, 249, 250);
+				// DIBUJAR ENCABEZADO DE LA TABLA
+				const headerHeight = 12;
+				doc.setFillColor(240, 240, 240);
 				doc.rect(margin, yPosition, pageWidth - 2 * margin, headerHeight, 'F');
+				
+				// Bordes del encabezado
+				doc.setLineWidth(0.5);
+				doc.setDrawColor(0, 0, 0);
+				doc.rect(margin, yPosition, pageWidth - 2 * margin, headerHeight);
 				
 				// Texto del encabezado
 				doc.setFont('helvetica', 'bold');
-				doc.setFontSize(8); // Tamaño legible para encabezados
-				doc.setTextColor(50, 50, 50);
+				doc.setFontSize(8);
+				doc.setTextColor(0, 0, 0);
 				
-				let xPos = margin + 2; // Margen cómodo
+				let xPos = margin;
 				tableHeaders.forEach((header, index) => {
-					// Centrar texto en la celda
+					// Centrar texto en cada celda del encabezado
 					const textWidth = doc.getTextWidth(header);
 					const cellCenter = xPos + (colWidths[index] / 2) - (textWidth / 2);
-					doc.text(header, cellCenter, yPosition + 8); // Centrado vertical cómodo
+					doc.text(header, cellCenter, yPosition + 8);
+					
+					// Líneas verticales entre columnas
+					if (index < tableHeaders.length - 1) {
+						doc.line(xPos + colWidths[index], yPosition, xPos + colWidths[index], yPosition + headerHeight);
+					}
+					
 					xPos += colWidths[index];
 				});
 				
-				// Línea superior del encabezado
-				dibujarLineaHorizontal(yPosition);
 				yPosition += headerHeight;
 				
-				// Línea inferior del encabezado
-				dibujarLineaHorizontal(yPosition);
-				
-				// Líneas verticales del encabezado
-				xPos = margin;
-				for (let i = 0; i <= colWidths.length; i++) {
-					dibujarLineaVertical(xPos, yPosition - headerHeight, yPosition);
-					if (i < colWidths.length) xPos += colWidths[i];
-				}
-				
-				// Dibujar filas de datos (bien legibles y organizadas)
+				// DIBUJAR FILAS DE DATOS
 				doc.setFont('helvetica', 'normal');
-				doc.setFontSize(7); // Tamaño óptimo para lectura
+				doc.setFontSize(7);
 				
 				tableData.forEach((row, rowIndex) => {
-					// Altura fija cómoda
-					const rowHeight = 8; // Altura cómoda para lectura
+					const rowHeight = 8;
 					
-					// Verificar si necesitamos nueva página
-					if (yPosition + rowHeight > pageHeight - 25) { // Margen inferior adecuado
-						doc.addPage('landscape'); // Mantener orientación horizontal
-						yPosition = margin;
+					// Verificar si necesita nueva página
+					if (yPosition + rowHeight > pageHeight - 30) {
+						doc.addPage('landscape');
+						yPosition = margin + 10;
 						
 						// Redibujar encabezado en nueva página
-						doc.setFillColor(248, 249, 250);
+						doc.setFillColor(240, 240, 240);
 						doc.rect(margin, yPosition, pageWidth - 2 * margin, headerHeight, 'F');
+						doc.setLineWidth(0.5);
+						doc.setDrawColor(0, 0, 0);
+						doc.rect(margin, yPosition, pageWidth - 2 * margin, headerHeight);
 						
 						doc.setFont('helvetica', 'bold');
 						doc.setFontSize(8);
-						doc.setTextColor(50, 50, 50);
-						xPos = margin + 2;
+						xPos = margin;
 						tableHeaders.forEach((header, index) => {
 							const textWidth = doc.getTextWidth(header);
 							const cellCenter = xPos + (colWidths[index] / 2) - (textWidth / 2);
 							doc.text(header, cellCenter, yPosition + 8);
+							
+							if (index < tableHeaders.length - 1) {
+								doc.line(xPos + colWidths[index], yPosition, xPos + colWidths[index], yPosition + headerHeight);
+							}
 							xPos += colWidths[index];
 						});
 						
-						dibujarLineaHorizontal(yPosition);
 						yPosition += headerHeight;
-						dibujarLineaHorizontal(yPosition);
-						
-						xPos = margin;
-						for (let i = 0; i <= colWidths.length; i++) {
-							dibujarLineaVertical(xPos, yPosition - headerHeight, yPosition);
-							if (i < colWidths.length) xPos += colWidths[i];
-						}
-						
 						doc.setFont('helvetica', 'normal');
 						doc.setFontSize(7);
 					}
 					
-					// Alternar color de fondo para mejor lectura
+					// Fondo alternado para las filas
 					if (rowIndex % 2 === 0) {
-						doc.setFillColor(252, 252, 252);
+						doc.setFillColor(250, 250, 250);
 						doc.rect(margin, yPosition, pageWidth - 2 * margin, rowHeight, 'F');
 					}
 					
-					// Dibujar contenido de la celda optimizado para horizontal
+					// Bordes de la fila
+					doc.setLineWidth(0.3);
+					doc.setDrawColor(200, 200, 200);
+					doc.rect(margin, yPosition, pageWidth - 2 * margin, rowHeight);
+					
+					// Contenido de las celdas - TODO CENTRADO
 					doc.setTextColor(0, 0, 0);
-					xPos = margin + 2;
+					xPos = margin;
 					row.forEach((cellData, cellIndex) => {
-						let texto = String(cellData);
+						let texto = String(cellData || '-');
 						
-						// Verificar que no esté vacío
-						if (!texto || texto === 'undefined' || texto === 'null') {
-							texto = '-';
+						// Truncar texto si es muy largo
+						const maxChars = Math.floor(colWidths[cellIndex] * 1.2);
+						if (texto.length > maxChars) {
+							texto = texto.substring(0, maxChars - 3) + '...';
 						}
 						
-						// Truncar de manera inteligente según el ancho de columna
-						if (cellIndex === 0 || cellIndex === 4 || cellIndex === 8) { // #, Apto, Tiempo
-							if (texto.length > 12) texto = texto.substring(0, 12);
-						} else if (cellIndex === 1 || cellIndex === 5) { // Nombre completo y autorizado por
-							if (texto.length > 35) texto = `${texto.substring(0, 32)}...`;
-						} else { // Resto de columnas
-							if (texto.length > 20) texto = `${texto.substring(0, 17)}...`;
-						}
+						// CENTRAR TEXTO EN CADA CELDA
+						const textWidth = doc.getTextWidth(texto);
+						const cellCenter = xPos + (colWidths[cellIndex] / 2) - (textWidth / 2);
+						doc.text(texto, cellCenter, yPosition + 5.5);
 						
-						// Alineación optimizada por tipo de columna
-						if (cellIndex === 0 || cellIndex === 4 || cellIndex === 8) { // #, Apto, Tiempo - centrados
-							const textWidth = doc.getTextWidth(texto);
-							const cellCenter = xPos + (colWidths[cellIndex] / 2) - (textWidth / 2);
-							doc.text(texto, cellCenter, yPosition + 5.5); // Centrado vertical
-						} else {
-							// Resto de columnas - alineadas a la izquierda con margen
-							doc.text(texto, xPos + 1, yPosition + 5.5);
+						// Líneas verticales entre columnas
+						if (cellIndex < row.length - 1) {
+							doc.line(xPos + colWidths[cellIndex], yPosition, xPos + colWidths[cellIndex], yPosition + rowHeight);
 						}
 						
 						xPos += colWidths[cellIndex];
 					});
 					
 					yPosition += rowHeight;
-					
-					// Línea horizontal después de cada fila
-					dibujarLineaHorizontal(yPosition);
-					
-					// Líneas verticales para esta fila
-					xPos = margin;
-					for (let i = 0; i <= colWidths.length; i++) {
-						dibujarLineaVertical(xPos, yPosition - rowHeight, yPosition);
-						if (i < colWidths.length) xPos += colWidths[i];
-					}
 				});
 				
-				// Pie de página bien legible
-				yPosition += 10; // Espacio adecuado
-				if (yPosition > pageHeight - 20) { // Margen inferior adecuado
-					doc.addPage('landscape');
-					yPosition = margin;
+				// AGREGAR TOTAL AL FINAL
+				if (incluirCosto && totalCosto > 0) {
+					yPosition += 10;
+					
+					// Verificar espacio para el total
+					if (yPosition + 20 > pageHeight - 20) {
+						doc.addPage('landscape');
+						yPosition = margin + 20;
+					}
+					
+					doc.setFont('helvetica', 'bold');
+					doc.setFontSize(12);
+					doc.setTextColor(0, 120, 0);
+					
+					const textoTotal = `TOTAL GENERADO: $${totalCosto.toLocaleString('es-CO')}`;
+					doc.text(textoTotal, pageWidth - margin - 80, yPosition);
+					
+					// Subrayar el total
+					const totalWidth = doc.getTextWidth(textoTotal);
+					doc.setLineWidth(1);
+					doc.line(pageWidth - margin - 80, yPosition + 2, pageWidth - margin - 80 + totalWidth, yPosition + 2);
 				}
 				
+				// PIE DE PÁGINA
+				yPosition = pageHeight - 15;
 				doc.setFont('helvetica', 'italic');
-				doc.setFontSize(9); // Tamaño legible
+				doc.setFontSize(8);
 				doc.setTextColor(120, 120, 120);
-				doc.text(`Total de visitantes: ${historialFiltrado.length}`, margin, yPosition);
-				doc.text(`GestCloud © ${new Date().getFullYear()}`, pageWidth - margin - 40, yPosition);
+				doc.text(`${textoFiltro}`, margin, yPosition);
+				doc.text(`GestCloud © ${new Date().getFullYear()}`, pageWidth - margin - 50, yPosition);
 				
-				// Guardar el PDF
+				// GUARDAR PDF con nombre descriptivo
 				const fechaActual = new Date().toLocaleDateString('es-CO').replace(/\//g, '-');
-				doc.save(`historial-visitantes-${fechaActual}.pdf`);
+				let nombreArchivo = `historial-visitantes-${fechaActual}`;
+				
+				switch(filtroTipoActual) {
+					case 'con-vehiculo':
+						nombreArchivo += '-con-vehiculo';
+						break;
+					case 'sin-vehiculo':
+						nombreArchivo += '-sin-vehiculo';
+						break;
+				}
+				
+				doc.save(`${nombreArchivo}.pdf`);
 				
 				// Restaurar botón
 				btnPDF.innerHTML = textoOriginal;
@@ -1245,6 +1634,8 @@ import AlertNotification from '../components/AlertNotification.astro';
 			unsubscribe = window.escucharHistorialVisitantes((visitantes) => {
 				historialVisitantes = visitantes;
 				historialFiltrado = [...visitantes];
+				actualizarContadoresFiltrosHistorial();
+				actualizarContadorBotonFiltrar();
 				renderizarTabla();
 			});
 		}
