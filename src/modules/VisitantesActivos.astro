@@ -141,6 +141,41 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				<div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
 					Ingresó: <span class="visitante-hora-entrada"></span>
 				</div>
+				<!-- Costo acumulado del vehículo (solo si tiene vehículo) -->
+				<div class="vehiculo-costo hidden mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+					<div class="flex items-center justify-between">
+						<span class="text-sm text-gray-600 dark:text-gray-400">Costo acumulado:</span>
+						<span class="costo-valor text-lg font-semibold text-orange-600 dark:text-orange-400"></span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Información del vehículo (solo si tiene vehículo) -->
+			<div class="vehiculo-info hidden bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 mb-4 border border-blue-200 dark:border-blue-800">
+				<div class="flex items-center mb-2">
+					<svg class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 15c-.83 0-1.5-.67-1.5-1.5S5.67 12 6.5 12s1.5.67 1.5 1.5S7.33 15 6.5 15zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 10l1.5-4.5h11L19 10H5z"/>
+					</svg>
+					<span class="text-sm font-medium text-blue-800 dark:text-blue-200">Vehículo</span>
+				</div>
+				<div class="space-y-1 text-sm">
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Tipo:</span>
+						<span class="vehiculo-tipo font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Placa:</span>
+						<span class="vehiculo-placa font-mono font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Color:</span>
+						<span class="vehiculo-color font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-blue-700 dark:text-blue-300">Tarifa:</span>
+						<span class="vehiculo-tarifa font-medium text-blue-900 dark:text-blue-100"></span>
+					</div>
+				</div>
 			</div>
 
 			<!-- Botón de salida -->
@@ -366,6 +401,29 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			}
 		}
 
+		// Función para calcular el costo acumulado del vehículo
+		function calcularCostoVehiculo(visitante) {
+			if (!visitante.vehiculo) return '$0';
+			
+			const ahora = new Date();
+			let entrada;
+			
+			// Manejar diferentes formatos de fecha
+			if (visitante.tiempoEntrada?.toDate) {
+				entrada = visitante.tiempoEntrada.toDate();
+			} else if (typeof visitante.tiempoEntrada === 'string') {
+				entrada = new Date(visitante.tiempoEntrada);
+			} else {
+				entrada = new Date(visitante.tiempoEntrada || visitante.fechaCreacion);
+			}
+			
+			const diferenciaMilis = ahora - entrada;
+			const minutos = Math.floor(diferenciaMilis / (1000 * 60));
+			const costo = minutos * visitante.vehiculo.tarifa;
+			
+			return `$${costo.toLocaleString('es-CO')}`;
+		}
+
 		// Función para crear una card de visitante
 		function crearCardVisitante(visitante) {
 			const card = templateCard.content.cloneNode(true);
@@ -379,6 +437,27 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			card.querySelector('.visitante-tiempo').textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
 			card.querySelector('.visitante-hora-entrada').textContent = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
 			
+			// Manejar información del vehículo
+			if (visitante.vehiculo) {
+				// Mostrar sección del vehículo
+				const vehiculoInfo = card.querySelector('.vehiculo-info');
+				const vehiculoCosto = card.querySelector('.vehiculo-costo');
+				
+				if (vehiculoInfo) {
+					vehiculoInfo.classList.remove('hidden');
+					card.querySelector('.vehiculo-tipo').textContent = visitante.vehiculo.tipo.toUpperCase();
+					card.querySelector('.vehiculo-placa').textContent = visitante.vehiculo.placa;
+					card.querySelector('.vehiculo-color').textContent = visitante.vehiculo.color;
+					card.querySelector('.vehiculo-tarifa').textContent = `$${visitante.vehiculo.tarifa}/min`;
+				}
+				
+				if (vehiculoCosto) {
+					vehiculoCosto.classList.remove('hidden');
+					// El costo se actualizará con el cronómetro
+					card.querySelector('.costo-valor').textContent = calcularCostoVehiculo(visitante);
+				}
+			}
+			
 			// Agregar ID para identificar la card
 			card.querySelector('.visitante-card').dataset.visitanteId = visitante.id;
 			
@@ -386,7 +465,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			card.querySelector('.btn-dar-salida').addEventListener('click', async () => {
 				// Mostrar modal de confirmación en lugar de ejecutar directamente
 				if (window.mostrarConfirmSalida) {
-					window.mostrarConfirmSalida(visitante.id, capitalizarNombre(visitante.nombre), ejecutarSalidaVisitante);
+					window.mostrarConfirmSalida(visitante.id, capitalizarNombre(visitante.nombre), ejecutarSalidaVisitante, visitante);
 				} else {
 					// Fallback si el modal no está disponible
 					await ejecutarSalidaVisitante(visitante.id, capitalizarNombre(visitante.nombre));
@@ -439,6 +518,14 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					const tiempoElement = card.querySelector('.visitante-tiempo');
 					if (tiempoElement) {
 						tiempoElement.textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
+					}
+
+					// Actualizar costo del vehículo si tiene vehículo
+					if (visitante.vehiculo) {
+						const costoElement = card.querySelector('.costo-valor');
+						if (costoElement) {
+							costoElement.textContent = calcularCostoVehiculo(visitante);
+						}
 					}
 				}
 			});
