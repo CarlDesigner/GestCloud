@@ -11,13 +11,13 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				<ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
 					<li class="inline-flex items-center">
 						<a href="#" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
-							<svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home mr-2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
 							Visitantes
 						</a>
 					</li>
 					<li>
 						<div class="flex items-center">
-							<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-6 h-6 text-gray-400"><path d="m9 18 6-6-6-6"/></svg>
 							<span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Activos</span>
 						</div>
 					</li>
@@ -28,8 +28,8 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		</div>
 		
 		<!-- Contador de visitantes -->
-		<div class="flex items-center justify-between">
-			<div class="flex items-center space-x-4">
+		<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+			<div class="flex flex-col sm:flex-row sm:items-center gap-4">
 				<div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-3">
 					<div class="flex items-center">
 						<div class="mr-3">
@@ -43,23 +43,36 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				</div>
 				<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
 					<div class="text-sm text-gray-600 dark:text-gray-300">
-						Total activos: <span id="contador-visitantes" class="font-bold text-lg text-gray-900 dark:text-white">0</span>
+						<span class="hidden sm:inline">Total activos: </span>
+						<span class="sm:hidden">Activos: </span>
+						<span id="contador-visitantes" class="font-bold text-lg text-gray-900 dark:text-white">0</span>
 					</div>
 				</div>
 			</div>
 			
 			<!-- Filtros de visitantes -->
-			<div class="flex items-center space-x-3">
-				<span class="text-sm text-gray-500 dark:text-gray-400">Filtrar por:</span>
-				<div class="flex items-center space-x-2">
-					<button id="filtro-todos" class="filtro-btn active px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-primary-500 bg-primary-500 text-white shadow-sm hover:shadow-md">
+			<div class="flex flex-col sm:flex-row sm:items-center gap-3">
+				<span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Filtrar por:</span>
+				<div class="flex flex-wrap gap-2">
+					<button id="filtro-todos" class="filtro-btn active px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-primary-500 bg-primary-500 text-white shadow-sm hover:shadow-md flex-shrink-0">
 						Todos <span id="contador-todos" class="ml-1 text-xs opacity-90">(0)</span>
 					</button>
-					<button id="filtro-con-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:shadow-sm">
-						🚗 Con vehículo <span id="contador-con-vehiculo" class="ml-1 text-xs opacity-75">(0)</span>
+					<button id="filtro-con-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-primary-300 dark:border-primary-600 text-primary-600 dark:text-primary-400 bg-transparent hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:border-primary-500 dark:hover:border-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:shadow-sm flex-shrink-0">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car inline mr-1"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.4 9H5.6L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+						<span class="hidden md:inline">Con vehículo</span>
+						<span class="md:hidden">Vehículo</span>
+						<span id="contador-con-vehiculo" class="ml-1 text-xs opacity-75">(0)</span>
 					</button>
-					<button id="filtro-sin-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-green-300 dark:border-green-600 text-green-600 dark:text-green-400 bg-transparent hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-500 dark:hover:border-green-400 hover:text-green-700 dark:hover:text-green-300 hover:shadow-sm">
-						👤 Sin vehículo <span id="contador-sin-vehiculo" class="ml-1 text-xs opacity-75">(0)</span>
+					<button id="filtro-sin-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900/20 hover:border-gray-500 dark:hover:border-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:shadow-sm flex-shrink-0">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user inline mr-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						<span class="hidden md:inline">Sin vehículo</span>
+						<span class="md:hidden">Peatón</span>
+						<span id="contador-sin-vehiculo" class="ml-1 text-xs opacity-75">(0)</span>
+					</button>
+					<button id="btn-imprimir-parqueadero" class="px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-orange-300 dark:border-orange-600 text-orange-600 dark:text-orange-400 bg-transparent hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-500 dark:hover:border-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:shadow-sm flex-shrink-0">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer inline mr-1"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+						<span class="hidden md:inline">Check-in</span>
+						<span class="md:hidden">Check</span>
 					</button>
 				</div>
 			</div>
@@ -72,15 +85,13 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 	<div class="overflow-x-auto">
 		<div class="inline-block min-w-full align-middle">
 			<div class="overflow-hidden shadow">
-				<div class="p-6 bg-white dark:bg-gray-800 min-h-screen">
+				<div class="p-4 sm:p-6 bg-white dark:bg-gray-800 min-h-screen">
 					
 					<!-- Estado sin visitantes -->
-					<div id="sin-visitantes" class="text-center py-16">
-						<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.196-2.121L17 20zM9 12a4 4 0 008 0 4 4 0 00-8 0zm8 0c0 1.021-.4 1.95-1.05 2.63l2.05 2.37a1 1 0 11-1.5 1.32l-2.05-2.37A5.973 5.973 0 0112 18a5.973 5.973 0 01-3.45-1.05L6.5 19.32a1 1 0 11-1.5-1.32l2.05-2.37A5.973 5.973 0 017 12a6 6 0 0110 0z"/>
-						</svg>
-						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay visitantes activos</h3>
-						<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando se registre un visitante aparecerá aquí en tiempo real</p>
+					<div id="sin-visitantes" class="text-center py-12 sm:py-16">
+						<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users mx-auto h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 text-gray-400 dark:text-gray-600 mb-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m22 21-2-2"/><path d="m16 11 2 2"/></svg>
+						<h3 class="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">No hay visitantes activos</h3>
+						<p class="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-6 px-4">Cuando se registre un visitante aparecerá aquí en tiempo real</p>
 						<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
 							 Registrar Visitante
 							 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus">
@@ -93,7 +104,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					</div>
 
 					<!-- Grid de Cards de Visitantes -->
-					<div id="grid-visitantes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+					<div id="grid-visitantes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
 						<!-- Las cards se generarán dinámicamente aquí -->
 					</div>
 				</div>
@@ -110,9 +121,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			<div class="flex items-center justify-between mb-4">
 				<div class="flex items-center space-x-3">
 					<div class="w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
-						<svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="currentColor" viewBox="0 0 24 24">
-							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-						</svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5 text-primary-600 dark:text-primary-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 					</div>
 					<div>
 						<h3 class="visitante-nombre font-semibold text-lg text-gray-900 dark:text-white"></h3>
@@ -128,21 +137,15 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			<!-- Información del visitante -->
 			<div class="space-y-3 mb-6">
 				<div class="flex items-center">
-					<svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-					</svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-4 h-4 text-gray-400 mr-2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
 					<span class="visitante-celular text-sm text-gray-700 dark:text-gray-300"></span>
 				</div>
 				<div class="flex items-center">
-					<svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-					</svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home w-4 h-4 text-gray-400 mr-2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
 					<span class="visitante-apartamento text-sm text-gray-700 dark:text-gray-300"></span>
 				</div>
 				<div class="flex items-center">
-					<svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-					</svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-check w-4 h-4 text-gray-400 mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16,11 18,13 22,9"/></svg>
 					<span class="visitante-autorizado text-sm text-gray-700 dark:text-gray-300"></span>
 				</div>
 			</div>
@@ -171,9 +174,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			<!-- Información del vehículo (solo si tiene vehículo) -->
 			<div class="vehiculo-info hidden bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 mb-4 border border-blue-200 dark:border-blue-800">
 				<div class="flex items-center mb-2">
-					<svg class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M18.92 5.01C18.72 4.42 18.16 4 17.5 4h-11c-.66 0-1.22.42-1.42 1.01L3 11v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 15c-.83 0-1.5-.67-1.5-1.5S5.67 12 6.5 12s1.5.67 1.5 1.5S7.33 15 6.5 15zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 10l1.5-4.5h11L19 10H5z"/>
-					</svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-4 h-4 text-blue-600 dark:text-blue-400 mr-2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.4 9H5.6L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
 					<span class="text-sm font-medium text-blue-800 dark:text-blue-200">Vehículo</span>
 				</div>
 				<div class="space-y-1 text-sm">
@@ -198,11 +199,8 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 
 			<!-- Botón de salida -->
 			<button class="btn-dar-salida w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
-				<!-- <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-					<path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5z"/>
-				</svg> -->
-				Dar Salida &nbsp;
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
+				Dar Salida
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out ml-2"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
 			</button>
 		</div>
 	</div>
@@ -246,7 +244,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					<div class="text-center py-16">
 						<div class="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mb-4"></div>
 						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Cargando visitantes...</h3>
-						<p class="text-gray-500 dark:text-gray-400">Conectando con Firebase</p>
+						<p class="text-gray-500 dark:text-gray-400">Cargando base de datos...</p>
 					</div>
 				`;
 			}
@@ -256,8 +254,8 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		function restaurarEstadoVacio() {
 			if (sinVisitantes) {
 				sinVisitantes.innerHTML = `
-					<svg class="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.196-2.121L17 20zM9 12a4 4 0 008 0 4 4 0 00-8 0zm8 0c0 1.021-.4 1.95-1.05 2.63l2.05 2.37a1 1 0 11-1.5 1.32l-2.05-2.37A5.973 5.973 0 0112 18a5.973 5.973 0 01-3.45-1.05L6.5 19.32a1 1 0 11-1.5-1.32l2.05-2.37A5.973 5.973 0 017 12a6 6 0 0110 0z"/>
+					<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-4">
+						<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m22 21-2-2"/><path d="m16 11 2 2"/>
 					</svg>
 					<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay visitantes activos</h3>
 					<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando se registre un visitante aparecerá aquí en tiempo real</p>
@@ -345,16 +343,16 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		function actualizarEstadoFiltros() {
 			// Remover clases active de todos los botones y aplicar estilo outline
 			document.querySelectorAll('.filtro-btn').forEach(btn => {
-				btn.classList.remove('active', 'bg-primary-500', 'bg-blue-500', 'bg-green-500', 'text-white', 'shadow-md');
+				btn.classList.remove('active', 'bg-primary-500', 'text-white', 'shadow-md');
 				
 				// Determinar el color base del botón
 				if (btn.id === 'filtro-todos') {
 					btn.classList.add('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
 					btn.classList.remove('border-primary-500');
 				} else if (btn.id === 'filtro-con-vehiculo') {
-					btn.classList.add('border-blue-300', 'dark:border-blue-600', 'text-blue-600', 'dark:text-blue-400', 'bg-transparent');
+					btn.classList.add('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
 				} else if (btn.id === 'filtro-sin-vehiculo') {
-					btn.classList.add('border-green-300', 'dark:border-green-600', 'text-green-600', 'dark:text-green-400', 'bg-transparent');
+					btn.classList.add('border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent');
 				}
 			});
 
@@ -367,11 +365,11 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					btnActivo.classList.remove('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
 					btnActivo.classList.add('border-primary-500', 'bg-primary-500', 'text-white');
 				} else if (filtroActual === 'con-vehiculo') {
-					btnActivo.classList.remove('border-blue-300', 'dark:border-blue-600', 'text-blue-600', 'dark:text-blue-400', 'bg-transparent');
-					btnActivo.classList.add('border-blue-500', 'bg-blue-500', 'text-white');
+					btnActivo.classList.remove('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
+					btnActivo.classList.add('border-primary-500', 'bg-primary-500', 'text-white');
 				} else if (filtroActual === 'sin-vehiculo') {
-					btnActivo.classList.remove('border-green-300', 'dark:border-green-600', 'text-green-600', 'dark:text-green-400', 'bg-transparent');
-					btnActivo.classList.add('border-green-500', 'bg-green-500', 'text-white');
+					btnActivo.classList.remove('border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent');
+					btnActivo.classList.add('border-gray-500', 'bg-gray-500', 'text-white');
 				}
 			}
 		}
@@ -400,6 +398,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				aplicarFiltro();
 			});
 		}
+
 
 		// Función para capitalizar nombres (primera letra de cada palabra en mayúscula)
 		function capitalizarNombre(nombre) {
@@ -545,7 +544,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				const button = card?.querySelector('.btn-dar-salida');
 				if (button) {
 					button.disabled = true;
-					button.innerHTML = '⏳ Procesando...';
+					button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin inline mr-2"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>Procesando...';
 				}
 				
 				// Verificar que la función existe
@@ -587,10 +586,10 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					if (button) {
 						button.disabled = false;
 						button.innerHTML = `
-							<svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-								<path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5z"/>
-							</svg>
 							Dar Salida
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out ml-2">
+								<path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+							</svg>
 						`;
 					}
 				}
@@ -646,6 +645,56 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			});
 		}
 
+		// Event listener para el botón de imprimir parqueadero
+		const btnImprimirParqueadero = document.getElementById('btn-imprimir-parqueadero');
+		if (btnImprimirParqueadero) {
+			btnImprimirParqueadero.addEventListener('click', () => {
+				// Filtrar solo visitantes con vehículo
+				const visitantesConVehiculo = visitantesActivos.filter(visitante => visitante.vehiculo);
+				
+				if (visitantesConVehiculo.length === 0) {
+					if (window.mostrarToast) {
+						window.mostrarToast('No hay vehículos activos para imprimir', 'warning');
+					}
+					return;
+				}
+
+				// Crear contenido HTML para imprimir
+				const fechaActual = new Date().toLocaleString('es-CO', {
+					day: '2-digit',
+					month: '2-digit', 
+					year: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit'
+				});
+
+				let contenidoHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Verificación de Parqueadero - ${fechaActual}</title><style>body{font-family:Arial,sans-serif;margin:20px;color:#000;background:white}.header{text-align:center;margin-bottom:30px;border-bottom:2px solid #333;padding-bottom:15px}.fecha{font-size:14px;color:#666;margin-top:5px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #333;padding:8px;text-align:left;font-size:12px}th{background-color:#f5f5f5;font-weight:bold}.verificado{width:60px;text-align:center}.footer{margin-top:30px;text-align:center;font-size:11px;color:#666}@media print{body{margin:0}.no-print{display:none}}</style></head><body><div class="header"><h1>VERIFICACIÓN DE PARQUEADERO</h1><div class="fecha">Generado: ${fechaActual}</div><div class="fecha">Total de vehículos: ${visitantesConVehiculo.length}</div></div><table><thead><tr><th>Placa</th><th>Propietario</th><th>Tipo</th><th>Color</th><th>Hora Entrada</th><th>Tiempo</th><th class="verificado">✓</th></tr></thead><tbody>`;
+
+				// Agregar cada vehículo a la tabla
+				visitantesConVehiculo.forEach(visitante => {
+					const tiempo = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
+					const horaEntrada = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
+					
+					contenidoHTML += `<tr><td><strong>${visitante.vehiculo.placa || 'N/A'}</strong></td><td>${capitalizarNombre(visitante.nombre)}</td><td>${visitante.vehiculo.tipo || 'N/A'}</td><td>${visitante.vehiculo.color || 'N/A'}</td><td>${horaEntrada}</td><td>${tiempo}</td><td class="verificado"></td></tr>`;
+				});
+
+				contenidoHTML += `</tbody></table><div class="footer"><p>Documento generado automáticamente para verificación física del parqueadero</p><p>Marque la columna ✓ al verificar cada vehículo físicamente</p></div></body></html>`;
+
+				// Crear ventana emergente para imprimir
+				const ventanaImpresion = window.open('', '_blank');
+				ventanaImpresion.document.write(contenidoHTML);
+				ventanaImpresion.document.close();
+				
+				// Esperar a que cargue y luego imprimir automáticamente
+				ventanaImpresion.onload = function ventanaImpresionOnload() {
+					ventanaImpresion.print();
+					setTimeout(() => {
+						ventanaImpresion.close();
+					}, 1000);
+				};
+			});
+		}
+
 		// Conectar con Firebase para obtener visitantes en tiempo real
 		if (window.escucharVisitantesActivos) {
 			unsubscribe = window.escucharVisitantesActivos((visitantes) => {
@@ -670,11 +719,16 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 						// Si después de 3 segundos no hay Firebase, mostrar error
 						sinVisitantes.innerHTML = `
 							<div class="text-center py-16">
-								<div class="mx-auto h-24 w-24 text-red-400 mb-4">❌</div>
+								<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi-off mx-auto h-24 w-24 text-red-400 mb-4">
+									<line x1="1" x2="8.5" y1="1" y2="8.5"/><path d="M16.5 10.5c.5-.5 1.2-.5 1.7 0l.6.6c.5.5.5 1.2 0 1.7l-4 4-4-4c-.5-.5-.5-1.2 0-1.7l.6-.6c.5-.5 1.2-.5 1.7 0L12 12l.5-.5z"/><path d="M8.5 8.5A10 10 0 0 1 12 7a10 10 0 0 1 10 10"/><path d="M5 11a7 7 0 0 1 7-7"/>
+								</svg>
 								<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Error de conexión</h3>
 								<p class="text-gray-500 dark:text-gray-400 mb-6">No se pudo conectar con la base de datos</p>
 								<button onclick="location.reload()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700">
-									🔄 Reintentar
+									<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw mr-2">
+										<path d="m3 12 6-6 6 6"/><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 7.12 3"/>
+									</svg>
+									Reintentar
 								</button>
 							</div>
 						`;
@@ -701,4 +755,3 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		});
 	});
 </script>
-// Cache bust: 07/07/2025 17:27:30

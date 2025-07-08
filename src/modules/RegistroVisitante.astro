@@ -10,20 +10,20 @@ import AlertNotification from '../components/AlertNotification.astro';
 				<ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
 					<li class="inline-flex items-center">
 						<a href="#" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
-							<svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home w-5 h-5 mr-2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
 							Inicio
 						</a>
 					</li>
 					<li>
 						<div class="flex items-center">
-							<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-6 h-6 text-gray-400"><path d="m9 18 6-6-6-6"/></svg>
 							<span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Registro de Visitantes</span>
 						</div>
 					</li>
 				</ol>
 			</nav>
 			<h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Registro de Visitantes</h1>
-			<p class="text-gray-600 dark:text-gray-400 mt-2">Registra los datos del visitante que ingresa al conjunto residencial</p>
+			<p class="text-gray-600 dark:text-gray-400 mt-2">Complete el formulario para registrar el ingreso de un nuevo visitante</p>
 		</div>
 	</div>
 </div>
@@ -35,7 +35,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 			<div class="overflow-hidden shadow">
 				<div class="p-6 bg-white dark:bg-gray-800">
 					<!-- Card del formulario -->
-					<div class="max-w-2xl mx-auto">
+					<div class="max-w-4xl mx-auto">
 						<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg border border-gray-200 dark:border-gray-700">
 							<div class="flex items-center justify-between p-4 border-b dark:border-gray-600">
 								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -43,136 +43,163 @@ import AlertNotification from '../components/AlertNotification.astro';
 								</h3>
 							</div>
 							
-							<form id="visitante-form" class="p-6 space-y-6">
-								<!-- Nombre -->
-								<div>
-									<label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-										Nombre Completo <span class="text-red-500">*</span>
-									</label>
-									<input type="text" name="nombre" id="nombre" 
-										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-										   placeholder="Ej: Juan Pérez González" required>
-								</div>
+							<form id="visitante-form" class="p-4 md:p-6">
+								<!-- Layout responsivo: 1 col móvil, 2 cols tablet+ -->
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+									<!-- Columna Izquierda: Datos del Visitante -->
+									<div class="space-y-4">
+										<div class="pb-3 border-b border-gray-200 dark:border-gray-600">
+											<h4 class="text-base md:text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
+												<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400">
+													<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+													<circle cx="12" cy="7" r="4"/>
+												</svg>
+												Datos del Visitante
+											</h4>
+										</div>
 
-								<!-- Cédula -->
-								<div>
-									<label for="cedula" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-										Número de Cédula <span class="text-red-500">*</span>
-									</label>
-									<input type="text" name="cedula" id="cedula" 
-										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-										   placeholder="Ej: 12345678" 
-										   pattern="[0-9]{6,12}"
-										   maxlength="12"
-										   minlength="6"
-										   title="La cédula debe contener solo números (6-12 dígitos)"
-										   required>
-									<p id="cedula-error" class="hidden text-red-600 text-xs mt-1">La cédula debe contener solo números (6-12 dígitos)</p>
-								</div>
+										<!-- Nombre -->
+										<div>
+											<label for="nombre" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+												Nombre Completo <span class="text-red-500">*</span>
+											</label>
+											<input type="text" name="nombre" id="nombre" 
+												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+												   placeholder="Ej: Juan Pérez González" required>
+										</div>
 
-								<!-- Celular -->
-								<div>
-									<label for="celular" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-										Número de Celular <span class="text-red-500">*</span>
-									</label>
-									<input type="tel" name="celular" id="celular" 
-										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-										   placeholder="Ej: 3001234567" 
-										   pattern="3[0-9]{9}"
-										   maxlength="10"
-										   minlength="10"
-										   title="El celular debe tener 10 dígitos y empezar por 3"
-										   required>
-									<p id="celular-error" class="hidden text-red-600 text-xs mt-1">El celular debe tener 10 dígitos y empezar por 3</p>
-								</div>
+										<!-- Cédula -->
+										<div>
+											<label for="cedula" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+												Número de Cédula <span class="text-red-500">*</span>
+											</label>
+											<input type="text" name="cedula" id="cedula" 
+												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+												   placeholder="Ej: 12345678" 
+												   pattern="[0-9]{6,12}"
+												   maxlength="12"
+												   minlength="6"
+												   title="La cédula debe contener solo números (6-12 dígitos)"
+												   required>
+											<p id="cedula-error" class="hidden text-red-600 text-xs mt-1">La cédula debe contener solo números (6-12 dígitos)</p>
+										</div>
 
-								<!-- Apartamento -->
-								<div>
-									<label for="apartamento" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-										Apartamento a Visitar <span class="text-red-500">*</span>
-									</label>
-									<input type="text" name="apartamento" id="apartamento" 
-										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-										   placeholder="Ej: 101, 205, Casa 15" required>
-								</div>
+										<!-- Celular -->
+										<div>
+											<label for="celular" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+												Número de Celular <span class="text-red-500">*</span>
+											</label>
+											<input type="tel" name="celular" id="celular" 
+												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+												   placeholder="Ej: 3001234567" 
+												   pattern="3[0-9]{9}"
+												   maxlength="10"
+												   minlength="10"
+												   title="El celular debe tener 10 dígitos y empezar por 3"
+												   required>
+											<p id="celular-error" class="hidden text-red-600 text-xs mt-1">El celular debe tener 10 dígitos y empezar por 3</p>
+										</div>
 
-								<!-- Autorizado por -->
-								<div>
-									<label for="autorizado-por" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-										Autorizado por <span class="text-red-500">*</span>
-									</label>
-									<input type="text" name="autorizadoPor" id="autorizado-por" 
-										   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-										   placeholder="Nombre del residente que autoriza" required>
-								</div>
+										<!-- Apartamento -->
+										<div>
+											<label for="apartamento" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+												Apartamento a Visitar <span class="text-red-500">*</span>
+											</label>
+											<input type="text" name="apartamento" id="apartamento" 
+												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+												   placeholder="Ej: 101, 205, Casa 15" required>
+										</div>
 
-								<!-- Sección de Vehículo -->
-								<div class="border-t border-gray-200 dark:border-gray-600 pt-6">
-									<!-- Checkbox para agregar vehículo -->
-									<div class="flex items-center mb-4">
-										<input id="agregar-vehiculo" name="tieneVehiculo" type="checkbox" 
-											   class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-										<label for="agregar-vehiculo" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-											Agregar vehículo
-										</label>
+										<!-- Autorizado por -->
+										<div>
+											<label for="autorizado-por" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+												Autorizado por <span class="text-red-500">*</span>
+											</label>
+											<input type="text" name="autorizadoPor" id="autorizado-por" 
+												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+												   placeholder="Nombre del residente que autoriza" required>
+										</div>
 									</div>
 
-									<!-- Campos del vehículo (ocultos por defecto) -->
-									<div id="vehiculo-campos" class="hidden space-y-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-										<!-- Tipo de Vehículo -->
-										<div>
-											<label for="tipo-vehiculo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-												Tipo de Vehículo <span class="text-red-500">*</span>
-											</label>
-											<select name="tipoVehiculo" id="tipo-vehiculo" 
-													class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-												<option value="">Seleccionar tipo</option>
-												<option value="carro">Carro - $100/minuto</option>
-												<option value="moto">Moto - $150/minuto</option>
-											</select>
-										</div>
-
-										<!-- Placa del Vehículo -->
-										<div>
-											<label for="placa-vehiculo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-												Placa del Vehículo <span class="text-red-500">*</span>
-											</label>
-											<input type="text" name="placa" id="placa-vehiculo" 
-												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-												   placeholder="Ej: ABC123"
-												   maxlength="6"
-												   style="text-transform: uppercase;">
-											<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formato: ABC123 (3 letras + 3 números)</p>
-										</div>
-
-										<!-- Color del Vehículo -->
-										<div>
-											<label for="color-vehiculo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-												Color del Vehículo <span class="text-red-500">*</span>
-											</label>
-											<input type="text" name="color" id="color-vehiculo" 
-												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-												   placeholder="Ej: Blanco, Negro, Azul">
-										</div>
-
-										<!-- Información de tarifa -->
-										<div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-											<div class="flex items-center">
-												<svg class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-													<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+									<!-- Columna Derecha: Datos del Vehículo -->
+									<div class="space-y-4">
+										<div class="pb-3 border-b border-gray-200 dark:border-gray-600">
+											<h4 class="text-base md:text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
+												<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400">
+													<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10c-.3-1.1-1.4-2-2.5-2h-7c-1.1 0-2.2.9-2.5 2l-2.5 1.1c-.8.2-1.5 1-1.5 1.9v3c0 .6.4 1 1 1h2"/>
+													<circle cx="7" cy="17" r="2"/>
+													<path d="M9 17h6"/>
+													<circle cx="17" cy="17" r="2"/>
 												</svg>
-												<span class="text-sm text-blue-800 dark:text-blue-200">
-													<strong>Tarifa:</strong> Se cobrará por minuto según el tipo de vehículo. El costo se calculará automáticamente al momento de la salida.
-												</span>
+												Vehículo
+												<span class="text-xs md:text-sm font-normal text-gray-500 dark:text-gray-400">(Opcional)</span>
+											</h4>
+										</div>
+
+										<!-- Checkbox para agregar vehículo -->
+										<div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+											<input id="agregar-vehiculo" name="tieneVehiculo" type="checkbox" 
+												   class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+											<label for="agregar-vehiculo" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+												El visitante trae vehículo
+											</label>
+										</div>
+
+										<!-- Campos del vehículo (ocultos por defecto) -->
+										<div id="vehiculo-campos" class="hidden space-y-3">
+											<!-- Tipo de Vehículo -->
+											<div>
+												<label for="tipo-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+													Tipo de Vehículo <span class="text-red-500">*</span>
+												</label>
+												<select name="tipoVehiculo" id="tipo-vehiculo" 
+														class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+													<option value="">Seleccionar tipo</option>
+													<option value="carro">Carro - $100/minuto</option>
+													<option value="moto">Moto - $150/minuto</option>
+												</select>
+											</div>
+
+											<!-- Placa del Vehículo -->
+											<div>
+												<label for="placa-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+													Placa del Vehículo <span class="text-red-500">*</span>
+												</label>
+												<input type="text" name="placa" id="placa-vehiculo" 
+													   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+													   placeholder="Ej: ABC123"
+													   maxlength="6"
+													   style="text-transform: uppercase;">
+												<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formato: ABC123 (3 letras + 3 números)</p>
+											</div>
+
+											<!-- Color del Vehículo -->
+											<div>
+												<label for="color-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+													Color del Vehículo <span class="text-red-500">*</span>
+												</label>
+												<input type="text" name="color" id="color-vehiculo" 
+													   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+													   placeholder="Ej: Blanco, Negro, Azul">
+											</div>
+
+											<!-- Información de tarifa compacta -->
+											<div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-2.5">
+												<div class="flex items-start">
+													<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info w-3.5 h-3.5 text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+													<span class="text-xs text-blue-800 dark:text-blue-200">
+														<strong>Tarifa:</strong> Se cobra por minuto según el tipo. El costo se calcula al momento de la salida.
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 
 								<!-- Botón de envío -->
-								<div class="flex items-center pt-4">
+								<div class="col-span-1 md:col-span-2 pt-4 mt-4 border-t border-gray-200 dark:border-gray-600">
 									<button type="submit" 
-											class="w-full flex items-center justify-center gap-2 text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+											class="w-full flex items-center justify-center gap-2 text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 transition-colors">
 										<span>Registrar Visitante</span>
 										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus">
 											<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
