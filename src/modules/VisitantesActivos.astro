@@ -50,29 +50,38 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				</div>
 			</div>
 			
-			<!-- Filtros de visitantes -->
-			<div class="flex flex-col sm:flex-row sm:items-center gap-3">
-				<span class="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Filtrar por:</span>
-				<div class="flex flex-wrap gap-2">
-					<button id="filtro-todos" class="filtro-btn active px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-primary-500 bg-primary-500 text-white shadow-sm hover:shadow-md flex-shrink-0">
+			<!-- Barra de herramientas de visitantes activos mejorada y centrada -->
+			<div class="flex flex-col gap-4">
+				<!-- Búsqueda centrada -->
+				<div class="flex justify-center">
+					<div class="relative w-full max-w-md">
+						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search text-gray-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+						</div>
+						<input type="text" id="buscar-visitante" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-9 pr-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 shadow-sm" placeholder="Buscar por nombre, cédula, placa...">
+					</div>
+				</div>
+				
+				<!-- Filtros y acciones centrados -->
+				<div class="flex flex-wrap items-center justify-center gap-2">
+					<span class="text-sm text-gray-500 dark:text-gray-400 hidden lg:inline">Filtrar:</span>
+					<button id="filtro-todos" class="filtro-btn active px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200 border-primary-500 bg-primary-500 text-white shadow-sm hover:shadow-md">
 						Todos <span id="contador-todos" class="ml-1 text-xs opacity-90">(0)</span>
 					</button>
-					<button id="filtro-con-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-primary-300 dark:border-primary-600 text-primary-600 dark:text-primary-400 bg-transparent hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:border-primary-500 dark:hover:border-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:shadow-sm flex-shrink-0">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car inline mr-1"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.4 9H5.6L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-						<span class="hidden md:inline">Con vehículo</span>
-						<span class="md:hidden">Vehículo</span>
+					<button id="filtro-con-vehiculo" class="filtro-btn px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200 border-primary-300 dark:border-primary-600 text-primary-600 dark:text-primary-400 bg-transparent hover:bg-primary-50 dark:hover:bg-primary-900/20">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car inline mr-1"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.4 9H5.6L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+						<span class="hidden sm:inline">Vehículo</span>
 						<span id="contador-con-vehiculo" class="ml-1 text-xs opacity-75">(0)</span>
 					</button>
-					<button id="filtro-sin-vehiculo" class="filtro-btn px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900/20 hover:border-gray-500 dark:hover:border-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:shadow-sm flex-shrink-0">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user inline mr-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-						<span class="hidden md:inline">Sin vehículo</span>
-						<span class="md:hidden">Peatón</span>
+					<button id="filtro-sin-vehiculo" class="filtro-btn px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-900/20">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user inline mr-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						<span class="hidden sm:inline">Peatón</span>
 						<span id="contador-sin-vehiculo" class="ml-1 text-xs opacity-75">(0)</span>
 					</button>
-					<button id="btn-imprimir-parqueadero" class="px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 border-orange-300 dark:border-orange-600 text-orange-600 dark:text-orange-400 bg-transparent hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-500 dark:hover:border-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:shadow-sm flex-shrink-0">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer inline mr-1"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-						<span class="hidden md:inline">Check-in</span>
-						<span class="md:hidden">Check</span>
+					<div class="w-px h-6 bg-gray-300 dark:bg-gray-600 hidden sm:block"></div>
+					<button id="btn-imprimir-parqueadero" class="px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200 border-orange-300 dark:border-orange-600 text-orange-600 dark:text-orange-400 bg-transparent hover:bg-orange-50 dark:hover:bg-orange-900/20">
+						<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer inline mr-1"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+						<span class="hidden sm:inline">Check-in</span>
 					</button>
 				</div>
 			</div>
@@ -229,6 +238,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		const gridVisitantes = document.getElementById('grid-visitantes');
 		const contadorVisitantes = document.getElementById('contador-visitantes');
 		const templateCard = document.getElementById('template-card-visitante');
+		const buscarVisitante = document.getElementById('buscar-visitante');
 		
 		let visitantesActivos = [];
 		let visitantesFiltrados = [];
@@ -236,6 +246,69 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		let unsubscribe = null;
 		let intervalCronometro = null;
 		let isLoading = true;
+
+		// Variables para Fuse.js (búsqueda avanzada)
+		let fuse = null;
+		let fuseInitialized = false;
+
+		// Configuración de Fuse.js para búsqueda inteligente en visitantes activos
+		const fuseOptions = {
+			keys: [
+				{ name: 'nombre', weight: 0.4 },
+				{ name: 'cedula', weight: 0.3 },
+				{ name: 'apartamento', weight: 0.2 },
+				{ name: 'vehiculo.placa', weight: 0.1 }
+			],
+			threshold: 0.3,
+			includeScore: true,
+			minMatchCharLength: 2,
+			ignoreLocation: true,
+			findAllMatches: true
+		};
+
+		// Función para inicializar Fuse.js para visitantes activos
+		async function inicializarFuseActivos() {
+			if (!fuseInitialized && visitantesActivos.length > 0) {
+				try {
+					const Fuse = (await import('fuse.js')).default;
+					fuse = new Fuse(visitantesActivos, fuseOptions);
+					fuseInitialized = true;
+				} catch (error) {
+					// Fallback a búsqueda simple si falla Fuse.js
+					fuse = null;
+				}
+			}
+		}
+
+		// Función de búsqueda para visitantes activos
+		function buscarVisitantes(termino) {
+			if (!termino || termino.length < 2) {
+				return [...visitantesActivos];
+			}
+
+			// Si es una búsqueda exacta (cédula o placa), usar método directo
+			if (/^\d+$/.test(termino) || /^[A-Z]{3}\d{3}$/.test(termino.toUpperCase())) {
+				return visitantesActivos.filter(visitante =>
+					visitante.cedula.toString().includes(termino) ||
+					(visitante.vehiculo && visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase()))
+				);
+			}
+
+			// Para búsquedas generales, usar Fuse.js si está disponible
+			if (fuse) {
+				const resultados = fuse.search(termino);
+				return resultados.map(resultado => resultado.item);
+			}
+
+			// Fallback a búsqueda simple
+			const terminoLower = termino.toLowerCase();
+			return visitantesActivos.filter(visitante =>
+				visitante.nombre.toLowerCase().includes(terminoLower) ||
+				visitante.cedula.toString().includes(termino) ||
+				visitante.apartamento.toLowerCase().includes(terminoLower) ||
+				(visitante.vehiculo && visitante.vehiculo.placa.toLowerCase().includes(terminoLower))
+			);
+		}
 
 		// Mostrar indicador de carga inicial
 		function mostrarCarga() {
@@ -274,17 +347,26 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		// Mostrar carga inicial
 		mostrarCarga();
 
-		// Función para aplicar filtros
+		// Función para aplicar filtros con búsqueda mejorada
 		function aplicarFiltro() {
+			let resultado = [...visitantesActivos];
+			
+			// Aplicar búsqueda primero si hay términos
+			const termino = buscarVisitante?.value?.trim() || '';
+			if (termino) {
+				resultado = buscarVisitantes(termino);
+			}
+			
+			// Luego aplicar filtro por tipo
 			switch(filtroActual) {
 				case 'con-vehiculo':
-					visitantesFiltrados = visitantesActivos.filter(v => v.vehiculo);
+					visitantesFiltrados = resultado.filter(v => v.vehiculo);
 					break;
 				case 'sin-vehiculo':
-					visitantesFiltrados = visitantesActivos.filter(v => !v.vehiculo);
+					visitantesFiltrados = resultado.filter(v => !v.vehiculo);
 					break;
 				default:
-					visitantesFiltrados = [...visitantesActivos];
+					visitantesFiltrados = resultado;
 			}
 			renderizarCards();
 		}
@@ -383,6 +465,24 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			});
 		}
 
+		// Función para resaltar texto de búsqueda en resultados
+		function resaltarTexto(texto, termino) {
+			if (!termino || termino.length < 2) {
+				return texto;
+			}
+			
+			// Escapar caracteres especiales para regex
+			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			
+			// Crear regex con ignorar mayúsculas/minúsculas
+			const regex = new RegExp(`(${terminoEscapado})`, 'gi');
+			
+			// Resaltar el texto con un span amarillo
+			return texto.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+		}
+
+		// Configurar event listeners para filtros
+
 		if (filtroConVehiculo) {
 			filtroConVehiculo.addEventListener('click', () => {
 				filtroActual = 'con-vehiculo';
@@ -424,6 +524,17 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				return `${numero.slice(0, 3)} ${numero.slice(3, 6)} ${numero.slice(6)}`;
 			}
 			return numero;
+		}
+
+		// Función para formatear placa con guión (formato colombiano)
+		function formatearPlaca(placa) {
+			if (!placa) return '';
+			const placaLimpia = String(placa).replace(/[^A-Z0-9]/g, '').toUpperCase();
+			// Formato: ABC-123
+			if (placaLimpia.length === 6) {
+				return `${placaLimpia.slice(0, 3)}-${placaLimpia.slice(3)}`;
+			}
+			return placaLimpia;
 		}
 
 		// Función para formatear apartamento
@@ -487,12 +598,15 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 		function crearCardVisitante(visitante) {
 			const card = templateCard.content.cloneNode(true);
 			
-			// Llenar datos con formato mejorado
-			card.querySelector('.visitante-nombre').textContent = capitalizarNombre(visitante.nombre);
-			card.querySelector('.visitante-cedula').textContent = `CC: ${formatearCedula(visitante.cedula)}`;
-			card.querySelector('.visitante-celular').textContent = formatearCelular(visitante.celular);
-			card.querySelector('.visitante-apartamento').textContent = `Apto: ${formatearApartamento(visitante.apartamento)}`;
-			card.querySelector('.visitante-autorizado').textContent = `Por: ${capitalizarNombre(visitante.autorizadoPor)}`;
+			// Obtener término de búsqueda actual para resaltado
+			const termino = buscarVisitante?.value?.trim() || '';
+			
+			// Llenar datos con formato mejorado y resaltado
+			card.querySelector('.visitante-nombre').innerHTML = resaltarTexto(capitalizarNombre(visitante.nombre), termino);
+			card.querySelector('.visitante-cedula').innerHTML = `CC: ${resaltarTexto(formatearCedula(visitante.cedula), termino)}`;
+			card.querySelector('.visitante-celular').innerHTML = resaltarTexto(formatearCelular(visitante.celular), termino);
+			card.querySelector('.visitante-apartamento').innerHTML = `Apto: ${resaltarTexto(formatearApartamento(visitante.apartamento), termino)}`;
+			card.querySelector('.visitante-autorizado').innerHTML = `Por: ${resaltarTexto(capitalizarNombre(visitante.autorizadoPor), termino)}`;
 			card.querySelector('.visitante-tiempo').textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
 			card.querySelector('.visitante-hora-entrada').textContent = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
 			
@@ -504,9 +618,9 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				
 				if (vehiculoInfo) {
 					vehiculoInfo.classList.remove('hidden');
-					card.querySelector('.vehiculo-tipo').textContent = visitante.vehiculo.tipo.toUpperCase();
-					card.querySelector('.vehiculo-placa').textContent = visitante.vehiculo.placa;
-					card.querySelector('.vehiculo-color').textContent = visitante.vehiculo.color;
+					card.querySelector('.vehiculo-tipo').innerHTML = resaltarTexto(visitante.vehiculo.tipo.toUpperCase(), termino);
+					card.querySelector('.vehiculo-placa').innerHTML = resaltarTexto(formatearPlaca(visitante.vehiculo.placa), termino);
+					card.querySelector('.vehiculo-color').innerHTML = resaltarTexto(visitante.vehiculo.color, termino);
 					card.querySelector('.vehiculo-tarifa').textContent = `$${visitante.vehiculo.tarifa}/min`;
 				}
 				
@@ -675,7 +789,7 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					const tiempo = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
 					const horaEntrada = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
 					
-					contenidoHTML += `<tr><td><strong>${visitante.vehiculo.placa || 'N/A'}</strong></td><td>${capitalizarNombre(visitante.nombre)}</td><td>${visitante.vehiculo.tipo || 'N/A'}</td><td>${visitante.vehiculo.color || 'N/A'}</td><td>${horaEntrada}</td><td>${tiempo}</td><td class="verificado"></td></tr>`;
+					contenidoHTML += `<tr><td><strong>${formatearPlaca(visitante.vehiculo.placa) || 'N/A'}</strong></td><td>${capitalizarNombre(visitante.nombre)}</td><td>${visitante.vehiculo.tipo || 'N/A'}</td><td>${visitante.vehiculo.color || 'N/A'}</td><td>${horaEntrada}</td><td>${tiempo}</td><td class="verificado"></td></tr>`;
 				});
 
 				contenidoHTML += `</tbody></table><div class="footer"><p>Documento generado automáticamente para verificación física del parqueadero</p><p>Marque la columna ✓ al verificar cada vehículo físicamente</p></div></body></html>`;
@@ -695,10 +809,14 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 			});
 		}
 
-		// Conectar con Firebase para obtener visitantes en tiempo real
+		// Conectar con Firebase para obtener visitantes en tiempo real con Fuse.js
 		if (window.escucharVisitantesActivos) {
 			unsubscribe = window.escucharVisitantesActivos((visitantes) => {
 				visitantesActivos = visitantes;
+				
+				// Inicializar Fuse.js con los nuevos datos
+				inicializarFuseActivos();
+				
 				renderizarVisitantes();
 			});
 		} else {
@@ -736,6 +854,27 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				}
 				intentos += 1;
 			}, 100);
+		}
+
+		// Event listener para búsqueda en tiempo real
+		if (buscarVisitante) {
+			let timeoutId = null;
+			
+			buscarVisitante.addEventListener('input', () => {
+				// Debounce para evitar búsquedas excesivas
+				clearTimeout(timeoutId);
+				timeoutId = setTimeout(() => {
+					aplicarFiltro();
+				}, 150);
+			});
+
+			// Búsqueda inmediata al presionar Enter
+			buscarVisitante.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter') {
+					clearTimeout(timeoutId);
+					aplicarFiltro();
+				}
+			});
 		}
 
 		// Timeout de seguridad: si después de 1 segundo no hay datos, mostrar estado vacío

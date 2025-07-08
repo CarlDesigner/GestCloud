@@ -26,37 +26,43 @@ import AlertNotification from '../components/AlertNotification.astro';
 			<p class="text-gray-600 dark:text-gray-400 mt-2">Registro de todos los visitantes que han salido del conjunto residencial</p>
 		</div>
 		
-		<!-- Barra de herramientas -->
-		<div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-			<div class="w-full md:w-1/2 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
-				<!-- Búsqueda por texto -->
-				<div class="relative flex-1">
+		<!-- Barra de herramientas mejorada -->
+		<div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 p-4">
+			<!-- Grupo izquierdo: Búsqueda y filtros principales -->
+			<div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-1">
+				<!-- Búsqueda compacta -->
+				<div class="relative w-full sm:w-80">
 					<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-5 h-5 text-gray-500 dark:text-gray-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search text-gray-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
 					</div>
-					<input type="text" id="table-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Buscar visitantes...">
+					<input type="text" id="table-search" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-9 pr-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 shadow-sm" placeholder="Buscar por nombre, cédula, placa...">
 				</div>
 				
-				<!-- Filtro por fecha -->
-				<div class="relative">
-					<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-5 h-5 text-gray-500 dark:text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+				<!-- Filtros compactos -->
+				<div class="flex items-center gap-2">
+					<!-- Filtro por fecha compacto -->
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+							<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+						</div>
+						<input 
+							type="text" 
+							id="datepicker-historial" 
+							class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-36 pl-8 pr-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 shadow-sm" 
+							placeholder="Fecha"
+							readonly
+						>
 					</div>
-					<input 
-						type="text" 
-						id="datepicker-historial" 
-						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-						placeholder="Filtrar por fecha"
-						readonly
-					>
+					
+					<!-- Botón limpiar filtros compacto -->
+					<button type="button" id="btn-limpiar-filtros" class="hidden p-2.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700 shadow-sm transition-colors" title="Limpiar filtros">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+					</button>
 				</div>
-				
-				<!-- Botón limpiar filtros -->
-				<button type="button" id="btn-limpiar-filtros" class="hidden px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700" title="Limpiar filtros">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-				</button>
 			</div>
-			<div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+			
+			<!-- Grupo derecho: Filtros por tipo y acciones -->
+			<div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-shrink-0">
 				<!-- Filtro por tipo de visitante -->
 				<div class="relative">
 					<button type="button" id="btn-filtrar" class="flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
@@ -400,6 +406,26 @@ import AlertNotification from '../components/AlertNotification.astro';
 		let filtroTipoActual = 'todos'; // Filtro por tipo de visitante
 		let fechaFiltroActual = null; // Filtro por fecha
 
+		// Variables para Fuse.js (búsqueda avanzada)
+		let fuse = null;
+		let fuseInitialized = false;
+
+		// Configuración de Fuse.js para búsqueda inteligente
+		const fuseOptions = {
+			keys: [
+				{ name: 'nombre', weight: 0.3 },
+				{ name: 'cedula', weight: 0.25 },
+				{ name: 'apartamento', weight: 0.2 },
+				{ name: 'autorizadoPor', weight: 0.15 },
+				{ name: 'vehiculo.placa', weight: 0.1 }
+			],
+			threshold: 0.3, // 0 = coincidencia exacta, 1 = coincidencia cualquiera
+			includeScore: true,
+			minMatchCharLength: 2,
+			ignoreLocation: true,
+			findAllMatches: true
+		};
+
 		// Elementos del dropdown de filtros
 		const btnFiltrar = document.getElementById('btn-filtrar');
 		const dropdownFiltros = document.getElementById('dropdown-filtros');
@@ -447,7 +473,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 			if (contadorSinVehiculo) contadorSinVehiculo.textContent = `(${sinVehiculo})`;
 		}
 
-		// Función para aplicar filtro por tipo de visitante
+		// Función para aplicar filtro por tipo de visitante con Fuse.js
 		function aplicarFiltroHistorial() {
 			let resultado = [...historialVisitantes];
 			
@@ -485,16 +511,67 @@ import AlertNotification from '../components/AlertNotification.astro';
 				});
 			}
 			
-			// Aplicar filtro de búsqueda si existe
-			const termino = tableSearch?.value?.toLowerCase() || '';
+			// Aplicar búsqueda con Fuse.js (mejorada)
+			const termino = tableSearch?.value?.trim() || '';
 			if (termino) {
-				resultado = resultado.filter(visitante =>
-					visitante.nombre.toLowerCase().includes(termino) ||
-					visitante.cedula.toString().includes(termino) ||
-					visitante.apartamento.toLowerCase().includes(termino) ||
-					visitante.autorizadoPor.toLowerCase().includes(termino) ||
-					(visitante.vehiculo && visitante.vehiculo.placa.toLowerCase().includes(termino))
-				);
+				// Actualizar Fuse con los datos filtrados por tipo y fecha
+				if (resultado.length !== historialVisitantes.length && fuse) {
+					// Crear una instancia temporal de Fuse para los datos filtrados
+					try {
+						const Fuse = fuse.constructor;
+						const fuseTemp = new Fuse(resultado, fuseOptions);
+						const resultadoBusqueda = buscarConFuseTemp(fuseTemp, termino, resultado);
+						resultado = resultadoBusqueda;
+					} catch (error) {
+						// Fallback a búsqueda simple en datos filtrados
+						const terminoLower = termino.toLowerCase();
+						resultado = resultado.filter(visitante =>
+							visitante.nombre.toLowerCase().includes(terminoLower) ||
+							visitante.cedula.toString().includes(termino) ||
+							visitante.apartamento.toLowerCase().includes(terminoLower) ||
+							visitante.autorizadoPor.toLowerCase().includes(terminoLower) ||
+							(visitante.vehiculo && visitante.vehiculo.placa.toLowerCase().includes(terminoLower))
+						);
+					}
+				} else {
+					// Usar búsqueda global con Fuse.js
+					const resultadosBusqueda = buscarConFuse(termino);
+					// Filtrar los resultados de Fuse.js por tipo y fecha
+					resultado = resultadosBusqueda.filter(visitante => {
+						// Verificar filtro por tipo
+						let pasaTipo = true;					switch(filtroTipoActual) {
+						case 'con-vehiculo':
+							pasaTipo = !!visitante.vehiculo;
+							break;
+						case 'sin-vehiculo':
+							pasaTipo = !visitante.vehiculo;
+							break;
+						default:
+							pasaTipo = true;
+							break;
+					}
+						
+						// Verificar filtro por fecha
+						let pasaFecha = true;
+						if (fechaFiltroActual) {
+							const fechaCampo = visitante.tiempoEntrada || visitante.tiempoSalida;
+							if (fechaCampo) {
+								let fechaVisitante;
+								if (fechaCampo?.toDate) {
+									fechaVisitante = fechaCampo.toDate();
+								} else {
+									fechaVisitante = new Date(fechaCampo);
+								}
+								const fechaVisitanteStr = fechaVisitante.toISOString().split('T')[0];
+								pasaFecha = fechaVisitanteStr === fechaFiltroActual;
+							} else {
+								pasaFecha = false;
+							}
+						}
+						
+						return pasaTipo && pasaFecha;
+					});
+				}
 			}
 			
 			historialFiltrado = resultado;
@@ -504,12 +581,31 @@ import AlertNotification from '../components/AlertNotification.astro';
 			// Actualizar contador del botón de filtrar
 			actualizarContadorBotonFiltrar();
 			
-			// Mostrar/ocultar botón de limpiar filtros
-			if (fechaFiltroActual || filtroTipoActual !== 'todos' || (tableSearch?.value || '').trim()) {
+			// Mostrar/ocultar botón de limpiar filtros (solo para filtros de fecha/tipo, no búsqueda)
+			if (fechaFiltroActual || filtroTipoActual !== 'todos') {
 				btnLimpiarFiltros?.classList.remove('hidden');
 			} else {
 				btnLimpiarFiltros?.classList.add('hidden');
 			}
+		}
+
+		// Función auxiliar para búsqueda con Fuse temporal
+		function buscarConFuseTemp(fuseInstance, termino, datos) {
+			if (!termino || termino.length < 2) {
+				return datos;
+			}
+
+			// Si es una búsqueda exacta (cédula o placa), usar método directo
+			if (/^\d+$/.test(termino) || /^[A-Z]{3}\d{3}$/.test(termino.toUpperCase())) {
+				return datos.filter(visitante =>
+					visitante.cedula.toString().includes(termino) ||
+					(visitante.vehiculo && visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase()))
+				);
+			}
+
+			// Para búsquedas generales, usar Fuse.js
+			const resultados = fuseInstance.search(termino);
+			return resultados.map(resultado => resultado.item);
 		}
 
 		// Event listeners para el dropdown de filtros
@@ -597,10 +693,71 @@ import AlertNotification from '../components/AlertNotification.astro';
 			});
 		}
 
-		// Event listener para búsqueda en tiempo real
+		// Función para inicializar Fuse.js
+		async function inicializarFuse() {
+			if (!fuseInitialized && historialVisitantes.length > 0) {
+				try {
+					const Fuse = (await import('fuse.js')).default;
+					fuse = new Fuse(historialVisitantes, fuseOptions);
+					fuseInitialized = true;
+					// console.log('🔍 Fuse.js inicializado con', historialVisitantes.length, 'visitantes');
+				} catch (error) {
+					// console.error('Error al inicializar Fuse.js:', error);
+					// Fallback a búsqueda simple si falla Fuse.js
+					fuse = null;
+				}
+			}
+		}
+
+		// Función de búsqueda mejorada con Fuse.js
+		function buscarConFuse(termino) {
+			if (!termino || termino.length < 2) {
+				return [...historialVisitantes];
+			}
+
+			// Si es una búsqueda exacta (cédula o placa), usar método directo
+			if (/^\d+$/.test(termino) || /^[A-Z]{3}\d{3}$/.test(termino.toUpperCase())) {
+				return historialVisitantes.filter(visitante =>
+					visitante.cedula.toString().includes(termino) ||
+					(visitante.vehiculo && visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase()))
+				);
+			}
+
+			// Para búsquedas generales, usar Fuse.js si está disponible
+			if (fuse) {
+				const resultados = fuse.search(termino);
+				return resultados.map(resultado => resultado.item);
+			}
+
+			// Fallback a búsqueda simple si Fuse.js no está disponible
+			const terminoLower = termino.toLowerCase();
+			return historialVisitantes.filter(visitante =>
+				visitante.nombre.toLowerCase().includes(terminoLower) ||
+				visitante.cedula.toString().includes(termino) ||
+				visitante.apartamento.toLowerCase().includes(terminoLower) ||
+				visitante.autorizadoPor.toLowerCase().includes(terminoLower) ||
+				(visitante.vehiculo && visitante.vehiculo.placa.toLowerCase().includes(terminoLower))
+			);
+		}
+
+		// Event listener para búsqueda en tiempo real mejorada
 		if (tableSearch) {
+			let timeoutId = null;
+			
 			tableSearch.addEventListener('input', () => {
-				aplicarFiltroHistorial();
+				// Debounce para evitar búsquedas excesivas
+				clearTimeout(timeoutId);
+				timeoutId = setTimeout(() => {
+					aplicarFiltroHistorial();
+				}, 150); // Esperar 150ms después del último keystroke
+			});
+
+			// Búsqueda inmediata al presionar Enter
+			tableSearch.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter') {
+					clearTimeout(timeoutId);
+					aplicarFiltroHistorial();
+				}
 			});
 		}
 
@@ -654,6 +811,17 @@ import AlertNotification from '../components/AlertNotification.astro';
 			return numero;
 		}
 
+		// Función para formatear placa con guión (formato colombiano)
+		function formatearPlaca(placa) {
+			if (!placa) return '';
+			const placaLimpia = String(placa).replace(/[^A-Z0-9]/g, '').toUpperCase();
+			// Formato: ABC-123
+			if (placaLimpia.length === 6) {
+				return `${placaLimpia.slice(0, 3)}-${placaLimpia.slice(3)}`;
+			}
+			return placaLimpia;
+		}
+
 		// Función para formatear fecha/hora
 		function formatearFecha(timestamp) {
 			let fecha;
@@ -702,6 +870,22 @@ import AlertNotification from '../components/AlertNotification.astro';
 			return `${minutos}m`;
 		}
 
+		// Función para resaltar texto de búsqueda en resultados
+		function resaltarTexto(texto, termino) {
+			if (!termino || termino.length < 2) {
+				return texto;
+			}
+			
+			// Escapar caracteres especiales para regex
+			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			
+			// Crear regex con ignorar mayúsculas/minúsculas
+			const regex = new RegExp(`(${terminoEscapado})`, 'gi');
+			
+			// Resaltar el texto con un span amarillo
+			return texto.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+		}
+
 		// Función para calcular el costo total del vehículo
 		function calcularCostoTotal(visitante) {
 			if (!visitante.vehiculo || !visitante.vehiculo.tarifa) return 0;
@@ -743,6 +927,9 @@ import AlertNotification from '../components/AlertNotification.astro';
 			// Calcular costo total del vehículo
 			const costoTotal = visitante.vehiculo ? calcularCostoTotal(visitante) : 0;
 			
+			// Obtener término de búsqueda actual para resaltado
+			const termino = tableSearch?.value?.trim() || '';
+			
 			return `
 				<tr class="border-b dark:border-gray-700">
 					<td class="px-4 py-3 font-medium text-gray-900 dark:text-white w-1/5">
@@ -751,25 +938,25 @@ import AlertNotification from '../components/AlertNotification.astro';
 								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5 text-gray-600"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 							</div>
 							<div class="min-w-0">
-								<div class="text-base font-semibold truncate">${capitalizarNombre(visitante.nombre)}</div>
-								<div class="font-normal text-gray-500 truncate">CC: ${formatearCedula(visitante.cedula)}</div>
+								<div class="text-base font-semibold truncate">${resaltarTexto(capitalizarNombre(visitante.nombre), termino)}</div>
+								<div class="font-normal text-gray-500 truncate">CC: ${resaltarTexto(formatearCedula(visitante.cedula), termino)}</div>
 							</div>
 						</div>
 					</td>
 					<td class="px-4 py-3 w-1/8">
-						<span class="truncate block">${formatearCelular(visitante.celular)}</span>
+						<span class="truncate block">${resaltarTexto(formatearCelular(visitante.celular), termino)}</span>
 					</td>
 					<td class="px-4 py-3 w-1/8">
-						<div class="text-base truncate">Apto: ${visitante.apartamento.toUpperCase()}</div>
-						<div class="text-sm text-gray-500 truncate">Por: ${capitalizarNombre(visitante.autorizadoPor)}</div>
+						<div class="text-base truncate">Apto: ${resaltarTexto(visitante.apartamento.toUpperCase(), termino)}</div>
+						<div class="text-sm text-gray-500 truncate">Por: ${resaltarTexto(capitalizarNombre(visitante.autorizadoPor), termino)}</div>
 					</td>
 					<td class="px-4 py-3 w-1/6">
 						${visitante.vehiculo ? `
 							<div class="flex items-center">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-4 h-4 text-blue-600 dark:text-blue-400 mr-1 flex-shrink-0"><path d="M8 19H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h6l2 4h4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
 								<div class="min-w-0">
-									<div class="text-sm font-medium text-gray-900 dark:text-white truncate">${visitante.vehiculo.placa}</div>
-									<div class="text-xs text-gray-500 dark:text-gray-400 truncate">${visitante.vehiculo.tipo} • ${visitante.vehiculo.color}</div>
+									<div class="text-sm font-medium text-gray-900 dark:text-white truncate">${resaltarTexto(formatearPlaca(visitante.vehiculo.placa), termino)}</div>
+									<div class="text-xs text-gray-500 dark:text-gray-400 truncate">${resaltarTexto(visitante.vehiculo.tipo, termino)} • ${resaltarTexto(visitante.vehiculo.color, termino)}</div>
 								</div>
 							</div>
 						` : `
@@ -977,7 +1164,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 					bannerVer.classList.remove('hidden');
 					
 					// Llenar elementos de solo lectura
-					document.getElementById('vehiculo-placa-ver').textContent = visitante.vehiculo.placa || '';
+					document.getElementById('vehiculo-placa-ver').textContent = formatearPlaca(visitante.vehiculo.placa) || '';
 					document.getElementById('vehiculo-tipo-ver').textContent = visitante.vehiculo.tipo || '';
 					document.getElementById('vehiculo-color-ver').textContent = visitante.vehiculo.color || '';
 					document.getElementById('vehiculo-costo-ver').textContent = costoFormateado;
@@ -1279,7 +1466,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 					// Agregar vehículo si corresponde
 					if (incluirVehiculo) {
 						if (visitante.vehiculo) {
-							row.push(`${visitante.vehiculo.placa} - ${visitante.vehiculo.tipo} ${visitante.vehiculo.color}`);
+							row.push(`${formatearPlaca(visitante.vehiculo.placa)} - ${visitante.vehiculo.tipo} ${visitante.vehiculo.color}`);
 						} else {
 							row.push('Sin vehículo');
 						}
@@ -1721,6 +1908,10 @@ import AlertNotification from '../components/AlertNotification.astro';
 			unsubscribe = window.escucharHistorialVisitantes((visitantes) => {
 				historialVisitantes = visitantes;
 				historialFiltrado = [...visitantes];
+				
+				// Inicializar Fuse.js con los nuevos datos
+				inicializarFuse();
+				
 				actualizarContadoresFiltrosHistorial();
 				actualizarContadorBotonFiltrar();
 				renderizarTabla();
