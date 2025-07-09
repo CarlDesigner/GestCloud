@@ -22,11 +22,6 @@ function probarNotificaciones() {
     setTimeout(() => {
       window.mostrarToast('ℹ️ Sistema funcionando correctamente', 'info', 3000);
     }, 5500);
-    
-    console.log('🧪 Pruebas de notificaciones toast iniciadas');
-  } else {
-    console.error('❌ Sistema de notificaciones toast no disponible');
-  }
 }
 
 // Función para probar el modal de confirmación

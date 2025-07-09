@@ -286,28 +286,65 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				return [...visitantesActivos];
 			}
 
-			// Si es una búsqueda exacta (cédula o placa), usar método directo
-			if (/^\d+$/.test(termino) || /^[A-Z]{3}\d{3}$/.test(termino.toUpperCase())) {
+			// Limpiar término de búsqueda para cédulas (remover puntos y espacios)
+			const terminoLimpio = termino.replace(/[.\s-]/g, '');
+			
+			// PRIORIDAD 1: Si es una búsqueda de solo números (cédula), hacer búsqueda directa
+			if (/^\d+$/.test(terminoLimpio)) {
+				return visitantesActivos.filter(visitante => {
+					const cedulaLimpia = visitante.cedula.toString().replace(/[.\s-]/g, '');
+					const cedulaOriginal = visitante.cedula.toString();
+					
+					// Buscar en cédula sin formato Y con formato
+					return cedulaLimpia.includes(terminoLimpio) || 
+						   cedulaOriginal.includes(termino) ||
+						   cedulaLimpia === terminoLimpio ||
+						   cedulaOriginal === termino;
+				});
+			}
+
+			// PRIORIDAD 2: Si es una placa (3 letras + 3 números), buscar por placa
+			if (/^[A-Z]{3}\d{3}$/.test(termino.toUpperCase().replace(/[-\s]/g, ''))) {
+				const placaLimpia = termino.toUpperCase().replace(/[-\s]/g, '');
 				return visitantesActivos.filter(visitante =>
-					visitante.cedula.toString().includes(termino) ||
-					(visitante.vehiculo && visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase()))
+					visitante.vehiculo && (
+						visitante.vehiculo.placa.toUpperCase().replace(/[-\s]/g, '').includes(placaLimpia) ||
+						visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase())
+					)
 				);
 			}
 
-			// Para búsquedas generales, usar Fuse.js si está disponible
+			// PRIORIDAD 3: Para búsquedas de texto general, hacer búsqueda manual primero
+			const terminoLower = termino.toLowerCase();
+			const resultadosManual = visitantesActivos.filter(visitante => {
+				const cedulaLimpia = visitante.cedula.toString().replace(/[.\s-]/g, '');
+				const cedulaOriginal = visitante.cedula.toString();
+				
+				return visitante.nombre.toLowerCase().includes(terminoLower) ||
+					   cedulaOriginal.includes(termino) ||
+					   cedulaLimpia.includes(terminoLimpio) ||
+					   visitante.apartamento.toLowerCase().includes(terminoLower) ||
+					   visitante.autorizadoPor.toLowerCase().includes(terminoLower) ||
+					   (visitante.vehiculo && (
+					   		visitante.vehiculo.placa.toLowerCase().includes(terminoLower) ||
+					   		visitante.vehiculo.tipo.toLowerCase().includes(terminoLower) ||
+					   		visitante.vehiculo.color.toLowerCase().includes(terminoLower)
+					   ));
+			});
+
+			// Si encontramos resultados manuales, devolverlos
+			if (resultadosManual.length > 0) {
+				return resultadosManual;
+			}
+
+			// PRIORIDAD 4: Si no hay resultados manuales, usar Fuse.js como respaldo
 			if (fuse) {
 				const resultados = fuse.search(termino);
 				return resultados.map(resultado => resultado.item);
 			}
 
-			// Fallback a búsqueda simple
-			const terminoLower = termino.toLowerCase();
-			return visitantesActivos.filter(visitante =>
-				visitante.nombre.toLowerCase().includes(terminoLower) ||
-				visitante.cedula.toString().includes(termino) ||
-				visitante.apartamento.toLowerCase().includes(terminoLower) ||
-				(visitante.vehiculo && visitante.vehiculo.placa.toLowerCase().includes(terminoLower))
-			);
+			// Si todo falla, devolver array vacío
+			return [];
 		}
 
 		// Mostrar indicador de carga inicial
@@ -471,10 +508,32 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 				return texto;
 			}
 			
-			// Escapar caracteres especiales para regex
-			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			// Limpiar término de búsqueda para cédulas (remover puntos y espacios)
+			const terminoLimpio = termino.replace(/[.\s-]/g, '');
 			
-			// Crear regex con ignorar mayúsculas/minúsculas
+			// Si es una búsqueda de solo números (cédula), resaltar tanto números como formato
+			if (/^\d+$/.test(terminoLimpio)) {
+				// Escapar caracteres especiales para regex
+				const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				const terminoLimpioEscapado = terminoLimpio.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				
+				// Crear regex para buscar tanto el término original como el limpio
+				const regexOriginal = new RegExp(`(${terminoEscapado})`, 'gi');
+				const regexLimpio = new RegExp(`(${terminoLimpioEscapado})`, 'gi');
+				
+				// Primero intentar con el término original
+				let resultado = texto.replace(regexOriginal, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+				
+				// Si no hay cambios, intentar con el término limpio
+				if (resultado === texto) {
+					resultado = texto.replace(regexLimpio, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+				}
+				
+				return resultado;
+			}
+			
+			// Para búsquedas normales de texto
+			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			const regex = new RegExp(`(${terminoEscapado})`, 'gi');
 			
 			// Resaltar el texto con un span amarillo

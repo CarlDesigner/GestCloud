@@ -1,6 +1,7 @@
 ---
 /// Módulo de Historial de Visitantes con CRUD - GestCloud
 import AlertNotification from '../components/AlertNotification.astro';
+import ToastNotification from '../components/ToastNotification.astro';
 ---
 
 <div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
@@ -399,8 +400,8 @@ import AlertNotification from '../components/AlertNotification.astro';
 		// Variables de estado
 		let historialVisitantes = [];
 		let historialFiltrado = [];
-		let unsubscribe = null;
 		let visitanteEditando = null;
+		let unsubscribe = null;
 		let paginaActual = 1;
 		const itemsPorPagina = 10;
 		let filtroTipoActual = 'todos'; // Filtro por tipo de visitante
@@ -595,15 +596,58 @@ import AlertNotification from '../components/AlertNotification.astro';
 				return datos;
 			}
 
-			// Si es una búsqueda exacta (cédula o placa), usar método directo
-			if (/^\d+$/.test(termino) || /^[A-Z]{3}\d{3}$/.test(termino.toUpperCase())) {
+			// Limpiar término de búsqueda para cédulas (remover puntos y espacios)
+			const terminoLimpio = termino.replace(/[.\s-]/g, '');
+			
+			// PRIORIDAD 1: Si es una búsqueda de solo números (cédula), hacer búsqueda directa
+			if (/^\d+$/.test(terminoLimpio)) {
+				return datos.filter(visitante => {
+					const cedulaLimpia = visitante.cedula.toString().replace(/[.\s-]/g, '');
+					const cedulaOriginal = visitante.cedula.toString();
+					
+					// Buscar en cédula sin formato Y con formato
+					return cedulaLimpia.includes(terminoLimpio) || 
+						   cedulaOriginal.includes(termino) ||
+						   cedulaLimpia === terminoLimpio ||
+						   cedulaOriginal === termino;
+				});
+			}
+
+			// PRIORIDAD 2: Si es una placa (3 letras + 3 números), buscar por placa
+			if (/^[A-Z]{3}\d{3}$/.test(termino.toUpperCase().replace(/[-\s]/g, ''))) {
+				const placaLimpia = termino.toUpperCase().replace(/[-\s]/g, '');
 				return datos.filter(visitante =>
-					visitante.cedula.toString().includes(termino) ||
-					(visitante.vehiculo && visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase()))
+					visitante.vehiculo && (
+						visitante.vehiculo.placa.toUpperCase().replace(/[-\s]/g, '').includes(placaLimpia) ||
+						visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase())
+					)
 				);
 			}
 
-			// Para búsquedas generales, usar Fuse.js
+			// PRIORIDAD 3: Para búsquedas de texto general, hacer búsqueda manual primero
+			const terminoLower = termino.toLowerCase();
+			const resultadosManual = datos.filter(visitante => {
+				const cedulaLimpia = visitante.cedula.toString().replace(/[.\s-]/g, '');
+				const cedulaOriginal = visitante.cedula.toString();
+				
+				return visitante.nombre.toLowerCase().includes(terminoLower) ||
+					   cedulaOriginal.includes(termino) ||
+					   cedulaLimpia.includes(terminoLimpio) ||
+					   visitante.apartamento.toLowerCase().includes(terminoLower) ||
+					   visitante.autorizadoPor.toLowerCase().includes(terminoLower) ||
+					   (visitante.vehiculo && (
+					   		visitante.vehiculo.placa.toLowerCase().includes(terminoLower) ||
+					   		visitante.vehiculo.tipo.toLowerCase().includes(terminoLower) ||
+					   		visitante.vehiculo.color.toLowerCase().includes(terminoLower)
+					   ));
+			});
+
+			// Si encontramos resultados manuales, devolverlos
+			if (resultadosManual.length > 0) {
+				return resultadosManual;
+			}
+
+			// PRIORIDAD 4: Si no hay resultados manuales, usar Fuse.js como respaldo
 			const resultados = fuseInstance.search(termino);
 			return resultados.map(resultado => resultado.item);
 		}
@@ -715,29 +759,65 @@ import AlertNotification from '../components/AlertNotification.astro';
 				return [...historialVisitantes];
 			}
 
-			// Si es una búsqueda exacta (cédula o placa), usar método directo
-			if (/^\d+$/.test(termino) || /^[A-Z]{3}\d{3}$/.test(termino.toUpperCase())) {
+			// Limpiar término de búsqueda para cédulas (remover puntos y espacios)
+			const terminoLimpio = termino.replace(/[.\s-]/g, '');
+			
+			// PRIORIDAD 1: Si es una búsqueda de solo números (cédula), hacer búsqueda directa
+			if (/^\d+$/.test(terminoLimpio)) {
+				return historialVisitantes.filter(visitante => {
+					const cedulaLimpia = visitante.cedula.toString().replace(/[.\s-]/g, '');
+					const cedulaOriginal = visitante.cedula.toString();
+					
+					// Buscar en cédula sin formato Y con formato
+					return cedulaLimpia.includes(terminoLimpio) || 
+						   cedulaOriginal.includes(termino) ||
+						   cedulaLimpia === terminoLimpio ||
+						   cedulaOriginal === termino;
+				});
+			}
+
+			// PRIORIDAD 2: Si es una placa (3 letras + 3 números), buscar por placa
+			if (/^[A-Z]{3}\d{3}$/.test(termino.toUpperCase().replace(/[-\s]/g, ''))) {
+				const placaLimpia = termino.toUpperCase().replace(/[-\s]/g, '');
 				return historialVisitantes.filter(visitante =>
-					visitante.cedula.toString().includes(termino) ||
-					(visitante.vehiculo && visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase()))
+					visitante.vehiculo && (
+						visitante.vehiculo.placa.toUpperCase().replace(/[-\s]/g, '').includes(placaLimpia) ||
+						visitante.vehiculo.placa.toUpperCase().includes(termino.toUpperCase())
+					)
 				);
 			}
 
-			// Para búsquedas generales, usar Fuse.js si está disponible
+			// PRIORIDAD 3: Para búsquedas de texto general, hacer búsqueda manual primero
+			const terminoLower = termino.toLowerCase();
+			const resultadosManual = historialVisitantes.filter(visitante => {
+				const cedulaLimpia = visitante.cedula.toString().replace(/[.\s-]/g, '');
+				const cedulaOriginal = visitante.cedula.toString();
+				
+				return visitante.nombre.toLowerCase().includes(terminoLower) ||
+					   cedulaOriginal.includes(termino) ||
+					   cedulaLimpia.includes(terminoLimpio) ||
+					   visitante.apartamento.toLowerCase().includes(terminoLower) ||
+					   visitante.autorizadoPor.toLowerCase().includes(terminoLower) ||
+					   (visitante.vehiculo && (
+					   		visitante.vehiculo.placa.toLowerCase().includes(terminoLower) ||
+					   		visitante.vehiculo.tipo.toLowerCase().includes(terminoLower) ||
+					   		visitante.vehiculo.color.toLowerCase().includes(terminoLower)
+					   ));
+			});
+
+			// Si encontramos resultados manuales, devolverlos
+			if (resultadosManual.length > 0) {
+				return resultadosManual;
+			}
+
+			// PRIORIDAD 4: Si no hay resultados manuales, usar Fuse.js como respaldo
 			if (fuse) {
 				const resultados = fuse.search(termino);
 				return resultados.map(resultado => resultado.item);
 			}
 
-			// Fallback a búsqueda simple si Fuse.js no está disponible
-			const terminoLower = termino.toLowerCase();
-			return historialVisitantes.filter(visitante =>
-				visitante.nombre.toLowerCase().includes(terminoLower) ||
-				visitante.cedula.toString().includes(termino) ||
-				visitante.apartamento.toLowerCase().includes(terminoLower) ||
-				visitante.autorizadoPor.toLowerCase().includes(terminoLower) ||
-				(visitante.vehiculo && visitante.vehiculo.placa.toLowerCase().includes(terminoLower))
-			);
+			// Si todo falla, devolver array vacío
+			return [];
 		}
 
 		// Event listener para búsqueda en tiempo real mejorada
@@ -876,10 +956,32 @@ import AlertNotification from '../components/AlertNotification.astro';
 				return texto;
 			}
 			
-			// Escapar caracteres especiales para regex
-			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			// Limpiar término de búsqueda para cédulas (remover puntos y espacios)
+			const terminoLimpio = termino.replace(/[.\s-]/g, '');
 			
-			// Crear regex con ignorar mayúsculas/minúsculas
+			// Si es una búsqueda de solo números (cédula), resaltar tanto números como formato
+			if (/^\d+$/.test(terminoLimpio)) {
+				// Escapar caracteres especiales para regex
+				const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				const terminoLimpioEscapado = terminoLimpio.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				
+				// Crear regex para buscar tanto el término original como el limpio
+				const regexOriginal = new RegExp(`(${terminoEscapado})`, 'gi');
+				const regexLimpio = new RegExp(`(${terminoLimpioEscapado})`, 'gi');
+				
+				// Primero intentar con el término original
+				let resultado = texto.replace(regexOriginal, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+				
+				// Si no hay cambios, intentar con el término limpio
+				if (resultado === texto) {
+					resultado = texto.replace(regexLimpio, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+				}
+				
+				return resultado;
+			}
+			
+			// Para búsquedas normales de texto
+			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			const regex = new RegExp(`(${terminoEscapado})`, 'gi');
 			
 			// Resaltar el texto con un span amarillo
@@ -938,7 +1040,15 @@ import AlertNotification from '../components/AlertNotification.astro';
 								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5 text-gray-600"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 							</div>
 							<div class="min-w-0">
-								<div class="text-base font-semibold truncate">${resaltarTexto(capitalizarNombre(visitante.nombre), termino)}</div>
+								<div class="text-base font-semibold truncate">
+									<button 
+										onclick="verVisitante('${visitante.id}')" 
+										class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 hover:underline cursor-pointer transition-colors duration-200 text-left truncate w-full"
+										title="Ver detalles del visitante"
+									>
+										${resaltarTexto(capitalizarNombre(visitante.nombre), termino)}
+									</button>
+								</div>
 								<div class="font-normal text-gray-500 truncate">CC: ${resaltarTexto(formatearCedula(visitante.cedula), termino)}</div>
 							</div>
 						</div>
@@ -1186,16 +1296,35 @@ import AlertNotification from '../components/AlertNotification.astro';
 			});
 		}
 
+		// Variable para tracking del modal actual
+		let modalActual = null;
+		
+		// Función para manejar la tecla Escape en modales
+		const manejarEscapeModal = function(event) {
+			if (event.key === 'Escape' && modalActual) {
+				event.preventDefault();
+				ocultarModal(modalActual);
+			}
+		};
+		
 		// Función para mostrar modal
 		function mostrarModal(modal) {
 			modal.classList.remove('hidden');
 			modal.classList.add('flex', 'items-center', 'justify-center');
+			modalActual = modal;
+			
+			// Agregar event listener para cerrar con Escape
+			document.addEventListener('keydown', manejarEscapeModal);
 		}
 
 		// Función para ocultar modal
 		function ocultarModal(modal) {
 			modal.classList.add('hidden');
 			modal.classList.remove('flex', 'items-center', 'justify-center');
+			modalActual = null;
+			
+			// Remover event listener para cerrar con Escape
+			document.removeEventListener('keydown', manejarEscapeModal);
 		}
 
 		// Función para filtrar visitantes
@@ -1852,25 +1981,49 @@ import AlertNotification from '../components/AlertNotification.astro';
 						erroresEliminacion.push(`visitantes_historial: ${error.message}`);
 					}
 					
+					// Eliminación optimista mejorada
+					const visitanteId = visitanteEditando.id;
+					
+					// Cerrar modal inmediatamente
 					ocultarModal(modalEliminar);
 					
-					// Mostrar resultado de la eliminación
+					// Eliminar de Firebase en segundo plano
+					// Los arrays locales se actualizarán automáticamente por el listener
+					// pero mostramos notificación inmediatamente
+					
 					if (eliminacionesExitosas > 0) {
 						const mensaje = eliminacionesExitosas === 1 ? 
 							'Registro eliminado definitivamente' : 
 							`Registro eliminado definitivamente de ${eliminacionesExitosas} ubicaciones`;
 						
-						if (window.mostrarAlert) {
-							window.mostrarAlert(mensaje, 'success');
+						// Intentar mostrar toast primero, luego alert como fallback
+						if (window.mostrarToast) {
+							window.mostrarToast(mensaje, 'success', 4000);
+						} else {
+							// Esperar un poco por si el toast no está listo aún
+							setTimeout(() => {
+								if (window.mostrarToast) {
+									window.mostrarToast(mensaje, 'success', 4000);
+								} else if (window.mostrarAlert) {
+									window.mostrarAlert(mensaje, 'success');
+								}
+							}, 100);
 						}
-						
-						// Recargar la tabla para reflejar los cambios
-						setTimeout(() => {
-							window.location.reload();
-						}, 2000);
 					} else {
-						if (window.mostrarAlert) {
-							window.mostrarAlert('El registro no se encontró en ninguna colección o ya fue eliminado', 'warning');
+						const mensaje = 'El registro no se encontró en ninguna colección o ya fue eliminado';
+						
+						// Intentar mostrar toast primero, luego alert como fallback
+						if (window.mostrarToast) {
+							window.mostrarToast(mensaje, 'warning', 5000);
+						} else {
+							// Esperar un poco por si el toast no está listo aún
+							setTimeout(() => {
+								if (window.mostrarToast) {
+									window.mostrarToast(mensaje, 'warning', 5000);
+								} else if (window.mostrarAlert) {
+									window.mostrarAlert(mensaje, 'warning');
+								}
+							}, 100);
 						}
 					}
 					
@@ -1880,8 +2033,23 @@ import AlertNotification from '../components/AlertNotification.astro';
 					
 				} catch (error) {
 					console.error('Error eliminando visitante:', error);
-					if (window.mostrarAlert) {
-						window.mostrarAlert('Error al eliminar registro', 'error');
+					
+					// Cerrar modal inmediatamente incluso en caso de error
+					ocultarModal(modalEliminar);
+					
+					// Mostrar notificación de error con el mismo patrón
+					const mensaje = 'Error al eliminar registro';
+					if (window.mostrarToast) {
+						window.mostrarToast(mensaje, 'error', 5000);
+					} else {
+						// Esperar un poco por si el toast no está listo aún
+						setTimeout(() => {
+							if (window.mostrarToast) {
+								window.mostrarToast(mensaje, 'error', 5000);
+							} else if (window.mostrarAlert) {
+								window.mostrarAlert(mensaje, 'error');
+							}
+						}, 100);
 					}
 				}
 			}
@@ -1903,7 +2071,7 @@ import AlertNotification from '../components/AlertNotification.astro';
 			}
 		});
 
-		// Conectar con Firebase para obtener historial
+		// Conectar con Firebase para obtener historial (mantenemos el listener pero controlado)
 		if (window.escucharHistorialVisitantes) {
 			unsubscribe = window.escucharHistorialVisitantes((visitantes) => {
 				historialVisitantes = visitantes;
@@ -1925,5 +2093,6 @@ import AlertNotification from '../components/AlertNotification.astro';
 	});
 </script>
 
-<!-- Incluir componente de notificaciones alert -->
+<!-- Incluir componentes de notificaciones -->
 <AlertNotification />
+<ToastNotification />
