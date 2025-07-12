@@ -8,15 +8,15 @@ function getFirestoreInstance() {
     return window.__firestoreDb;
   }
   
-  // Fallback: configurar Firebase si no está precargado
+  // Fallback: configurar Firebase si no está precargado usando variables de entorno
   const firebaseConfig = {
-    apiKey: "AIzaSyCBwly1pkKYfH0tdcfnQMb1-A8sjOyuqtU",
-    authDomain: "gestcloud-9d02f.firebaseapp.com",
-    databaseURL: "https://gestcloud-9d02f-default-rtdb.firebaseio.com/",
-    projectId: "gestcloud-9d02f",
-    storageBucket: "gestcloud-9d02f.firebasestorage.app",
-    messagingSenderId: "493348332872",
-    appId: "1:493348332872:web:3e9540d0f567e4bc573f7d"
+    apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
+    authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
+    databaseURL: import.meta.env.PUBLIC_FIREBASE_DATABASE_URL,
+    projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.PUBLIC_FIREBASE_APP_ID
   };
   
   const app = initializeApp(firebaseConfig);
@@ -92,32 +92,24 @@ export function escucharVisitantesActivos(callback) {
 
 // Función para dar salida a un visitante (TEMPORAL: solo cambiar activo a false)
 export async function darSalidaVisitante(visitanteId) {
-  console.log('🚪 Iniciando proceso de salida para visitante:', visitanteId);
-  
   try {
     // Verificar que tenemos acceso a Firestore
     if (!db) {
       throw new Error('Base de datos no inicializada');
     }
 
-    console.log('📊 Método temporal: Solo marcar como inactivo...');
-    
     // MÉTODO TEMPORAL: Solo actualizar el visitante existente
     const { getDoc, updateDoc } = await import('firebase/firestore');
-    
-    console.log('🔍 Buscando visitante en la base de datos...');
     
     // 1. Obtener visitante activo
     const visitanteRef = doc(db, 'visitantes', visitanteId);
     const visitanteDoc = await getDoc(visitanteRef);
     
     if (!visitanteDoc.exists()) {
-      console.error('❌ Visitante no encontrado:', visitanteId);
       throw new Error('Visitante no encontrado en la base de datos');
     }
     
     const datosVisitante = visitanteDoc.data();
-    console.log('✅ Visitante encontrado:', datosVisitante.nombre);
     
     // 2. Calcular tiempo de estancia
     const tiempoEntrada = datosVisitante.tiempoEntrada?.toDate ? 
@@ -126,8 +118,6 @@ export async function darSalidaVisitante(visitanteId) {
     
     const tiempoSalida = new Date();
     const tiempoTotal = Math.floor((tiempoSalida - tiempoEntrada) / 1000); // en segundos
-    
-    console.log('⏱️ Tiempo de permanencia calculado:', formatearTiempo(tiempoTotal));
     
     // 3. Calcular costo del vehículo si tiene vehículo
     let costoVehiculo = 0;
@@ -141,7 +131,6 @@ export async function darSalidaVisitante(visitanteId) {
         minutosEstacionado: minutos,
         costoTotal: costoVehiculo
       };
-      console.log(`💰 Costo calculado para vehículo ${datosVisitante.vehiculo.tipo}: $${costoVehiculo.toLocaleString('es-CO')} (${minutos} minutos x $${datosVisitante.vehiculo.tarifa})`);
     }
     
     // 4. Actualizar el visitante existente con datos de salida
@@ -160,34 +149,21 @@ export async function darSalidaVisitante(visitanteId) {
       actualizacion.costoVehiculo = costoVehiculo;
     }
     
-    console.log('💾 Actualizando visitante como inactivo...');
-    
     // 4. Actualizar el documento existente
     await updateDoc(visitanteRef, actualizacion);
-    
-    console.log('✅ Visitante marcado como inactivo');
     
     const resultado = {
       success: true,
       visitante: datosVisitante.nombre,
       tiempo: formatearTiempo(tiempoTotal),
       metodo: 'temporal_inactivo',
-      costoVehiculo: costoVehiculo,
+      costoVehiculo,
       vehiculo: infoVehiculo
     };
     
-    console.log('✅ Salida completada exitosamente:', resultado);
     return resultado;
     
   } catch (error) {
-    console.error('❌ Error en darSalidaVisitante:', error);
-    console.error('📋 Detalles completos del error:', {
-      message: error.message,
-      code: error.code,
-      stack: error.stack,
-      cause: error.cause
-    });
-    
     // Manejo de errores específicos
     if (error.code === 'permission-denied') {
       throw new Error('No tienes permisos para realizar esta operación. Verifica las reglas de Firebase.');

@@ -1,30 +1,10 @@
-import type { endpointsToOperations } from '../pages/api/[...entity].js';
-import type { playgroundActions } from '../pages/playground/_actions.js';
+// Archivo de tipos para entidades del sistema
+// Limpiado de referencias del template original
 
-export type EndpointsToOperations = typeof endpointsToOperations;
-export type Endpoint = keyof EndpointsToOperations;
-
-export type Products = Product[];
-export interface Product {
-	name: string;
-	category: string;
-	technology: string;
-	id: number;
-	description: string;
-	price: string;
-	discount: string;
-}
-
-export type Users = User[];
-export interface User {
-	id: number;
-	name: string;
-	avatar: string;
-	email: string;
-	biography: string;
-	position: string;
-	country: string;
-	status: string;
-}
-
-export type PlaygroundAction = (typeof playgroundActions)[number];
+// TODO: Aquí se agregarán los tipos para usuarios de Firebase cuando se implemente
+// export interface FirebaseUser {
+//   uid: string;
+//   email: string;
+//   displayName?: string;
+//   // ... otros campos según necesites
+// }
