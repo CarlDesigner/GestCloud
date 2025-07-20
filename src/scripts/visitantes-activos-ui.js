@@ -55,20 +55,41 @@ document.addEventListener('DOMContentLoaded', () => {
 			return [...visitantesActivos];
 		}
 
-		// Limpiar término de búsqueda para cédulas (remover puntos y espacios)
+		// Limpiar término de búsqueda para cédulas y celulares (remover puntos, espacios y guiones)
 		const terminoLimpio = termino.replace(/[.\s-]/g, '');
 		
-		// PRIORIDAD 1: Si es una búsqueda de solo números (cédula), hacer búsqueda directa
+		// PRIORIDAD 1: Si es una búsqueda de solo números (cédula o celular), hacer búsqueda directa
 		if (/^\d+$/.test(terminoLimpio)) {
 			return visitantesActivos.filter(visitante => {
 				const cedulaLimpia = visitante.cedula.toString().replace(/[.\s-]/g, '');
 				const cedulaOriginal = visitante.cedula.toString();
-				
-				// Buscar en cédula sin formato Y con formato
-				return cedulaLimpia.includes(terminoLimpio) || 
-					   cedulaOriginal.includes(termino) ||
-					   cedulaLimpia === terminoLimpio ||
-					   cedulaOriginal === termino;
+				const celularLimpio = visitante.celular.toString().replace(/[.\s-]/g, '');
+				const celularOriginal = visitante.celular.toString();
+				const aptoLimpio = visitante.apartamento.toString().replace(/[.\s-]/g, '');
+				const aptoOriginal = visitante.apartamento.toString();
+				// Buscar en placa (solo números)
+				let placaNumeros = '';
+				let placaOriginal = '';
+				if (visitante.vehiculo && visitante.vehiculo.placa) {
+					placaOriginal = visitante.vehiculo.placa.toString();
+					placaNumeros = placaOriginal.replace(/[^0-9]/g, '');
+				}
+				return (
+					cedulaLimpia.includes(terminoLimpio) ||
+					cedulaOriginal.includes(termino) ||
+					cedulaLimpia === terminoLimpio ||
+					cedulaOriginal === termino ||
+					celularLimpio.includes(terminoLimpio) ||
+					celularOriginal.includes(termino) ||
+					celularLimpio === terminoLimpio ||
+					celularOriginal === termino ||
+					aptoLimpio.includes(terminoLimpio) ||
+					aptoOriginal.includes(termino) ||
+					aptoLimpio === terminoLimpio ||
+					aptoOriginal === termino ||
+					(placaNumeros && placaNumeros.includes(terminoLimpio)) ||
+					(placaOriginal && placaOriginal.includes(termino))
+				);
 			});
 		}
 
@@ -277,34 +298,63 @@ document.addEventListener('DOMContentLoaded', () => {
 			return texto;
 		}
 		
-		// Limpiar término de búsqueda para cédulas (remover puntos y espacios)
+		// Limpiar término de búsqueda para cédulas y celulares (remover puntos, espacios y guiones)
 		const terminoLimpio = termino.replace(/[.\s-]/g, '');
 		
-		// Si es una búsqueda de solo números (cédula), resaltar tanto números como formato
+		// Si es una búsqueda de solo números (cédula o celular), resaltar coincidencias en ambos
 		if (/^\d+$/.test(terminoLimpio)) {
 			// Escapar caracteres especiales para regex
 			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			const terminoLimpioEscapado = terminoLimpio.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-			
-			// Crear regex para buscar tanto el término original como el limpio
+
+			// Crear regex para buscar tanto el término original como el limpio (sin puntos)
 			const regexOriginal = new RegExp(`(${terminoEscapado})`, 'gi');
 			const regexLimpio = new RegExp(`(${terminoLimpioEscapado})`, 'gi');
-			
+
 			// Primero intentar con el término original
 			let resultado = texto.replace(regexOriginal, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
-			
-			// Si no hay cambios, intentar con el término limpio
+
+			// Si no hay cambios, intentar con el término limpio (sin puntos/espacios)
 			if (resultado === texto) {
-				resultado = texto.replace(regexLimpio, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+				// Eliminar puntos y espacios del texto para buscar coincidencia sin formato
+				const textoLimpio = texto.replace(/[.\s-]/g, '');
+				resultado = textoLimpio.replace(regexLimpio, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+				// Volver a formatear el texto con los <mark> en la posición correcta
+				if (resultado !== textoLimpio) {
+					// Encontrar el índice de la coincidencia en el texto limpio
+					const match = textoLimpio.match(regexLimpio);
+					if (match && match.index !== undefined) {
+						// Calcular la posición en el texto original
+						const start = match.index;
+						const end = start + match[0].length;
+						// Buscar la posición correspondiente en el texto original
+						let count = 0, i = 0, startOrig = -1, endOrig = -1;
+						for (; i < texto.length; i++) {
+							if (/[0-9]/.test(texto[i])) {
+								if (count === start) startOrig = i;
+								if (count === end - 1) endOrig = i;
+								count++;
+							}
+						}
+						if (startOrig !== -1 && endOrig !== -1) {
+							return (
+								texto.slice(0, startOrig) +
+								'<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">' +
+								texto.slice(startOrig, endOrig + 1) +
+								'</mark>' +
+								texto.slice(endOrig + 1)
+							);
+						}
+					}
+				}
 			}
-			
 			return resultado;
 		}
-		
+
 		// Para búsquedas normales de texto
 		const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		const regex = new RegExp(`(${terminoEscapado})`, 'gi');
-		
+
 		// Resaltar el texto con un span amarillo
 		return texto.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
 	}
@@ -710,5 +760,50 @@ document.addEventListener('DOMContentLoaded', () => {
 	window.addEventListener('beforeunload', () => {
 		if (unsubscribe) unsubscribe();
 		if (intervalCronometro) clearInterval(intervalCronometro);
+	});
+
+	// ===== LÓGICA DEL MODAL =====
+	const btnAgregar = document.getElementById('btn-agregar-visitante');
+	const modal = document.getElementById('modal-visitante');
+	const cerrar = document.getElementById('cerrar-modal-visitante');
+
+	function abrirModal() {
+		modal.classList.remove('opacity-0', 'pointer-events-none');
+		modal.classList.add('opacity-100');
+		modal.querySelector('div').classList.remove('scale-95');
+		modal.querySelector('div').classList.add('scale-100');
+	}
+	
+	function cerrarModal() {
+		modal.classList.add('opacity-0', 'pointer-events-none');
+		modal.classList.remove('opacity-100');
+		modal.querySelector('div').classList.add('scale-95');
+		modal.querySelector('div').classList.remove('scale-100');
+	}
+	
+	if (btnAgregar && modal && cerrar) {
+		btnAgregar.addEventListener('click', abrirModal);
+		cerrar.addEventListener('click', cerrarModal);
+		
+		// Cerrar con fondo
+		modal.addEventListener('click', (e) => {
+			if (e.target === modal) cerrarModal();
+		});
+		
+		// Cerrar con Escape
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && !modal.classList.contains('opacity-0')) cerrarModal();
+		});
+	}
+
+	// Escuchar evento de registro exitoso para cerrar el modal suavemente
+	window.addEventListener('visitante-registrado-exito', () => {
+		// Animación de cierre suave
+		modal.classList.add('opacity-0');
+		modal.querySelector('div').classList.add('scale-95');
+		setTimeout(() => {
+			modal.classList.add('pointer-events-none');
+			modal.classList.remove('opacity-100');
+		}, 300);
 	});
 });

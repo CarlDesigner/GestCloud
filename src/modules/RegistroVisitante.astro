@@ -28,452 +28,202 @@ import AlertNotification from '../components/AlertNotification.astro';
 	</div>
 </div>
 
-<!-- Formulario de Registro -->
-<div class="flex flex-col">
-	<div class="overflow-x-auto">
-		<div class="inline-block min-w-full align-middle">
-			<div class="overflow-hidden shadow">
-				<div class="p-6 bg-white dark:bg-gray-800">
-					<!-- Card del formulario -->
-					<div class="max-w-4xl mx-auto">
-						<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg border border-gray-200 dark:border-gray-700">
-							<div class="flex items-center justify-between p-4 border-b dark:border-gray-600">
-								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-									Nuevo Visitante
-								</h3>
-							</div>
-							
-							<form id="visitante-form" class="p-4 md:p-6">
-								<!-- Layout responsivo: 1 col móvil, 2 cols tablet+ -->
-								<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-									<!-- Columna Izquierda: Datos del Visitante -->
-									<div class="space-y-4">
-										<div class="pb-3 border-b border-gray-200 dark:border-gray-600">
-											<h4 class="text-base md:text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
-												<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400">
-													<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-													<circle cx="12" cy="7" r="4"/>
-												</svg>
-												Datos del Visitante
-											</h4>
-										</div>
+<!-- FORMULARIO OCULTO: Ahora el registro de visitantes se realiza desde el módulo de Activos (modal). Si necesitas restaurar, elimina la clase 'hidden'. -->
+<div class="hidden">
+  <!-- Formulario original de registro de visitantes -->
+  <div class="flex flex-col">
+    <div class="overflow-x-auto">
+      <div class="inline-block min-w-full align-middle">
+        <div class="overflow-hidden shadow">
+          <div class="p-6 bg-white dark:bg-gray-800">
+            <!-- Card del formulario -->
+            <div class="max-w-4xl mx-auto">
+              <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between p-4 border-b dark:border-gray-600">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Nuevo Visitante
+                  </h3>
+                </div>
+                <form id="visitante-form" class="p-4 md:p-6">
+                  <!-- Layout responsivo: 1 col móvil, 2 cols tablet+ -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <!-- Columna Izquierda: Datos del Visitante -->
+                    <div class="space-y-4">
+                      <div class="pb-3 border-b border-gray-200 dark:border-gray-600">
+                        <h4 class="text-base md:text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                          </svg>
+                          Datos del Visitante
+                        </h4>
+                      </div>
 
-										<!-- Nombre -->
-										<div>
-											<label for="nombre" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-												Nombre Completo <span class="text-red-500">*</span>
-											</label>
-											<input type="text" name="nombre" id="nombre" 
-												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-												   placeholder="Ej: Juan Pérez González" required>
-										</div>
+                      <!-- Nombre -->
+                      <div>
+                        <label for="nombre" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                          Nombre Completo <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="nombre" id="nombre" 
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                               placeholder="Ej: Juan Pérez González" required>
+                      </div>
 
-										<!-- Cédula -->
-										<div>
-											<label for="cedula" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-												Número de Cédula <span class="text-red-500">*</span>
-											</label>
-											<input type="text" name="cedula" id="cedula" 
-												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-												   placeholder="Ej: 12345678" 
-												   pattern="[0-9]{6,12}"
-												   maxlength="12"
-												   minlength="6"
-												   title="La cédula debe contener solo números (6-12 dígitos)"
-												   required>
-											<p id="cedula-error" class="hidden text-red-600 text-xs mt-1">La cédula debe contener solo números (6-12 dígitos)</p>
-										</div>
+                      <!-- Cédula -->
+                      <div>
+                        <label for="cedula" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                          Número de Cédula <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="cedula" id="cedula" 
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                               placeholder="Ej: 12345678" 
+                               pattern="[0-9]{6,12}"
+                               maxlength="12"
+                               minlength="6"
+                               title="La cédula debe contener solo números (6-12 dígitos)"
+                               required>
+                        <p id="cedula-error" class="hidden text-red-600 text-xs mt-1">La cédula debe contener solo números (6-12 dígitos)</p>
+                      </div>
 
-										<!-- Celular -->
-										<div>
-											<label for="celular" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-												Número de Celular <span class="text-red-500">*</span>
-											</label>
-											<input type="tel" name="celular" id="celular" 
-												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-												   placeholder="Ej: 3001234567" 
-												   pattern="3[0-9]{9}"
-												   maxlength="10"
-												   minlength="10"
-												   title="El celular debe tener 10 dígitos y empezar por 3"
-												   required>
-											<p id="celular-error" class="hidden text-red-600 text-xs mt-1">El celular debe tener 10 dígitos y empezar por 3</p>
-										</div>
+                      <!-- Celular -->
+                      <div>
+                        <label for="celular" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                          Número de Celular <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" name="celular" id="celular" 
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                               placeholder="Ej: 3001234567" 
+                               pattern="3[0-9]{9}"
+                               maxlength="10"
+                               minlength="10"
+                               title="El celular debe tener 10 dígitos y empezar por 3"
+                               required>
+                        <p id="celular-error" class="hidden text-red-600 text-xs mt-1">El celular debe tener 10 dígitos y empezar por 3</p>
+                      </div>
 
-										<!-- Apartamento -->
-										<div>
-											<label for="apartamento" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-												Apartamento a Visitar <span class="text-red-500">*</span>
-											</label>
-											<input type="text" name="apartamento" id="apartamento" 
-												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-												   placeholder="Ej: 101, 205, Casa 15" required>
-										</div>
+                      <!-- Apartamento -->
+                      <div>
+                        <label for="apartamento" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                          Apartamento a Visitar <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="apartamento" id="apartamento" 
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                               placeholder="Ej: 101, 205, Casa 15" required>
+                      </div>
 
-										<!-- Autorizado por -->
-										<div>
-											<label for="autorizado-por" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-												Autorizado por <span class="text-red-500">*</span>
-											</label>
-											<input type="text" name="autorizadoPor" id="autorizado-por" 
-												   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-												   placeholder="Nombre del residente que autoriza" required>
-										</div>
-									</div>
+                      <!-- Autorizado por -->
+                      <div>
+                        <label for="autorizado-por" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                          Autorizado por <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="autorizadoPor" id="autorizado-por" 
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                               placeholder="Nombre del residente que autoriza" required>
+                      </div>
+                    </div>
 
-									<!-- Columna Derecha: Datos del Vehículo -->
-									<div class="space-y-4">
-										<div class="pb-3 border-b border-gray-200 dark:border-gray-600">
-											<h4 class="text-base md:text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
-												<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400">
-													<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10c-.3-1.1-1.4-2-2.5-2h-7c-1.1 0-2.2.9-2.5 2l-2.5 1.1c-.8.2-1.5 1-1.5 1.9v3c0 .6.4 1 1 1h2"/>
-													<circle cx="7" cy="17" r="2"/>
-													<path d="M9 17h6"/>
-													<circle cx="17" cy="17" r="2"/>
-												</svg>
-												Vehículo
-												<span class="text-xs md:text-sm font-normal text-gray-500 dark:text-gray-400">(Opcional)</span>
-											</h4>
-										</div>
+                    <!-- Columna Derecha: Datos del Vehículo -->
+                    <div class="space-y-4">
+                      <div class="pb-3 border-b border-gray-200 dark:border-gray-600">
+                        <h4 class="text-base md:text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-4 h-4 md:w-5 md:h-5 text-primary-600 dark:text-primary-400">
+                            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10c-.3-1.1-1.4-2-2.5-2h-7c-1.1 0-2.2.9-2.5 2l-2.5 1.1c-.8.2-1.5 1-1.5 1.9v3c0 .6.4 1 1 1h2"/>
+                            <circle cx="7" cy="17" r="2"/>
+                            <path d="M9 17h6"/>
+                            <circle cx="17" cy="17" r="2"/>
+                          </svg>
+                          Vehículo
+                          <span class="text-xs md:text-sm font-normal text-gray-500 dark:text-gray-400">(Opcional)</span>
+                        </h4>
+                      </div>
 
-										<!-- Checkbox para agregar vehículo -->
-										<div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-											<input id="agregar-vehiculo" name="tieneVehiculo" type="checkbox" 
-												   class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-											<label for="agregar-vehiculo" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-												El visitante trae vehículo
-											</label>
-										</div>
+                      <!-- Checkbox para agregar vehículo -->
+                      <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <input id="agregar-vehiculo" name="tieneVehiculo" type="checkbox" 
+                               class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="agregar-vehiculo" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                          El visitante trae vehículo
+                        </label>
+                      </div>
 
-										<!-- Campos del vehículo (ocultos por defecto) -->
-										<div id="vehiculo-campos" class="hidden space-y-3">
-											<!-- Tipo de Vehículo -->
-											<div>
-												<label for="tipo-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-													Tipo de Vehículo <span class="text-red-500">*</span>
-												</label>
-												<select name="tipoVehiculo" id="tipo-vehiculo" 
-														class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-													<option value="">Seleccionar tipo</option>
-													<option value="carro">Carro - $100/minuto</option>
-													<option value="moto">Moto - $150/minuto</option>
-												</select>
-											</div>
+                      <!-- Campos del vehículo (ocultos por defecto) -->
+                      <div id="vehiculo-campos" class="hidden space-y-3">
+                        <!-- Tipo de Vehículo -->
+                        <div>
+                          <label for="tipo-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                            Tipo de Vehículo <span class="text-red-500">*</span>
+                          </label>
+                          <select name="tipoVehiculo" id="tipo-vehiculo" 
+                                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="carro">Carro - $100/minuto</option>
+                            <option value="moto">Moto - $150/minuto</option>
+                          </select>
+                        </div>
 
-											<!-- Placa del Vehículo -->
-											<div>
-												<label for="placa-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-													Placa del Vehículo <span class="text-red-500">*</span>
-												</label>
-												<input type="text" name="placa" id="placa-vehiculo" 
-													   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-													   placeholder="Ej: ABC123"
-													   maxlength="6"
-													   style="text-transform: uppercase;">
-												<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formato: ABC123 (3 letras + 3 números)</p>
-											</div>
+                        <!-- Placa del Vehículo -->
+                        <div>
+                          <label for="placa-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                            Placa del Vehículo <span class="text-red-500">*</span>
+                          </label>
+                          <input type="text" name="placa" id="placa-vehiculo" 
+                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                                 placeholder="Ej: ABC123"
+                                 maxlength="6"
+                                 style="text-transform: uppercase;">
+                          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formato: ABC123 (3 letras + 3 números)</p>
+                        </div>
 
-											<!-- Color del Vehículo -->
-											<div>
-												<label for="color-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
-													Color del Vehículo <span class="text-red-500">*</span>
-												</label>
-												<input type="text" name="color" id="color-vehiculo" 
-													   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-													   placeholder="Ej: Blanco, Negro, Azul">
-											</div>
+                        <!-- Color del Vehículo -->
+                        <div>
+                          <label for="color-vehiculo" class="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                            Color del Vehículo <span class="text-red-500">*</span>
+                          </label>
+                          <input type="text" name="color" id="color-vehiculo" 
+                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                                 placeholder="Ej: Blanco, Negro, Azul">
+                        </div>
 
-											<!-- Información de tarifa compacta -->
-											<div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-2.5">
-												<div class="flex items-start">
-													<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info w-3.5 h-3.5 text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-													<span class="text-xs text-blue-800 dark:text-blue-200">
-														<strong>Tarifa:</strong> Se cobra por minuto según el tipo. El costo se calcula al momento de la salida.
-													</span>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+                        <!-- Información de tarifa compacta -->
+                        <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-2.5">
+                          <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info w-3.5 h-3.5 text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                            <span class="text-xs text-blue-800 dark:text-blue-200">
+                              <strong>Tarifa:</strong> Se cobra por minuto según el tipo. El costo se calcula al momento de la salida.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-								<!-- Botón de envío -->
-								<div class="col-span-1 md:col-span-2 pt-4 mt-4 border-t border-gray-200 dark:border-gray-600">
-									<button type="submit" 
-											class="w-full flex items-center justify-center gap-2 text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 transition-colors">
-										<span>Registrar Visitante</span>
-										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus">
-											<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-											<circle cx="9" cy="7" r="4"/>
-											<line x1="19" x2="19" y1="8" y2="14"/>
-											<line x1="22" x2="16" y1="11" y2="11"/>
-										</svg>
-									</button>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                  <!-- Botón de envío -->
+                  <div class="col-span-1 md:col-span-2 pt-4 mt-4 border-t border-gray-200 dark:border-gray-600">
+                    <button type="submit" 
+                            class="w-full flex items-center justify-center gap-2 text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 transition-colors">
+                      <span>Registrar Visitante</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <line x1="19" x2="19" y1="8" y2="14"/>
+                        <line x1="22" x2="16" y1="11" y2="11"/>
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 	// @ts-nocheck
 	// Script del cliente para manejar el formulario
-	import '../scripts/firebase-client.js';
-
-	document.addEventListener('DOMContentLoaded', () => {
-		const form = document.getElementById('visitante-form');
-		const cedulaInput = document.getElementById('cedula');
-		const celularInput = document.getElementById('celular');
-		const cedulaError = document.getElementById('cedula-error');
-		const celularError = document.getElementById('celular-error');
-
-		// Elementos del vehículo
-		const agregarVehiculoCheckbox = document.getElementById('agregar-vehiculo');
-		const vehiculoCampos = document.getElementById('vehiculo-campos');
-		const tipoVehiculoSelect = document.getElementById('tipo-vehiculo');
-		const placaVehiculoInput = document.getElementById('placa-vehiculo');
-		const colorVehiculoInput = document.getElementById('color-vehiculo');
-
-		// Manejar mostrar/ocultar campos del vehículo
-		if (agregarVehiculoCheckbox && vehiculoCampos) {
-			agregarVehiculoCheckbox.addEventListener('change', function() {
-				if (this.checked) {
-					vehiculoCampos.classList.remove('hidden');
-					// Hacer campos requeridos
-					tipoVehiculoSelect.required = true;
-					placaVehiculoInput.required = true;
-					colorVehiculoInput.required = true;
-				} else {
-					vehiculoCampos.classList.add('hidden');
-					// Remover required y limpiar campos
-					tipoVehiculoSelect.required = false;
-					placaVehiculoInput.required = false;
-					colorVehiculoInput.required = false;
-					tipoVehiculoSelect.value = '';
-					placaVehiculoInput.value = '';
-					colorVehiculoInput.value = '';
-				}
-			});
-		}
-
-		// Formatear placa en tiempo real
-		if (placaVehiculoInput) {
-			placaVehiculoInput.addEventListener('input', function() {
-				this.value = this.value.toUpperCase();
-			});
-		}
-
-		// Función para permitir solo números y mostrar mensaje si se intenta escribir letras
-		function soloNumeros(event, errorElement, campoNombre) {
-			const char = String.fromCharCode(event.which);
-			if (!/[0-9]/.test(char)) {
-				event.preventDefault();
-				// Mostrar mensaje temporal cuando se intenta escribir letras
-				mostrarError(event.target, errorElement, `Solo se permiten números en el campo ${campoNombre}`);
-				
-				// Ocultar el mensaje después de 2 segundos
-				setTimeout(() => {
-					if (event.target.value && ((campoNombre === 'cédula' && validarCedula(event.target.value)) || 
-						(campoNombre === 'celular' && validarCelular(event.target.value)))) {
-						ocultarError(event.target, errorElement);
-					}
-				}, 2000);
-			}
-		}
-
-		// Función para validar cédula
-		function validarCedula(cedula) {
-			const regex = /^[0-9]{6,12}$/;
-			return regex.test(cedula);
-		}
-
-		// Función para validar celular colombiano
-		function validarCelular(celular) {
-			const regex = /^3[0-9]{9}$/;
-			return regex.test(celular);
-		}
-
-		// Función para mostrar/ocultar errores
-		function mostrarError(input, errorElement, mensaje) {
-			input.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
-			input.classList.remove('border-gray-300', 'focus:border-primary-600', 'focus:ring-primary-600');
-			errorElement.textContent = mensaje;
-			errorElement.classList.remove('hidden');
-		}
-
-		function ocultarError(input, errorElement) {
-			input.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
-			input.classList.add('border-gray-300', 'focus:border-primary-600', 'focus:ring-primary-600');
-			errorElement.classList.add('hidden');
-		}
-
-		// Event listeners para campos numéricos
-		if (cedulaInput) {
-			// Permitir solo números mientras se escribe y mostrar mensaje si se intenta escribir letras
-			cedulaInput.addEventListener('keypress', (event) => {
-				soloNumeros(event, cedulaError, 'cédula');
-			});
-			
-			// Validar en tiempo real
-			cedulaInput.addEventListener('input', function() {
-				const valor = this.value;
-				if (valor && !validarCedula(valor)) {
-					mostrarError(this, cedulaError, 'La cédula debe contener solo números (6-12 dígitos)');
-				} else {
-					ocultarError(this, cedulaError);
-				}
-			});
-
-			// Validar al salir del campo
-			cedulaInput.addEventListener('blur', function() {
-				const valor = this.value;
-				if (valor && !validarCedula(valor)) {
-					mostrarError(this, cedulaError, 'La cédula debe contener solo números (6-12 dígitos)');
-				}
-			});
-		}
-
-		if (celularInput) {
-			// Permitir solo números mientras se escribe y mostrar mensaje si se intenta escribir letras
-			celularInput.addEventListener('keypress', (event) => {
-				soloNumeros(event, celularError, 'celular');
-			});
-			
-			// Validar en tiempo real
-			celularInput.addEventListener('input', function() {
-				const valor = this.value;
-				if (valor && !validarCelular(valor)) {
-					if (valor.length !== 10) {
-						mostrarError(this, celularError, 'El celular debe tener exactamente 10 dígitos');
-					} else if (!valor.startsWith('3')) {
-						mostrarError(this, celularError, 'El celular debe empezar por 3');
-					} else {
-						mostrarError(this, celularError, 'Formato de celular inválido');
-					}
-				} else {
-					ocultarError(this, celularError);
-				}
-			});
-
-			// Validar al salir del campo
-			celularInput.addEventListener('blur', function() {
-				const valor = this.value;
-				if (valor && !validarCelular(valor)) {
-					if (valor.length !== 10) {
-						mostrarError(this, celularError, 'El celular debe tener exactamente 10 dígitos');
-					} else if (!valor.startsWith('3')) {
-						mostrarError(this, celularError, 'El celular debe empezar por 3');
-					}
-				}
-			});
-		}
-
-		// Manejar envío del formulario
-		if (form) {
-			form.addEventListener('submit', async (e) => {
-				e.preventDefault();
-				
-				// Validar campos antes de enviar
-				let formularioValido = true;
-				
-				if (cedulaInput && !validarCedula(cedulaInput.value)) {
-					mostrarError(cedulaInput, cedulaError, 'La cédula debe contener solo números (6-12 dígitos)');
-					formularioValido = false;
-				}
-				
-				if (celularInput && !validarCelular(celularInput.value)) {
-					mostrarError(celularInput, celularError, 'El celular debe tener 10 dígitos y empezar por 3');
-					formularioValido = false;
-				}
-				
-				if (!formularioValido) {
-					if (window.mostrarToast) {
-						window.mostrarToast('Por favor corrige los errores en el formulario', 'error', 3000);
-					}
-					return;
-				}
-				
-				// Deshabilitar el botón mientras se procesa
-				const submitButton = form.querySelector('button[type="submit"]');
-				const originalHTML = submitButton.innerHTML;
-				submitButton.disabled = true;
-				submitButton.innerHTML = `
-					<span>Registrando...</span>
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hourglass animate-pulse">
-						<path d="M5 22h14"/>
-						<path d="M5 2h14"/>
-						<path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/>
-						<path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>
-					</svg>
-				`;
-
-				try {
-					// Obtener datos del formulario
-					const formData = new FormData(form);
-					const visitanteData = {
-						nombre: formData.get('nombre'),
-						cedula: formData.get('cedula'),
-						celular: formData.get('celular'),
-						apartamento: formData.get('apartamento'),
-						autorizadoPor: formData.get('autorizadoPor')
-					};
-
-					// Agregar datos del vehículo si está marcado
-					const tieneVehiculo = formData.get('tieneVehiculo');
-					if (tieneVehiculo && agregarVehiculoCheckbox.checked) {
-						const tipoVehiculo = formData.get('tipoVehiculo');
-						const placa = formData.get('placa');
-						const color = formData.get('color');
-						
-						if (tipoVehiculo && placa && color) {
-							visitanteData.vehiculo = {
-								tipo: tipoVehiculo,
-								placa: placa.toString().toUpperCase(),
-								color: color
-							};
-						}
-					}
-
-					// Registrar en Firebase
-					await window.registrarVisitante(visitanteData);
-
-					// Mostrar notificación de éxito con toast mejorado
-					if (window.mostrarToast) {
-						window.mostrarToast('🎉 ¡Visitante registrado exitosamente!', 'success', 5000);
-					}
-					
-					// Limpiar formulario
-					form.reset();
-					// Ocultar errores al limpiar
-					ocultarError(cedulaInput, cedulaError);
-					ocultarError(celularInput, celularError);
-					
-					// Ocultar campos del vehículo
-					if (vehiculoCampos) {
-						vehiculoCampos.classList.add('hidden');
-						tipoVehiculoSelect.required = false;
-						placaVehiculoInput.required = false;
-						colorVehiculoInput.required = false;
-					}
-
-				} catch (error) {
-					// Mostrar notificación de error con toast
-					const mensajeError = error.message || 'Error al registrar visitante. Intenta nuevamente.';
-					if (window.mostrarToast) {
-						window.mostrarToast(`Error: ${mensajeError}`, 'error', 5000);
-					}
-					console.error('Error:', error);
-				} finally {
-					// Rehabilitar botón
-					submitButton.disabled = false;
-					submitButton.innerHTML = originalHTML;
-				}
-			});
-		}
-	});
+	import '../scripts/registro-visitante.js';
 </script>
 
 <!-- Componente de notificaciones alert -->

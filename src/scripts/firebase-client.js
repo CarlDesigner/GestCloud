@@ -1,21 +1,6 @@
 // Cliente para manejar Firebase en el navegador - GestCloud
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
-// Configuración usando variables de entorno
-const firebaseConfig = {
-  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
-  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID
-};
-
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 // Función para registrar visitante en Firestore
 export async function registrarVisitante(visitanteData) {
@@ -36,8 +21,8 @@ export async function registrarVisitante(visitanteData) {
     if (visitanteData.vehiculo) {
       // Definir tarifas por tipo de vehículo (pesos por minuto)
       const tarifas = {
-        'carro': 100,
-        'moto': 150
+        'carro': 150,
+        'moto': 100
       };
 
       nuevoVisitante.vehiculo = {

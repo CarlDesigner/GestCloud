@@ -1,29 +1,6 @@
 // Cliente para obtener visitantes activos desde Firestore - GestCloud
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, query, where, onSnapshot, doc, serverTimestamp, runTransaction } from 'firebase/firestore';
-
-// Usar instancia de Firebase precargada si está disponible
-function getFirestoreInstance() {
-  if (window.__firestoreDb) {
-    return window.__firestoreDb;
-  }
-  
-  // Fallback: configurar Firebase si no está precargado usando variables de entorno
-  const firebaseConfig = {
-    apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY,
-    authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN,
-    databaseURL: import.meta.env.PUBLIC_FIREBASE_DATABASE_URL,
-    projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.PUBLIC_FIREBASE_APP_ID
-  };
-  
-  const app = initializeApp(firebaseConfig);
-  return getFirestore(app);
-}
-
-const db = getFirestoreInstance();
+import { collection, query, where, onSnapshot, doc, serverTimestamp, runTransaction } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 // Función auxiliar para formatear tiempo
 function formatearTiempo(segundos) {

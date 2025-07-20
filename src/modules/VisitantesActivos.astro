@@ -2,6 +2,7 @@
 // Módulo de Visitantes Activos - GestCloud
 import AlertNotification from '../components/AlertNotification.astro';
 import ConfirmModal from '../components/ConfirmModal.astro';
+import FormularioVisitante from '../components/FormularioVisitante.astro';
 ---
 
 <div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
@@ -42,10 +43,14 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 					</div>
 				</div>
 				<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-					<div class="text-sm text-gray-600 dark:text-gray-300">
+					<div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
 						<span class="hidden sm:inline">Total activos: </span>
 						<span class="sm:hidden">Activos: </span>
-						<span id="contador-visitantes" class="font-bold text-lg text-gray-900 dark:text-white">0</span>
+						<span id="contador-visitantes" class="font-bold text-lg text-gray-900 dark:text-white ml-1">0</span>
+						<button id="btn-agregar-visitante" type="button" class="ml-4 px-3 py-2 text-sm font-medium rounded-lg border border-green-600 bg-green-600 text-white shadow-sm hover:bg-green-700 transition-all duration-200 flex items-center">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="lucide lucide-user-plus mr-1"><path d="M15 19a6 6 0 1 0-12 0"/><circle cx="9" cy="7" r="4"/><path d="M16 11h6m-3-3v6"/></svg>
+							Agregar visitante
+						</button>
 					</div>
 				</div>
 			</div>
@@ -215,6 +220,15 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 	</div>
 </template>
 
+<!-- Modal para registrar visitante -->
+<div id="modal-visitante" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none">
+  <div class="transform scale-95 transition-transform duration-300 bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full mx-4" style="max-width: 700px;">
+    <button id="cerrar-modal-visitante" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white text-2xl font-bold focus:outline-none">&times;</button>
+    <FormularioVisitante />
+    <script type="module" src="../scripts/formulario-visitante-ui.js"></script>
+  </div>
+</div>
+
 <!-- Componente de notificaciones alert -->
 <AlertNotification />
 
@@ -223,9 +237,6 @@ import ConfirmModal from '../components/ConfirmModal.astro';
 
 <script>
 	// @ts-nocheck
-	// Precargar Firebase para mejorar rendimiento
-	import '../scripts/firebase-preload';
-	
 	// Script del cliente para manejar visitantes activos desde Firebase
 	import '../scripts/visitantes-activos';
 	
