@@ -87,6 +87,9 @@ importers:
       astro-eslint-parser:
         specifier: ^0.11.0
         version: 0.11.0
+      daisyui:
+        specifier: ^5.0.47
+        version: 5.0.47
       eslint:
         specifier: ^8.35.0
         version: 8.57.1
@@ -1457,6 +1460,9 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
+
+  daisyui@5.0.47:
+    resolution: {integrity: sha512-RuYjjVKpodDoOYAHIvG6qC3BeRxhlyj4JCO+6aV0VzK+i3RWD7cmICh0m5+Xfr5938mV0Mk7FUOQ00msz8H8dw==}
 
   data-view-buffer@1.0.2:
     resolution: {integrity: sha512-EmKO5V3OLXh1rtK2wgXRansaK1/mtVdTUEiEI0W8RkvgT05kfxaH29PliLnpLP73yYO6142Q72QNa8Wx/A5CqQ==}
@@ -5041,6 +5047,8 @@ snapshots:
     optional: true
 
   cssesc@3.0.0: {}
+
+  daisyui@5.0.47: {}
 
   data-view-buffer@1.0.2:
     dependencies:

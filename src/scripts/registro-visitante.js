@@ -1,5 +1,8 @@
 // Script del cliente para manejar el formulario de registro de visitantes
-import './firebase-client.js';
+import { registrarVisitante } from '../lib/firebase.ts';
+
+// Hacer disponible globalmente para el formulario
+window.registrarVisitante = registrarVisitante;
 
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.getElementById('visitante-form');

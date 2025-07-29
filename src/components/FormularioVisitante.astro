@@ -170,7 +170,8 @@
 
 <script>
   // @ts-nocheck
-  import '../scripts/firebase-client';
+  import { registrarVisitante } from '../lib/firebase.ts';
+  window.registrarVisitante = registrarVisitante;
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('visitante-form');

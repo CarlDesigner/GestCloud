@@ -1,5 +1,5 @@
 // Script de UI para el formulario de registro de visitantes
-import { registrarVisitante } from '../scripts/firebase-client';
+import { registrarVisitante } from '../lib/firebase.ts';
 
 // Esperar a que el DOM esté listo
 export function inicializarFormularioVisitante() {
