@@ -481,5 +481,11 @@ import ModalDirectorio from '../components/ModalDirectorio.astro';
 			<!-- ...existing code... (ya está la barra de búsqueda y botón arriba, eliminamos este bloque duplicado) -->
 		</div>
 	</div>
+  <!-- Importar el JS del directorio (debe estar en public/scripts/) -->
+	 <script>
+	// @ts-nocheck
+	// Script del cliente para manejar historial de visitantes con CRUD
+	import '../scripts/directorio-ui';
+</script>
 </LayoutSidebar>
 <ModalDirectorio />
