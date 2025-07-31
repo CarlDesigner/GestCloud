@@ -1,9 +1,61 @@
+
 import Fuse from 'fuse.js';
+import { collection, addDoc, getDocs, query, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase.ts';
+
+
+
+
+
+
+let datosGlobal = [];
+
+// --- Funciones principales: deben ir antes de cualquier uso ---
+
+
+
+
+
+
+
+
+
+function actualizarContadoresDirectorio(datos) {
+  // Actualizar los contadores del dropdown de filtro
+  const total = datos.length;
+  const ocupados = datos.filter(a => a.estado === 'Ocupado').length;
+  const desocupados = datos.filter(a => a.estado === 'Desocupado').length;
+  const arriendo = datos.filter(a => a.estado === 'En arriendo').length;
+  const venta = datos.filter(a => a.estado === 'En venta').length;
+  const el = id => document.getElementById(id);
+  if (el('contador-directorio-todos')) el('contador-directorio-todos').textContent = `(${total})`;
+  if (el('contador-directorio-ocupado')) el('contador-directorio-ocupado').textContent = `(${ocupados})`;
+  if (el('contador-directorio-desocupado')) el('contador-directorio-desocupado').textContent = `(${desocupados})`;
+  if (el('contador-directorio-arriendo')) el('contador-directorio-arriendo').textContent = `(${arriendo})`;
+  if (el('contador-directorio-venta')) el('contador-directorio-venta').textContent = `(${venta})`;
+}
+
+function cerrarModalPrincipalConEsc(e) {
+  const modal = document.getElementById('modal-apartamento');
+  if (e.key === 'Escape' && modal) {
+    modal.classList.add('hidden');
+    document.removeEventListener('keydown', cerrarModalPrincipalConEsc);
+  }
+}
+
+// --- Fin funciones principales ---
 // Función para ver detalles de un apartamento
-window.verApartamento = function(apartamentoId) {
+window.verApartamento = function verApartamento(apartamentoId) {
   const apto = datosGlobal.find(a => a.id === apartamentoId);
   if (!apto) return;
   let modalDetalles = document.getElementById('modal-detalles-apto');
+  // Declarar cerrarConEsc como función de flecha para que acceda a modalDetalles
+  const cerrarConEsc = (e) => {
+    if (e.key === 'Escape') {
+      if (modalDetalles) modalDetalles.remove();
+      document.removeEventListener('keydown', cerrarConEsc);
+    }
+  };
   if (!modalDetalles) {
     modalDetalles = document.createElement('div');
     modalDetalles.id = 'modal-detalles-apto';
@@ -56,13 +108,7 @@ window.verApartamento = function(apartamentoId) {
       modalDetalles.remove();
       document.removeEventListener('keydown', cerrarConEsc);
     };
-    // Cerrar con Esc
-    function cerrarConEsc(e) {
-      if (e.key === 'Escape') {
-        modalDetalles.remove();
-        document.removeEventListener('keydown', cerrarConEsc);
-      }
-    }
+    // Cerrar con Esc (declaración única al inicio del bloque)
     setTimeout(() => {
       document.addEventListener('keydown', cerrarConEsc);
     }, 100);
@@ -70,19 +116,19 @@ window.verApartamento = function(apartamentoId) {
 };
 
 // Función para editar apartamento
-window.editarApartamento = function(apartamentoId) {
+window.editarApartamento = function editarApartamento(apartamentoId) {
   const apto = datosGlobal.find(a => a.id === apartamentoId);
   if (!apto) return;
   const modal = document.getElementById('modal-apartamento');
   const form = document.getElementById('form-apartamento');
   if (!modal || !form) return;
   // Rellenar el formulario con los datos
-  form.elements['numero'].value = apto.numero || '';
-  form.elements['estado'].value = apto.estado || '';
-  form.elements['nombre'].value = apto.nombre || '';
-  form.elements['contacto'].value = apto.contacto || '';
-  form.elements['rol'].value = apto.rol || '';
-  form.elements['observaciones'].value = apto.observaciones || '';
+  form.elements.numero.value = apto.numero || '';
+  form.elements.estado.value = apto.estado || '';
+  form.elements.nombre.value = apto.nombre || '';
+  form.elements.contacto.value = apto.contacto || '';
+  form.elements.rol.value = apto.rol || '';
+  form.elements.observaciones.value = apto.observaciones || '';
   // Guardar el id editando
   form.setAttribute('data-edit-id', apartamentoId);
   modal.classList.remove('hidden');
@@ -90,32 +136,63 @@ window.editarApartamento = function(apartamentoId) {
 
 // Eliminado: submit duplicado. Toda la lógica de submit está centralizada en el bloque DOMContentLoaded más abajo.
 
+// Modal de confirmación reutilizable
+function mostrarModalConfirmacion(mensaje, onConfirm) {
+  // Eliminar cualquier modal previo
+  const modalExistente = document.getElementById('modal-confirmacion-directorio');
+  if (modalExistente) modalExistente.remove();
+  const modal = document.createElement('div');
+  modal.id = 'modal-confirmacion-directorio';
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/40';
+  modal.innerHTML = `
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full mx-auto">
+      <div class="mb-4 text-gray-900 dark:text-gray-100 text-center">${mensaje}</div>
+      <div class="flex justify-center gap-4">
+        <button id="btn-cancelar-confirmacion" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">Cancelar</button>
+        <button id="btn-confirmar-confirmacion" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Eliminar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  // Cerrar modal
+  let cerrarConEsc;
+  const cerrar = () => {
+    modal.remove();
+    document.removeEventListener('keydown', cerrarConEsc);
+  };
+  cerrarConEsc = (e) => {
+    if (e.key === 'Escape') cerrar();
+  };
+  setTimeout(() => {
+    document.addEventListener('keydown', cerrarConEsc);
+  }, 100);
+  document.getElementById('btn-cancelar-confirmacion').onclick = cerrar;
+  document.getElementById('btn-confirmar-confirmacion').onclick = () => {
+    cerrar();
+    onConfirm();
+  };
+}
+
 // Función para actualizar apartamento en Firestore
 async function actualizarApartamento(id, data) {
-  const { db } = await import('/src/lib/firebase');
-  const { doc, updateDoc, getDocs, collection, query } = await import('firebase/firestore');
   // Verificar si el nuevo número ya existe en otro registro
   const q = query(collection(db, 'directorio'));
   const snapshot = await getDocs(q);
-  const existe = snapshot.docs.some(doc => doc.id !== id && doc.data().numero == data.numero);
+  const existe = snapshot.docs.some(d => d.id !== id && d.data().numero === data.numero);
   if (existe) {
-    alert('Ya existe otro apartamento con ese número.');
+    mostrarModalConfirmacion('Ya existe otro apartamento con ese número.', () => {});
     return;
   }
   await updateDoc(doc(db, 'directorio', id), data);
 }
 
-// Función para eliminar apartamento
-window.eliminarApartamento = async function(apartamentoId) {
-  if (!confirm('¿Seguro que deseas eliminar este apartamento?')) return;
-  const { db } = await import('/src/lib/firebase');
-  const { doc, deleteDoc } = await import('firebase/firestore');
-  await deleteDoc(doc(db, 'directorio', apartamentoId));
-  actualizarTabla();
-};
+
+
+
+
+
 let currentPage = 1;
 let totalPages = 1;
-let datosGlobal = [];
 let fuse = null;
 const fuseOptions = {
   keys: [
@@ -129,8 +206,27 @@ const fuseOptions = {
   ignoreLocation: true,
   findAllMatches: true
 };
+
+
+
+// --- Declaraciones auxiliares para menús contextuales ---
+// Se definen fuera para evitar no-use-before-define y sin guion bajo inicial
+function cerrarMenu(menu) {
+  if (menu && menu.parentNode) menu.remove();
+  document.removeEventListener('click', menu.cerrarMenuHandler);
+  document.removeEventListener('keydown', menu.manejarTeclaEscapeHandler);
+}
+
+function manejarTeclaEscapeFactory(menu) {
+  return function manejarTeclaEscape(keyEvent) {
+    if (keyEvent.key === 'Escape') {
+      cerrarMenu(menu);
+    }
+  };
+}
+
 // Menú de acciones contextual para cada apartamento
-window.mostrarMenuAccionesDirectorio = function(event, apartamentoId) {
+window.mostrarMenuAccionesDirectorio = function mostrarMenuAccionesDirectorio(event, apartamentoId) {
   event.stopPropagation();
   // Verificar si ya existe un menú abierto para este apartamento
   const menuExistente = document.querySelector(`.menu-acciones[data-apartamento-id="${apartamentoId}"]`);
@@ -183,34 +279,25 @@ window.mostrarMenuAccionesDirectorio = function(event, apartamentoId) {
   menu.style.top = `${top}px`;
   menu.style.left = `${left}px`;
   menu.style.visibility = 'visible';
-  function cerrarMenu() {
-    menu.remove();
-    document.removeEventListener('click', cerrarMenu);
-    document.removeEventListener('keydown', manejarTeclaEscape);
-  }
-  function manejarTeclaEscape(keyEvent) {
-    if (keyEvent.key === 'Escape') {
-      cerrarMenu();
-    }
-  }
+  // Handlers únicos por menú (sin guion bajo)
+  menu.cerrarMenuHandler = () => cerrarMenu(menu);
+  menu.manejarTeclaEscapeHandler = manejarTeclaEscapeFactory(menu);
   setTimeout(() => {
-    document.addEventListener('click', cerrarMenu);
-    document.addEventListener('keydown', manejarTeclaEscape);
+    document.addEventListener('click', menu.cerrarMenuHandler);
+    document.addEventListener('keydown', menu.manejarTeclaEscapeHandler);
   }, 100);
 };
 
-import { db } from '/src/lib/firebase';
-import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
 
 async function cargarDirectorio() {
   // Obtener todos los registros sin ordenar en la consulta
   const q = query(collection(db, 'directorio'));
   const snapshot = await getDocs(q);
   // Mapear y asignar fechaCreacion=0 si no existe
-  const datos = snapshot.docs.map(doc => {
-    const data = doc.data();
+  const datos = snapshot.docs.map(documento => {
+    const data = documento.data();
     return {
-      id: doc.id,
+      id: documento.id,
       ...data,
       fechaCreacion: data.fechaCreacion || 0
     };
@@ -229,18 +316,30 @@ async function guardarApartamento(data) {
   // Verificar si ya existe un apartamento con el mismo número
   const q = query(collection(db, 'directorio'));
   const snapshot = await getDocs(q);
-  const existe = snapshot.docs.some(doc => doc.data().numero == data.numero);
+  const existe = snapshot.docs.some(documento => documento.data().numero === data.numero);
   if (existe) {
-    alert('Ya existe un apartamento con ese número.');
+    mostrarModalConfirmacion('Ya existe un apartamento con ese número.', () => {});
     return;
   }
   // Agregar campo de fecha de creación
   await addDoc(collection(db, 'directorio'), { ...data, fechaCreacion: Date.now() });
 }
 
+
+
 function limpiarFormulario(form) {
   form.reset();
 }
+
+// --- Mover funciones para cumplir no-use-before-define globalmente ---
+
+
+
+
+// --- Mover funciones para cumplir no-use-before-define ---
+
+
+
 
 function renderTabla(datos) {
   const tbody = document.getElementById('tabla-directorio-body');
@@ -253,11 +352,11 @@ function renderTabla(datos) {
   const datosPagina = datos.slice(inicio, fin);
 
   // Si hay búsqueda activa, obtener los términos y matches
-  let terminos = [];
-  let matchesMap = {};
+  // let terminos = [];
+  const matchesMap = {};
   const tableSearch = document.getElementById('table-search');
   if (tableSearch && tableSearch.value.trim().length > 0 && fuse) {
-    terminos = tableSearch.value.trim().split(/\s+/);
+    // const terminos = tableSearch.value.trim().split(/\s+/); // No se usa
     // Obtener matches de Fuse
     const resultados = fuse.search(tableSearch.value.trim());
     resultados.forEach(res => {
@@ -275,7 +374,7 @@ function renderTabla(datos) {
       matches.forEach(match => {
         match.indices.forEach(([start, end]) => {
           resaltado += texto.substring(lastIndex, start);
-          resaltado += `<mark class=\"bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded\">${texto.substring(start, end + 1)}</mark>`;
+          resaltado += `<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">${texto.substring(start, end + 1)}</mark>`;
           lastIndex = end + 1;
         });
       });
@@ -329,8 +428,8 @@ function renderTabla(datos) {
     // Capitalizar solo la primera letra (observaciones)
     function capitalizarObservacion(str) {
       if (!str) return '';
-      str = str.toLowerCase();
-      return str.charAt(0).toUpperCase() + str.slice(1);
+      const lower = str.toLowerCase();
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
     }
     // Crear celdas y usar innerHTML para aplicar el resaltado
     const tdNumero = document.createElement('td');
@@ -378,7 +477,7 @@ function renderTabla(datos) {
       const badge = tr.querySelector('span[data-numero]');
       if (badge) {
         badge.addEventListener('click', () => {
-          mostrarDetallesApartamento(apto.numero);
+          window.mostrarDetallesApartamento(apto.numero);
         });
       }
     }, 0);
@@ -429,7 +528,18 @@ function renderTabla(datos) {
   }
 }
 
+
+
+
+
 async function actualizarTabla() {
+// Mover aquí la definición de eliminarApartamento para evitar no-use-before-define
+window.eliminarApartamento = function eliminarApartamento(apartamentoId) {
+  mostrarModalConfirmacion('¿Seguro que deseas eliminar este apartamento?', async () => {
+    await deleteDoc(doc(db, 'directorio', apartamentoId));
+    actualizarTabla();
+  });
+};
   const datos = await cargarDirectorio();
   datosGlobal = datos;
   // Inicializar Fuse con los datos actuales
@@ -470,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Búsqueda en tiempo real para el directorio
   const tableSearch = document.getElementById('table-search');
   if (tableSearch) {
-    tableSearch.addEventListener('input', function () {
+    tableSearch.addEventListener('input', function handleTableSearchInput() {
       const termino = this.value.trim();
       if (fuse && termino.length > 0) {
         const resultados = fuse.search(termino).map(r => r.item);
@@ -488,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnAnterior) {
     btnAnterior.addEventListener('click', () => {
       if (currentPage > 1) {
-        currentPage--;
+        currentPage -= 1;
         renderTabla(datosGlobal);
       }
     });
@@ -496,7 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnSiguiente) {
     btnSiguiente.addEventListener('click', () => {
       if (currentPage < totalPages) {
-        currentPage++;
+        currentPage += 1;
         renderTabla(datosGlobal);
       }
     });
@@ -549,17 +659,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.removeEventListener('keydown', cerrarModalPrincipalConEsc);
     });
   }
-  function cerrarModalPrincipalConEsc(e) {
-    if (e.key === 'Escape') {
-      modal.classList.add('hidden');
-      document.removeEventListener('keydown', cerrarModalPrincipalConEsc);
-    }
-  }
   if (form && modal) {
     // Crear mensajes de error debajo de los inputs
-    const numeroInput = form.elements['numero'];
-    const contactoInput = form.elements['contacto'];
-    const nombreInput = form.elements['nombre'];
+    const numeroInput = form.elements.numero;
+    const contactoInput = form.elements.contacto;
+    const nombreInput = form.elements.nombre;
     const errorNumero = document.createElement('div');
     errorNumero.style.color = 'red';
     errorNumero.style.fontSize = '0.875rem';
@@ -668,24 +772,13 @@ document.addEventListener('DOMContentLoaded', () => {
   actualizarTabla();
 });
 
-function actualizarContadoresDirectorio(datos) {
-  // Actualizar los contadores del dropdown de filtro
-  const total = datos.length;
-  const ocupados = datos.filter(a => a.estado === 'Ocupado').length;
-  const desocupados = datos.filter(a => a.estado === 'Desocupado').length;
-  const arriendo = datos.filter(a => a.estado === 'En arriendo').length;
-  const venta = datos.filter(a => a.estado === 'En venta').length;
-  const el = id => document.getElementById(id);
-  if (el('contador-directorio-todos')) el('contador-directorio-todos').textContent = `(${total})`;
-  if (el('contador-directorio-ocupado')) el('contador-directorio-ocupado').textContent = `(${ocupados})`;
-  if (el('contador-directorio-desocupado')) el('contador-directorio-desocupado').textContent = `(${desocupados})`;
-  if (el('contador-directorio-arriendo')) el('contador-directorio-arriendo').textContent = `(${arriendo})`;
-  if (el('contador-directorio-venta')) el('contador-directorio-venta').textContent = `(${venta})`;
-}
+
+
+// Función para cerrar el modal principal con Esc
 
 // Función para mostrar detalles de un apartamento por número
-window.mostrarDetallesApartamento = function(numero) {
-  const apto = datosGlobal.find(a => a.numero == numero);
+window.mostrarDetallesApartamento = function mostrarDetallesApartamento(numero) {
+  const apto = datosGlobal.find(a => a.numero === numero);
   if (!apto) return;
   window.verApartamento(apto.id);
 }
