@@ -1,12 +1,33 @@
-
+// Mostrar/ocultar botón limpiar búsqueda y limpiar input
 import Fuse from 'fuse.js';
 import { collection, addDoc, getDocs, query, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase.ts';
 
+import { 
+  registrarCreacionApartamento, 
+  registrarEdicionApartamento,
+  inicializarHistorialUI,
+  eliminarHistorialApartamento 
+} from './historial-apartamento';
 
+let currentPage = 1;
 
-
-
+// Mostrar/ocultar botón limpiar búsqueda y limpiar input
+document.addEventListener('DOMContentLoaded', () => {
+  const inputBusqueda = document.getElementById('table-search');
+  const btnLimpiar = document.getElementById('btn-limpiar-busqueda');
+  if (inputBusqueda && btnLimpiar) {
+    inputBusqueda.addEventListener('input', () => {
+      btnLimpiar.style.display = inputBusqueda.value.length > 0 ? '' : 'none';
+    });
+    btnLimpiar.addEventListener('click', () => {
+      inputBusqueda.value = '';
+      btnLimpiar.style.display = 'none';
+  // Regresar a la página 1 al limpiar búsqueda
+      inputBusqueda.dispatchEvent(new Event('input'));
+    });
+  }
+});
 
 let datosGlobal = [];
 
@@ -124,6 +145,7 @@ window.editarApartamento = function editarApartamento(apartamentoId) {
   if (!modal || !form) return;
   // Rellenar el formulario con los datos
   form.elements.numero.value = apto.numero || '';
+  form.elements.numero.disabled = true; // Deshabilitar campo número al editar
   form.elements.estado.value = apto.estado || '';
   form.elements.nombre.value = apto.nombre || '';
   form.elements.contacto.value = apto.contacto || '';
@@ -183,7 +205,20 @@ async function actualizarApartamento(id, data) {
     mostrarModalConfirmacion('Ya existe otro apartamento con ese número.', () => {});
     return;
   }
-  await updateDoc(doc(db, 'directorio', id), data);
+  
+  // Obtener los datos anteriores del apartamento para el historial
+  const apartamentoAnterior = datosGlobal.find(apto => apto.id === id);
+
+  // Agregar campo de fechaActualizacion
+  const dataActualizada = { ...data, fechaActualizacion: Date.now() };
+
+  // Actualizar en Firestore
+  await updateDoc(doc(db, 'directorio', id), dataActualizada);
+
+  // Registrar en el historial si hay datos anteriores
+  if (apartamentoAnterior) {
+    await registrarEdicionApartamento(id, apartamentoAnterior, data);
+  }
 }
 
 
@@ -191,7 +226,6 @@ async function actualizarApartamento(id, data) {
 
 
 
-let currentPage = 1;
 let totalPages = 1;
 let fuse = null;
 const fuseOptions = {
@@ -202,9 +236,18 @@ const fuseOptions = {
   threshold: 0.3,
   includeScore: true,
   includeMatches: true,
-  minMatchCharLength: 2,
+  minMatchCharLength: 3,
   ignoreLocation: true,
-  findAllMatches: true
+  findAllMatches: true,
+  useExtendedSearch: true,
+  getFn: (obj, path) => {
+    // Normaliza los valores para ignorar tildes/acentos
+    const value = Fuse.config.getFn(obj, path);
+          if (typeof value === 'string') {
+            return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+    return value;
+  }
 };
 
 
@@ -293,21 +336,24 @@ async function cargarDirectorio() {
   // Obtener todos los registros sin ordenar en la consulta
   const q = query(collection(db, 'directorio'));
   const snapshot = await getDocs(q);
-  // Mapear y asignar fechaCreacion=0 si no existe
+  // Mapear y asignar fechas por defecto si no existen
   const datos = snapshot.docs.map(documento => {
     const data = documento.data();
     return {
       id: documento.id,
       ...data,
-      fechaCreacion: data.fechaCreacion || 0
+      fechaCreacion: data.fechaCreacion || 0,
+      fechaActualizacion: data.fechaActualizacion || data.fechaCreacion || 0
     };
   });
-  // Ordenar: primero por fechaCreacion descendente, luego por número ascendente
+  // Ordenar: primero por fechaActualizacion descendente, luego por fechaCreacion, luego por número
   return datos.sort((a, b) => {
+    if (b.fechaActualizacion !== a.fechaActualizacion) {
+      return b.fechaActualizacion - a.fechaActualizacion;
+    }
     if (b.fechaCreacion !== a.fechaCreacion) {
       return b.fechaCreacion - a.fechaCreacion;
     }
-    // Si ambos son antiguos, ordenar por número
     return (a.numero || '').localeCompare(b.numero || '', undefined, { numeric: true });
   });
 }
@@ -322,7 +368,10 @@ async function guardarApartamento(data) {
     return;
   }
   // Agregar campo de fecha de creación
-  await addDoc(collection(db, 'directorio'), { ...data, fechaCreacion: Date.now() });
+  const docRef = await addDoc(collection(db, 'directorio'), { ...data, fechaCreacion: Date.now() });
+  
+  // Registrar en el historial
+  await registrarCreacionApartamento(docRef.id, data);
 }
 
 
@@ -345,7 +394,7 @@ function renderTabla(datos) {
   const tbody = document.getElementById('tabla-directorio-body');
   tbody.innerHTML = '';
   // Paginación
-  const registrosPorPagina = 10;
+  const registrosPorPagina = 20;
   totalPages = Math.ceil(datos.length / registrosPorPagina) || 1;
   const inicio = (currentPage - 1) * registrosPorPagina;
   const fin = inicio + registrosPorPagina;
@@ -355,9 +404,8 @@ function renderTabla(datos) {
   // let terminos = [];
   const matchesMap = {};
   const tableSearch = document.getElementById('table-search');
-  if (tableSearch && tableSearch.value.trim().length > 0 && fuse) {
-    // const terminos = tableSearch.value.trim().split(/\s+/); // No se usa
-    // Obtener matches de Fuse
+  if (tableSearch && tableSearch.value.trim().length >= 3 && fuse) {
+    // Obtener matches de Fuse desde el tercer caracter
     const resultados = fuse.search(tableSearch.value.trim());
     resultados.forEach(res => {
       matchesMap[res.item.id] = res.matches;
@@ -369,6 +417,7 @@ function renderTabla(datos) {
       if (!matchesMap[aptoId]) return texto;
       const matches = matchesMap[aptoId].filter(m => m.key === key);
       if (matches.length === 0) return texto;
+    // (Eliminado textoNorm, ya no es necesario)
       let resaltado = '';
       let lastIndex = 0;
       matches.forEach(match => {
@@ -379,6 +428,8 @@ function renderTabla(datos) {
         });
       });
       resaltado += texto.substring(lastIndex);
+      // Si no se resaltó nada (por ejemplo, solo coincidencias parciales), devolver el texto original
+      if (resaltado === '' || resaltado === texto) return texto;
       return resaltado;
     }
 
@@ -454,7 +505,33 @@ function renderTabla(datos) {
 
     const tdObs = document.createElement('td');
     tdObs.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
-    tdObs.textContent = capitalizarObservacion(apto.observaciones) || '';
+    
+    // Limitar observaciones a 50 caracteres en la tabla
+    const observacionCompleta = capitalizarObservacion(apto.observaciones) || '';
+    const observacionCorta = observacionCompleta.length > 50 
+      ? `${observacionCompleta.substring(0, 50)}...` 
+      : observacionCompleta;
+    
+    tdObs.innerHTML = observacionCorta 
+      ? `<span class="text-gray-700 dark:text-gray-300" title="${observacionCompleta}">${observacionCorta}</span>`
+      : '<span class="text-gray-400 dark:text-gray-500 italic">Sin observaciones</span>';
+
+    const tdHistorial = document.createElement('td');
+    tdHistorial.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdHistorial.innerHTML = `<div class="flex items-center justify-center">
+      <button 
+        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-center text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-800 transition-colors" 
+        onclick="mostrarHistorialApartamento('${apto.id}', '${apto.numero}')"
+        title="Ver historial de cambios"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history mr-1">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+          <path d="M12 7v5l4 2"></path>  
+        </svg>
+        
+      </button>
+    </div>`;
 
     const tdAcciones = document.createElement('td');
     tdAcciones.className = 'px-4 py-2 w-16 border-b border-gray-200 dark:border-gray-700';
@@ -470,6 +547,7 @@ function renderTabla(datos) {
     tr.appendChild(tdContacto);
     tr.appendChild(tdRol);
     tr.appendChild(tdObs);
+    tr.appendChild(tdHistorial);
     tr.appendChild(tdAcciones);
 
     // Agregar evento al badge del número de apartamento
@@ -536,7 +614,12 @@ async function actualizarTabla() {
 // Mover aquí la definición de eliminarApartamento para evitar no-use-before-define
 window.eliminarApartamento = function eliminarApartamento(apartamentoId) {
   mostrarModalConfirmacion('¿Seguro que deseas eliminar este apartamento?', async () => {
+    // Eliminar el apartamento de Firestore
     await deleteDoc(doc(db, 'directorio', apartamentoId));
+    
+    // Eliminar también todo el historial asociado
+    await eliminarHistorialApartamento(apartamentoId);
+    
     actualizarTabla();
   });
 };
@@ -577,6 +660,11 @@ window.eliminarApartamento = function eliminarApartamento(apartamentoId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Verificar que el script se carga correctamente
+
+  // Inicializar UI del historial
+  inicializarHistorialUI();
+
   // Búsqueda en tiempo real para el directorio
   const tableSearch = document.getElementById('table-search');
   if (tableSearch) {
@@ -592,9 +680,44 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Mostrar/ocultar botón limpiar filtro según filtro activo
+  const btnLimpiarFiltro = document.getElementById('btn-limpiar-filtro-directorio');
+  const radiosFiltro = document.querySelectorAll('input[name="filtro-estado-directorio"]');
+  function actualizarBotonLimpiarFiltro() {
+    const filtro = document.querySelector('input[name="filtro-estado-directorio"]:checked');
+    if (btnLimpiarFiltro) {
+      if (filtro && filtro.value !== 'todos') {
+        btnLimpiarFiltro.style.display = '';
+      } else {
+        btnLimpiarFiltro.style.display = 'none';
+      }
+    }
+  }
+  radiosFiltro.forEach(radio => {
+    radio.addEventListener('change', actualizarBotonLimpiarFiltro);
+  });
+  actualizarBotonLimpiarFiltro();
+  if (btnLimpiarFiltro) {
+    btnLimpiarFiltro.addEventListener('click', () => {
+      // Seleccionar el radio 'todos' y actualizar la tabla
+      const radioTodos = document.querySelector('input[name="filtro-estado-directorio"][value="todos"]');
+      if (radioTodos) {
+        radioTodos.checked = true;
+        if (typeof currentPage !== 'undefined') {
+          currentPage = 1;
+        }
+        actualizarTabla();
+        actualizarBotonLimpiarFiltro();
+      }
+    });
+  }
   // Paginación: botones
   const btnAnterior = document.getElementById('btn-anterior-directorio');
   const btnSiguiente = document.getElementById('btn-siguiente-directorio');
+  const btnPrimera = document.getElementById('btn-primera-directorio');
+  const btnUltima = document.getElementById('btn-ultima-directorio');
+
   if (btnAnterior) {
     btnAnterior.addEventListener('click', () => {
       if (currentPage > 1) {
@@ -607,6 +730,22 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSiguiente.addEventListener('click', () => {
       if (currentPage < totalPages) {
         currentPage += 1;
+        renderTabla(datosGlobal);
+      }
+    });
+  }
+  if (btnPrimera) {
+    btnPrimera.addEventListener('click', () => {
+      if (currentPage !== 1) {
+        currentPage = 1;
+        renderTabla(datosGlobal);
+      }
+    });
+  }
+  if (btnUltima) {
+    btnUltima.addEventListener('click', () => {
+      if (currentPage !== totalPages) {
+        currentPage = totalPages;
         renderTabla(datosGlobal);
       }
     });
@@ -642,6 +781,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnAbrir && modal) {
     btnAbrir.addEventListener('click', () => {
       modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      // Habilitar campo número al crear
+      const formApto = document.getElementById('form-apartamento');
+      if (formApto && formApto.elements.numero) {
+        formApto.elements.numero.disabled = false;
+      }
       setTimeout(() => {
         document.addEventListener('keydown', cerrarModalPrincipalConEsc);
       }, 100);
@@ -650,6 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCerrar && modal) {
     btnCerrar.addEventListener('click', () => {
       modal.classList.add('hidden');
+      modal.classList.remove('flex');
       document.removeEventListener('keydown', cerrarModalPrincipalConEsc);
     });
   }
