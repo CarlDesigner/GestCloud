@@ -6,8 +6,9 @@ import { db } from '../lib/firebase.ts';
  * Guarda un registro de historial cuando se crea un nuevo apartamento
  * @param {string} apartamentoId - ID del apartamento
  * @param {Object} datosApartamento - Datos del apartamento creado
+ * @param {string} parqueaderoAsignado - ID del parqueadero asignado (opcional)
  */
-export async function registrarCreacionApartamento(apartamentoId, datosApartamento) {
+export async function registrarCreacionApartamento(apartamentoId, datosApartamento, parqueaderoAsignado = null) {
   try {
     const historialData = {
       apartamentoId,
@@ -21,7 +22,8 @@ export async function registrarCreacionApartamento(apartamentoId, datosApartamen
           nombre: datosApartamento.nombre,
           contacto: datosApartamento.contacto,
           rol: datosApartamento.rol,
-          observaciones: datosApartamento.observaciones || ''
+          observaciones: datosApartamento.observaciones || '',
+          parqueadero: parqueaderoAsignado || 'No asignado'
         }
       }
     };
@@ -247,6 +249,12 @@ export function generarElementoTimeline(item, esUltimo = false) {
               <span class="text-sm font-medium text-yellow-700 dark:text-yellow-300">Rol</span>
               <span class="px-2.5 py-1 text-xs font-bold bg-yellow-600 text-white rounded-full shadow-sm">
                 ${datos.rol}
+              </span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-100 dark:bg-yellow-900/10 dark:border-yellow-800/30">
+              <span class="text-sm font-medium text-yellow-700 dark:text-yellow-300">Parqueadero</span>
+              <span class="px-2.5 py-1 text-xs font-bold ${datos.parqueadero && datos.parqueadero !== 'No asignado' ? 'bg-blue-600' : 'bg-gray-600'} text-white rounded-full shadow-sm">
+                ${datos.parqueadero || 'No asignado'}
               </span>
             </div>
           </div>

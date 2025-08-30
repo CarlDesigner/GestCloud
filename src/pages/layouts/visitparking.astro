@@ -1,0 +1,103 @@
+---
+import LayoutSidebar from '../../app/LayoutSidebar.astro';
+---
+
+<LayoutSidebar>
+	<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+		<div class="w-full mb-1">
+			<div class="mb-4">
+				<nav class="flex mb-5" aria-label="Breadcrumb">
+					<ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+						<li class="inline-flex items-center">
+							<a href="#" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home mr-2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+								Parking
+							</a>
+						</li>
+						<li>
+							<div class="flex items-center">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-6 h-6 text-gray-400"><path d="m9 18 6-6-6-6"/></svg>
+								<span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">Visitantes</span>
+							</div>
+						</li>
+					</ol>
+				</nav>
+				<h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Parqueaderos Visitantes</h1>
+				<p class="text-gray-600 dark:text-gray-400 mt-2">Plano dinámico de los parqueaderos disponibles para visitantes.</p>
+				
+				<!-- Contadores de estado -->
+				<div class="flex flex-wrap gap-3 mt-4">
+					<button 
+						class="contador-btn bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-3 py-2 transition-all duration-200 hover:bg-green-100 dark:hover:bg-green-900/30 cursor-pointer"
+						data-filtro="libres"
+						onclick="cambiarFiltro('libres')"
+					>
+						<div class="flex items-center space-x-2">
+							<div class="w-2 h-2 bg-green-500 rounded-full"></div>
+							<div class="flex items-center space-x-1">
+								<span class="text-xs font-medium text-green-800 dark:text-green-200">Disponibles</span>
+								<span id="contador-libres" class="text-sm font-bold text-green-900 dark:text-green-100">0</span>
+							</div>
+						</div>
+					</button>
+					
+					<button 
+						class="contador-btn bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2 transition-all duration-200 hover:bg-red-100 dark:hover:bg-red-900/30 cursor-pointer"
+						data-filtro="ocupados"
+						onclick="cambiarFiltro('ocupados')"
+					>
+						<div class="flex items-center space-x-2">
+							<div class="w-2 h-2 bg-red-500 rounded-full"></div>
+							<div class="flex items-center space-x-1">
+								<span class="text-xs font-medium text-red-800 dark:text-red-200">Ocupados</span>
+								<span id="contador-ocupados" class="text-sm font-bold text-red-900 dark:text-red-100">0</span>
+							</div>
+						</div>
+					</button>
+					
+					<button 
+						class="contador-btn bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2 transition-all duration-200 hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
+						data-filtro="todos"
+						onclick="cambiarFiltro('todos')"
+					>
+						<div class="flex items-center space-x-2">
+							<div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+							<div class="flex items-center space-x-1">
+								<span class="text-xs font-medium text-blue-800 dark:text-blue-200">Total</span>
+								<span id="contador-total" class="text-sm font-bold text-blue-900 dark:text-blue-100">0</span>
+							</div>
+						</div>
+					</button>
+				</div>
+			</div>
+					<!-- Formulario para agregar parqueadero -->
+				<!-- <form id="form-parqueadero" class="bg-white shadow-lg rounded-xl p-4 space-y-3 max-w-md mb-8 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+					<h2 class="text-xl font-bold text-gray-900 dark:text-white">Agregar Parqueadero</h2>
+						<input type="text" name="id" placeholder="Ej: V-1" required class="w-full border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
+							<button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow font-semibold transition">Guardar</button>
+								<p id="msg-parqueadero"></p>
+				</form> -->
+					<hr class="my-6 border-t-2 border-gray-200 dark:border-gray-700" />
+
+					<!-- Cards de parqueaderos -->
+					<div id="cards-parqueaderos" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3"></div>
+				<script>
+			  import '../../scripts/parqueaderos-ui';
+				// @ts-nocheck
+				// Script del cliente para manejar directorio de parqueaderos
+				</script>
+
+				<style>
+					/* Estilos base para tooltips */
+					.tooltip-wrapper {
+						/* El posicionamiento se maneja dinámicamente con JavaScript */
+					}
+					
+					.tooltip-content {
+						/* Asegurar que el tooltip tenga un z-index alto */
+						z-index: 9999;
+					}
+				</style>											
+		</div>
+	</div>
+</LayoutSidebar>

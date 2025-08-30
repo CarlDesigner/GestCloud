@@ -202,18 +202,25 @@ const { id = 'confirm-modal' } = Astro.props;
 		pendingSalidaData = null;
 	};
 	
-	// Función para ejecutar la salida confirmada
+	// Función para ejecutar la salida confirmada o eliminación
 	window.ejecutarSalidaConfirmada = function ejecutarSalidaConfirmada() {
-		if (!pendingSalidaData) return;
-		
-		const data = pendingSalidaData;
-		
-		// Cerrar modal
-		window.cerrarConfirmModal();
-		
-		// Ejecutar callback de salida
-		if (data && data.callback && typeof data.callback === 'function') {
-			data.callback(data.id, data.nombre);
+		// Verificar si hay datos pendientes de visitante
+		if (pendingSalidaData) {
+			const data = pendingSalidaData;
+			
+			// Cerrar modal
+			window.cerrarConfirmModal();
+			
+			// Ejecutar callback de salida para visitantes
+			if (data && data.callback && typeof data.callback === 'function') {
+				data.callback(data.id, data.nombre);
+			}
+		} else if (window.pendingEliminacionData) {
+			// Verificar si hay datos pendientes de eliminación de apartamento
+			const { callback } = window.pendingEliminacionData;
+			window.cerrarConfirmModal();
+			if (callback) callback();
+			window.pendingEliminacionData = null;
 		}
 	};
 	

@@ -2,6 +2,8 @@
 import LayoutSidebar from '../app/LayoutSidebar.astro';
 import ModalDirectorio from '../components/ModalDirectorio.astro';
 import HistorialApartamento from '../components/HistorialApartamento.astro';
+import AlertNotification from '../components/AlertNotification.astro';
+import DeleteConfirmModal from '../components/DeleteConfirmModal.astro';
 ---
 
 <LayoutSidebar title="Directorio de Apartamentos">
@@ -393,13 +395,14 @@ import HistorialApartamento from '../components/HistorialApartamento.astro';
 								class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
 							>
 								<tr>
-									<th class="px-4 py-3 w-1/7">N° Apartamento</th>
-									<th class="px-4 py-3 w-1/7">Estado</th>
-									<th class="px-4 py-3 w-1/7">Residente principal</th>
-									<th class="px-4 py-3 w-1/7">Contacto</th>
-									<th class="px-4 py-3 w-1/7">Rol</th>
-									<th class="px-4 py-3 w-1/7">Observaciones</th>
-									<th class="px-4 py-3 w-1/7">Historial</th>
+									<th class="px-4 py-3 w-1/8">N° Apartamento</th>
+									<th class="px-4 py-3 w-1/8">Estado</th>
+									<th class="px-4 py-3 w-1/8">Residente principal</th>
+									<th class="px-4 py-3 w-1/8">Contacto</th>
+									<th class="px-4 py-3 w-1/8">Rol</th>
+									<th class="px-4 py-3 w-1/8">Parqueadero</th>
+									<th class="px-4 py-3 w-1/8">Observaciones</th>
+									<th class="px-4 py-3 w-1/8">Historial</th>
 									<th class="px-4 py-3 w-16"
 										><span class="sr-only">Acciones</span></th
 									>
@@ -517,3 +520,5 @@ import HistorialApartamento from '../components/HistorialApartamento.astro';
 </LayoutSidebar>
 <ModalDirectorio />
 <HistorialApartamento />
+<AlertNotification />
+<DeleteConfirmModal />

@@ -1,6 +1,6 @@
 // Mostrar/ocultar botón limpiar búsqueda y limpiar input
 import Fuse from 'fuse.js';
-import { collection, addDoc, getDocs, query, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
 import { db } from '../lib/firebase.ts';
 
 import { 
@@ -11,6 +11,7 @@ import {
 } from './historial-apartamento';
 
 let currentPage = 1;
+let datosFiltrados = []; // Variable para almacenar datos filtrados actuales
 
 // Mostrar/ocultar botón limpiar búsqueda y limpiar input
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,6 +33,119 @@ document.addEventListener('DOMContentLoaded', () => {
 let datosGlobal = [];
 
 // --- Funciones principales: deben ir antes de cualquier uso ---
+
+// Función para cargar parqueaderos disponibles
+async function cargarParqueaderosDisponibles() {
+  try {
+    const q = query(collection(db, 'parqueaderos_residentes'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs
+      .map(documento => ({ id: documento.id, ...documento.data() }))
+      .filter(p => !p.apartamento || p.apartamento === null || p.apartamento === undefined || String(p.apartamento).trim() === '' || String(p.apartamento) === 'null')
+      .sort((a, b) => {
+        const getNum = (id) => {
+          const match = (id || '').match(/(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        };
+        return getNum(a.id) - getNum(b.id);
+      });
+  } catch (error) {
+    return [];
+  }
+}
+
+// Función para poblar el select de parqueaderos para edición (incluye el asignado actual)
+async function poblarSelectParqueaderosParaEdicion(parqueaderoAsignadoActual = null) {
+  const select = document.getElementById('select-parqueadero');
+  if (!select) return;
+  
+  try {
+    const q = query(collection(db, 'parqueaderos_residentes'));
+    const snapshot = await getDocs(q);
+    const parqueaderos = snapshot.docs
+      .map(documento => ({ id: documento.id, ...documento.data() }))
+      .filter(p => 
+        // Incluir parqueaderos sin asignar O el que está asignado actualmente
+        (!p.apartamento || p.apartamento === null) || (parqueaderoAsignadoActual && p.id === parqueaderoAsignadoActual)
+      )
+      .sort((a, b) => {
+        const getNum = (id) => {
+          const match = (id || '').match(/(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        };
+        return getNum(a.id) - getNum(b.id);
+      });
+    
+    // Limpiar opciones existentes excepto la primera
+    select.innerHTML = '<option value="">Seleccionar parqueadero</option>';
+    
+    parqueaderos.forEach(parqueadero => {
+      const option = document.createElement('option');
+      option.value = parqueadero.id;
+      
+      // Mostrar si está asignado o disponible
+      const estado = parqueadero.apartamento ? 'Asignado' : 'Disponible';
+      option.textContent = `${parqueadero.id || 'N/A'} - ${estado}`;
+      
+      if (parqueaderoAsignadoActual === parqueadero.id) {
+        option.selected = true;
+      }
+      
+      select.appendChild(option);
+    });
+    
+    // Si no hay parqueaderos disponibles y no hay uno asignado, mostrar mensaje
+    if (parqueaderos.length === 0) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'No hay parqueaderos disponibles';
+      option.disabled = true;
+      select.appendChild(option);
+    }
+  } catch (error) {
+    // Error handling
+  }
+}
+
+// Función para poblar el select de parqueaderos
+async function poblarSelectParqueaderos(parqueaderoSeleccionado = null) {
+  const select = document.getElementById('select-parqueadero');
+  if (!select) return;
+  
+  const parqueaderos = await cargarParqueaderosDisponibles();
+  
+  // DEBUG: Mostrar qué parqueaderos existen realmente en consola
+  window.debugParqueaderosDisponibles = parqueaderos.map(p => p.id);
+  
+  // Limpiar opciones existentes excepto la primera
+  select.innerHTML = '<option value="">Seleccionar parqueadero</option>';
+  
+  parqueaderos.forEach(parqueadero => {
+    const option = document.createElement('option');
+    option.value = parqueadero.id;
+    option.textContent = `${parqueadero.id || 'N/A'} - Disponible`;
+    if (parqueaderoSeleccionado === parqueadero.id) {
+      option.selected = true;
+    }
+    select.appendChild(option);
+  });
+  
+  // Si no hay parqueaderos disponibles, mostrar mensaje
+  if (parqueaderos.length === 0) {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'No hay parqueaderos disponibles';
+    option.disabled = true;
+    select.appendChild(option);
+  } else {
+    // Agregar información sobre cuántos parqueaderos están disponibles
+    const infoOption = document.createElement('option');
+    infoOption.value = '';
+    infoOption.textContent = `--- ${parqueaderos.length} parqueaderos disponibles ---`;
+    infoOption.disabled = true;
+    select.appendChild(infoOption);
+  }
+}
 
 
 
@@ -60,15 +174,35 @@ function cerrarModalPrincipalConEsc(e) {
   const modal = document.getElementById('modal-apartamento');
   if (e.key === 'Escape' && modal) {
     modal.classList.add('hidden');
+    modal.classList.remove('flex');
     document.removeEventListener('keydown', cerrarModalPrincipalConEsc);
   }
 }
 
 // --- Fin funciones principales ---
 // Función para ver detalles de un apartamento
-window.verApartamento = function verApartamento(apartamentoId) {
+window.verApartamento = async function verApartamento(apartamentoId) {
   const apto = datosGlobal.find(a => a.id === apartamentoId);
   if (!apto) return;
+  
+  // Buscar parqueadero asignado
+  let parqueaderoAsignado = 'Sin asignar';
+  try {
+    const qParqueaderos = query(collection(db, 'parqueaderos_residentes'));
+    const snapshotParqueaderos = await getDocs(qParqueaderos);
+    const parqueaderoDoc = snapshotParqueaderos.docs.find(documento => {
+      const parqueadero = documento.data();
+      return parqueadero.apartamento === String(apto.numero);
+    });
+    
+    if (parqueaderoDoc) {
+      parqueaderoAsignado = parqueaderoDoc.data().id || 'Sin asignar';
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error obteniendo parqueadero:', error);
+  }
+  
   let modalDetalles = document.getElementById('modal-detalles-apto');
   // Declarar cerrarConEsc como función de flecha para que acceda a modalDetalles
   const cerrarConEsc = (e) => {
@@ -118,6 +252,10 @@ window.verApartamento = function verApartamento(apartamentoId) {
                   <span class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide block mb-1">Observaciones</span>
                   <p class="text-slate-800 dark:text-slate-100 font-semibold text-lg">${apto.observaciones || '-'}</p>
                 </div>
+                <div class="bg-white/80 dark:bg-slate-700/50 rounded-md p-3 border border-slate-200/60 dark:border-slate-600/40">
+                  <span class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide block mb-1">Parqueadero</span>
+                  <p class="text-slate-800 dark:text-slate-100 font-semibold text-lg">${parqueaderoAsignado}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -137,12 +275,32 @@ window.verApartamento = function verApartamento(apartamentoId) {
 };
 
 // Función para editar apartamento
-window.editarApartamento = function editarApartamento(apartamentoId) {
+window.editarApartamento = async function editarApartamento(apartamentoId) {
   const apto = datosGlobal.find(a => a.id === apartamentoId);
   if (!apto) return;
   const modal = document.getElementById('modal-apartamento');
   const form = document.getElementById('form-apartamento');
   if (!modal || !form) return;
+  
+  // Buscar el parqueadero asignado a este apartamento
+  let parqueaderoAsignado = null;
+  try {
+    const qParqueaderos = query(collection(db, 'parqueaderos_residentes'));
+    const snapshotParqueaderos = await getDocs(qParqueaderos);
+    const parqueaderoDoc = snapshotParqueaderos.docs.find(documento => {
+      const parqueadero = documento.data();
+      return parqueadero.apartamento === apto.numero;
+    });
+    if (parqueaderoDoc) {
+      parqueaderoAsignado = parqueaderoDoc.id;
+    }
+  } catch (error) {
+    // Error handling
+  }
+  
+  // Cargar parqueaderos disponibles (incluyendo el asignado actual)
+  await poblarSelectParqueaderosParaEdicion(parqueaderoAsignado);
+  
   // Rellenar el formulario con los datos
   form.elements.numero.value = apto.numero || '';
   form.elements.numero.disabled = true; // Deshabilitar campo número al editar
@@ -151,63 +309,87 @@ window.editarApartamento = function editarApartamento(apartamentoId) {
   form.elements.contacto.value = apto.contacto || '';
   form.elements.rol.value = apto.rol || '';
   form.elements.observaciones.value = apto.observaciones || '';
+  
+  // Seleccionar el parqueadero asignado
+  if (parqueaderoAsignado && form.elements.parqueadero) {
+    form.elements.parqueadero.value = parqueaderoAsignado;
+  }
+  
   // Guardar el id editando
   form.setAttribute('data-edit-id', apartamentoId);
   modal.classList.remove('hidden');
+  modal.classList.add('flex');
 };
 
 // Eliminado: submit duplicado. Toda la lógica de submit está centralizada en el bloque DOMContentLoaded más abajo.
 
-// Modal de confirmación reutilizable
-function mostrarModalConfirmacion(mensaje, onConfirm) {
-  // Eliminar cualquier modal previo
-  const modalExistente = document.getElementById('modal-confirmacion-directorio');
-  if (modalExistente) modalExistente.remove();
-  const modal = document.createElement('div');
-  modal.id = 'modal-confirmacion-directorio';
-  modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/40';
-  modal.innerHTML = `
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full mx-auto">
-      <div class="mb-4 text-gray-900 dark:text-gray-100 text-center">${mensaje}</div>
-      <div class="flex justify-center gap-4">
-        <button id="btn-cancelar-confirmacion" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">Cancelar</button>
-        <button id="btn-confirmar-confirmacion" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Eliminar</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  // Cerrar modal
-  let cerrarConEsc;
-  const cerrar = () => {
-    modal.remove();
-    document.removeEventListener('keydown', cerrarConEsc);
-  };
-  cerrarConEsc = (e) => {
-    if (e.key === 'Escape') cerrar();
-  };
-  setTimeout(() => {
-    document.addEventListener('keydown', cerrarConEsc);
-  }, 100);
-  document.getElementById('btn-cancelar-confirmacion').onclick = cerrar;
-  document.getElementById('btn-confirmar-confirmacion').onclick = () => {
-    cerrar();
-    onConfirm();
-  };
+// Función para actualizar apartamento en Firestore
+// Función para manejar cambios en la asignación de parqueaderos
+async function manejarCambioParqueadero(numeroApartamentoAnterior, numeroApartamentoNuevo, nuevoParqueaderoId, propietario) {
+  try {
+    // Buscar y liberar el parqueadero anterior si existe
+    const qParqueaderos = query(collection(db, 'parqueaderos_residentes'));
+    const snapshotParqueaderos = await getDocs(qParqueaderos);
+    
+    // Liberar parqueadero anterior
+    const parqueaderoAnterior = snapshotParqueaderos.docs.find(documento => {
+      const parqueadero = documento.data();
+      return parqueadero.apartamento === numeroApartamentoAnterior;
+    });
+    
+    if (parqueaderoAnterior) {
+      await updateDoc(doc(db, 'parqueaderos_residentes', parqueaderoAnterior.id), {
+        apartamento: null,
+        propietario: null,
+        vehiculo: null,
+        estado: 'libre'
+      });
+    }
+    
+    // Asignar nuevo parqueadero si se seleccionó uno - USANDO LA MISMA LÓGICA QUE VISITANTES
+    if (nuevoParqueaderoId) {
+      const parqueaderosQuery = query(
+        collection(db, 'parqueaderos_residentes'), 
+        where('id', '==', nuevoParqueaderoId)
+      );
+      const parqueaderosSnapshot = await getDocs(parqueaderosQuery);
+      
+      if (!parqueaderosSnapshot.empty) {
+        const parqueaderoDoc = parqueaderosSnapshot.docs[0];
+        if (parqueaderoDoc) {
+          await updateDoc(doc(db, 'parqueaderos_residentes', parqueaderoDoc.id), {
+            apartamento: numeroApartamentoNuevo,
+            propietario: propietario || null,
+            estado: 'libre'
+          });
+        }
+      }
+    }
+  } catch (error) {
+    // Error handling
+  }
 }
 
-// Función para actualizar apartamento en Firestore
 async function actualizarApartamento(id, data) {
   // Verificar si el nuevo número ya existe en otro registro
   const q = query(collection(db, 'directorio'));
   const snapshot = await getDocs(q);
   const existe = snapshot.docs.some(d => d.id !== id && d.data().numero === data.numero);
   if (existe) {
-    mostrarModalConfirmacion('Ya existe otro apartamento con ese número.', () => {});
+    window.mostrarAlert('Ya existe otro apartamento con ese número.', 'error');
     return;
   }
   
   // Obtener los datos anteriores del apartamento para el historial
   const apartamentoAnterior = datosGlobal.find(apto => apto.id === id);
+  
+  // Obtener el número del apartamento para usar en la alerta
+  const numeroApartamento = data.numero || apartamentoAnterior?.numero || 'sin número';
+
+  // Manejar cambios en el parqueadero asignado
+  if (apartamentoAnterior) {
+    await manejarCambioParqueadero(apartamentoAnterior.numero, data.numero, data.parqueadero, data.nombre);
+  }
 
   // Agregar campo de fechaActualizacion
   const dataActualizada = { ...data, fechaActualizacion: Date.now() };
@@ -219,6 +401,9 @@ async function actualizarApartamento(id, data) {
   if (apartamentoAnterior) {
     await registrarEdicionApartamento(id, apartamentoAnterior, data);
   }
+  
+  // Usar el número del apartamento que ya definimos arriba
+  window.mostrarAlert(`Apartamento ${numeroApartamento} actualizado correctamente`, 'success');
 }
 
 
@@ -358,20 +543,64 @@ async function cargarDirectorio() {
   });
 }
 
+
+// Función para asignar un parqueadero específico seleccionado
 async function guardarApartamento(data) {
+  // VERIFICAR que tenemos el número de apartamento
+  if (!data.numero) {
+    window.mostrarAlert('Error: Falta el número de apartamento', 'error');
+    return;
+  }
+  
   // Verificar si ya existe un apartamento con el mismo número
   const q = query(collection(db, 'directorio'));
   const snapshot = await getDocs(q);
   const existe = snapshot.docs.some(documento => documento.data().numero === data.numero);
   if (existe) {
-    mostrarModalConfirmacion('Ya existe un apartamento con ese número.', () => {});
+    window.mostrarAlert('Ya existe un apartamento con ese número', 'error');
     return;
   }
+  
   // Agregar campo de fecha de creación
   const docRef = await addDoc(collection(db, 'directorio'), { ...data, fechaCreacion: Date.now() });
   
-  // Registrar en el historial
-  await registrarCreacionApartamento(docRef.id, data);
+  let parqueaderoAsignado = null;
+  
+  // ASIGNACIÓN DE PARQUEADERO - USANDO LA MISMA LÓGICA QUE VISITANTES
+  if (data.parqueadero && data.parqueadero.trim() !== '') {
+    try {
+      // Buscar el documento del parqueadero usando query + where (como en visitantes)
+      const parqueaderosQuery = query(
+        collection(db, 'parqueaderos_residentes'), 
+        where('id', '==', data.parqueadero)
+      );
+      const parqueaderosSnapshot = await getDocs(parqueaderosQuery);
+      
+      if (!parqueaderosSnapshot.empty) {
+        const parqueaderoDoc = parqueaderosSnapshot.docs[0];
+        if (parqueaderoDoc) {
+          await updateDoc(doc(db, 'parqueaderos_residentes', parqueaderoDoc.id), {
+            apartamento: String(data.numero),
+            propietario: String(data.nombre),
+            estado: 'libre'
+          });
+          
+          parqueaderoAsignado = data.parqueadero;
+          window.mostrarAlert(`Apartamento ${data.numero} creado y parqueadero ${data.parqueadero} asignado correctamente`, 'success');
+        }
+      } else {
+        window.mostrarAlert(`Apartamento ${data.numero} creado, pero no se encontró el parqueadero ${data.parqueadero}`, 'warning');
+      }
+      
+    } catch (error) {
+      window.mostrarAlert(`Apartamento ${data.numero} creado, pero error asignando parqueadero: ${error.message}`, 'warning');
+    }
+  } else {
+    window.mostrarAlert(`Apartamento ${data.numero} creado exitosamente`, 'success');
+  }
+  
+  // Registrar en el historial (después de la asignación del parqueadero)
+  await registrarCreacionApartamento(docRef.id, data, parqueaderoAsignado);
 }
 
 
@@ -390,9 +619,24 @@ function limpiarFormulario(form) {
 
 
 
-function renderTabla(datos) {
+async function renderTabla(datos) {
   const tbody = document.getElementById('tabla-directorio-body');
   tbody.innerHTML = '';
+  
+  // Obtener todos los parqueaderos asignados de una vez
+  const parqueaderosData = {};
+  try {
+    const parqueaderosSnapshot = await getDocs(collection(db, 'parqueaderos_residentes'));
+    parqueaderosSnapshot.forEach(docParqueadero => {
+      const data = docParqueadero.data();
+      if (data.apartamento) {
+        parqueaderosData[data.apartamento] = data.id;
+      }
+    });
+  } catch (error) {
+    // Error silencioso obteniendo parqueaderos
+  }
+  
   // Paginación
   const registrosPorPagina = 20;
   totalPages = Math.ceil(datos.length / registrosPorPagina) || 1;
@@ -503,6 +747,16 @@ function renderTabla(datos) {
     tdRol.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
     tdRol.innerHTML = badgeRol;
 
+    // Nueva columna para parqueadero
+    const tdParqueadero = document.createElement('td');
+    tdParqueadero.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    const parqueaderoAsignado = parqueaderosData[apto.numero];
+    if (parqueaderoAsignado) {
+      tdParqueadero.innerHTML = `<span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-lg dark:bg-blue-900 dark:text-blue-300">${parqueaderoAsignado}</span>`;
+    } else {
+      tdParqueadero.innerHTML = '<span class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-lg dark:bg-gray-700 dark:text-gray-300">No asignado</span>';
+    }
+
     const tdObs = document.createElement('td');
     tdObs.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
     
@@ -546,6 +800,7 @@ function renderTabla(datos) {
     tr.appendChild(tdNombre);
     tr.appendChild(tdContacto);
     tr.appendChild(tdRol);
+    tr.appendChild(tdParqueadero);
     tr.appendChild(tdObs);
     tr.appendChild(tdHistorial);
     tr.appendChild(tdAcciones);
@@ -610,19 +865,68 @@ function renderTabla(datos) {
 
 
 
+// Función para liberar el parqueadero cuando se elimina un apartamento
+async function liberarParqueaderoApartamento(numeroApartamento) {
+  try {
+    // Buscar el parqueadero asignado a este apartamento
+    const qParqueaderos = query(collection(db, 'parqueaderos_residentes'));
+    const snapshotParqueaderos = await getDocs(qParqueaderos);
+    
+    const parqueaderoAsignado = snapshotParqueaderos.docs.find(parqueaderoDoc => {
+      const parqueadero = parqueaderoDoc.data();
+      return parqueadero.apartamento === numeroApartamento;
+    });
+    
+    if (parqueaderoAsignado) {
+      // Liberar el parqueadero
+      await updateDoc(doc(db, 'parqueaderos_residentes', parqueaderoAsignado.id), {
+        apartamento: null,
+        propietario: null,
+        vehiculo: null,
+        estado: 'libre'
+      });
+    }
+  } catch (error) {
+    // Error handling sin console
+  }
+}
+
 async function actualizarTabla() {
 // Mover aquí la definición de eliminarApartamento para evitar no-use-before-define
-window.eliminarApartamento = function eliminarApartamento(apartamentoId) {
-  mostrarModalConfirmacion('¿Seguro que deseas eliminar este apartamento?', async () => {
-    // Eliminar el apartamento de Firestore
-    await deleteDoc(doc(db, 'directorio', apartamentoId));
-    
-    // Eliminar también todo el historial asociado
-    await eliminarHistorialApartamento(apartamentoId);
-    
-    actualizarTabla();
-  });
+window.eliminarApartamento = async function eliminarApartamento(apartamentoId) {
+  // Buscar el apartamento para obtener información antes de eliminarlo
+  const apartamento = datosGlobal.find(a => a.id === apartamentoId);
+  const numeroApartamento = apartamento?.numero || 'sin número';
+  
+  // Usar el modal de eliminación del historial
+  window.mostrarModalEliminar(
+    `¿Estás seguro de que quieres eliminar el apartamento ${numeroApartamento}?`,
+    async () => {
+      try {
+        // Eliminar el apartamento de Firestore
+        await deleteDoc(doc(db, 'directorio', apartamentoId));
+        
+        // Liberar el parqueadero asignado si existe el apartamento
+        if (apartamento && apartamento.numero) {
+          await liberarParqueaderoApartamento(apartamento.numero);
+        }
+        
+        // Eliminar también todo el historial asociado
+        await eliminarHistorialApartamento(apartamentoId);
+        
+        // Actualizar la tabla
+        await actualizarTabla();
+        
+        window.mostrarAlert(`Apartamento ${numeroApartamento} eliminado correctamente`, 'success');
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error eliminando apartamento:', error);
+        window.mostrarAlert(`Error al eliminar el apartamento: ${error.message}`, 'error');
+      }
+    }
+  );
 };
+
   const datos = await cargarDirectorio();
   datosGlobal = datos;
   // Inicializar Fuse con los datos actuales
@@ -636,13 +940,18 @@ window.eliminarApartamento = function eliminarApartamento(apartamentoId) {
     filtrados = datos.filter(apto => (apto.estado || '').trim().toLowerCase() === valorFiltro);
     filtroActivo = true;
   }
+  
+  // Almacenar datos filtrados globalmente para la paginación
+  datosFiltrados = filtrados;
+  
   // Si hay búsqueda activa, mantenerla al recargar
   const tableSearch = document.getElementById('table-search');
   if (tableSearch && tableSearch.value.trim().length > 0 && fuse) {
     const resultados = fuse.search(tableSearch.value.trim()).map(r => r.item);
-    renderTabla(resultados);
+    datosFiltrados = resultados; // Actualizar con resultados de búsqueda
+    await renderTabla(resultados);
   } else {
-    renderTabla(filtrados);
+    await renderTabla(filtrados);
   }
   // Actualizar contadores
   actualizarContadoresDirectorio(datos);
@@ -668,15 +977,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Búsqueda en tiempo real para el directorio
   const tableSearch = document.getElementById('table-search');
   if (tableSearch) {
-    tableSearch.addEventListener('input', function handleTableSearchInput() {
+    tableSearch.addEventListener('input', async function handleTableSearchInput() {
       const termino = this.value.trim();
       if (fuse && termino.length > 0) {
         const resultados = fuse.search(termino).map(r => r.item);
+        datosFiltrados = resultados; // Actualizar datos filtrados
         currentPage = 1;
-        renderTabla(resultados);
+        await renderTabla(resultados);
       } else {
+        // Restablecer al filtro actual sin búsqueda
+        const filtro = document.querySelector('input[name="filtro-estado-directorio"]:checked');
+        let filtrados = datosGlobal;
+        if (filtro && filtro.value !== 'todos') {
+          const valorFiltro = filtro.value.trim().toLowerCase();
+          filtrados = datosGlobal.filter(apto => (apto.estado || '').trim().toLowerCase() === valorFiltro);
+        }
+        datosFiltrados = filtrados; // Actualizar datos filtrados
         currentPage = 1;
-        renderTabla(datosGlobal);
+        await renderTabla(filtrados);
       }
     });
   }
@@ -699,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   actualizarBotonLimpiarFiltro();
   if (btnLimpiarFiltro) {
-    btnLimpiarFiltro.addEventListener('click', () => {
+    btnLimpiarFiltro.addEventListener('click', async () => {
       // Seleccionar el radio 'todos' y actualizar la tabla
       const radioTodos = document.querySelector('input[name="filtro-estado-directorio"][value="todos"]');
       if (radioTodos) {
@@ -707,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof currentPage !== 'undefined') {
           currentPage = 1;
         }
-        actualizarTabla();
+        await actualizarTabla();
         actualizarBotonLimpiarFiltro();
       }
     });
@@ -719,34 +1037,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnUltima = document.getElementById('btn-ultima-directorio');
 
   if (btnAnterior) {
-    btnAnterior.addEventListener('click', () => {
+    btnAnterior.addEventListener('click', async () => {
       if (currentPage > 1) {
         currentPage -= 1;
-        renderTabla(datosGlobal);
+        await renderTabla(datosFiltrados);
       }
     });
   }
   if (btnSiguiente) {
-    btnSiguiente.addEventListener('click', () => {
+    btnSiguiente.addEventListener('click', async () => {
       if (currentPage < totalPages) {
         currentPage += 1;
-        renderTabla(datosGlobal);
+        await renderTabla(datosFiltrados);
       }
     });
   }
   if (btnPrimera) {
-    btnPrimera.addEventListener('click', () => {
+    btnPrimera.addEventListener('click', async () => {
       if (currentPage !== 1) {
         currentPage = 1;
-        renderTabla(datosGlobal);
+        await renderTabla(datosFiltrados);
       }
     });
   }
   if (btnUltima) {
-    btnUltima.addEventListener('click', () => {
+    btnUltima.addEventListener('click', async () => {
       if (currentPage !== totalPages) {
         currentPage = totalPages;
-        renderTabla(datosGlobal);
+        await renderTabla(datosFiltrados);
       }
     });
   }
@@ -767,8 +1085,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Filtro: aplicar filtro al cambiar radio
   const radios = document.querySelectorAll('input[name="filtro-estado-directorio"]');
   radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      actualizarTabla();
+    radio.addEventListener('change', async () => {
+      currentPage = 1; // Restablecer a página 1 al cambiar filtro
+      await actualizarTabla();
       dropdownFiltros.classList.add('hidden');
     });
   });
@@ -779,7 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form-apartamento');
 
   if (btnAbrir && modal) {
-    btnAbrir.addEventListener('click', () => {
+    btnAbrir.addEventListener('click', async () => {
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       // Habilitar campo número al crear
@@ -787,6 +1106,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (formApto && formApto.elements.numero) {
         formApto.elements.numero.disabled = false;
       }
+      
+      // Cargar parqueaderos disponibles cuando se abre el modal
+      poblarSelectParqueaderos();
       setTimeout(() => {
         document.addEventListener('keydown', cerrarModalPrincipalConEsc);
       }, 100);
@@ -802,6 +1124,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCancelar && modal) {
     btnCancelar.addEventListener('click', () => {
       modal.classList.add('hidden');
+      modal.classList.remove('flex');
       document.removeEventListener('keydown', cerrarModalPrincipalConEsc);
     });
   }
@@ -866,7 +1189,9 @@ document.addEventListener('DOMContentLoaded', () => {
         errorNombre.style.display = 'none';
       }
       if (!valido) return;
+      
       const data = Object.fromEntries(new FormData(form));
+      
       const editId = form.getAttribute('data-edit-id');
       if (editId) {
         await actualizarApartamento(editId, data);
@@ -876,6 +1201,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       limpiarFormulario(form);
       modal.classList.add('hidden');
+      modal.classList.remove('flex');
       actualizarTabla();
     });
     // Validación en tiempo real para número de apartamento

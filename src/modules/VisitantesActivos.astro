@@ -63,7 +63,7 @@ import FormularioVisitante from '../components/FormularioVisitante.astro';
 						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search text-gray-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
 						</div>
-						<input type="text" id="buscar-visitante" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-9 pr-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 shadow-sm" placeholder="Buscar por nombre, cédula, placa...">
+						<input type="text" id="buscar-visitante" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-9 pr-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 shadow-sm" placeholder="Buscar por nombre, cédula, placa, parqueadero...">
 					</div>
 				</div>
 				
@@ -130,12 +130,12 @@ import FormularioVisitante from '../components/FormularioVisitante.astro';
 <!-- Template para las cards de visitantes -->
 <template id="template-card-visitante">
 	<div class="visitante-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
-		<div class="p-6">
+		<div class="p-5">
 			<!-- Header de la card -->
-			<div class="flex items-center justify-between mb-4">
-				<div class="flex items-center space-x-3">
-					<div class="w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-5 h-5 text-primary-600 dark:text-primary-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+			<div class="flex items-center justify-between mb-3.5">
+				<div class="flex items-center space-x-2.5">
+					<div class="w-9 h-9 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4.5 h-4.5 text-primary-600 dark:text-primary-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 					</div>
 					<div>
 						<h3 class="visitante-nombre font-semibold text-lg text-gray-900 dark:text-white"></h3>
@@ -149,35 +149,35 @@ import FormularioVisitante from '../components/FormularioVisitante.astro';
 			</div>
 
 			<!-- Información del visitante -->
-			<div class="space-y-3 mb-6">
+			<div class="space-y-2.5 mb-5">
 				<div class="flex items-center">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-4 h-4 text-gray-400 mr-2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-3.5 h-3.5 text-gray-400 mr-2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
 					<span class="visitante-celular text-sm text-gray-700 dark:text-gray-300"></span>
 				</div>
 				<div class="flex items-center">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home w-4 h-4 text-gray-400 mr-2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home w-3.5 h-3.5 text-gray-400 mr-2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
 					<span class="visitante-apartamento text-sm text-gray-700 dark:text-gray-300"></span>
 				</div>
 				<div class="flex items-center">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-check w-4 h-4 text-gray-400 mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16,11 18,13 22,9"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-check w-3.5 h-3.5 text-gray-400 mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16,11 18,13 22,9"/></svg>
 					<span class="visitante-autorizado text-sm text-gray-700 dark:text-gray-300"></span>
 				</div>
 			</div>
 
 			<!-- Tiempo dentro - Cronómetro -->
-			<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-4">
+			<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2.5 mb-3.5">
 				<div class="flex items-center justify-between">
-					<span class="text-sm font-medium text-gray-600 dark:text-gray-400">Tiempo dentro:</span>
-					<div class="flex items-center space-x-2">
-						<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-						<span class="visitante-tiempo text-lg font-mono font-semibold text-gray-900 dark:text-white"></span>
+					<span class="text-xs font-medium text-gray-600 dark:text-gray-400">Tiempo dentro:</span>
+					<div class="flex items-center space-x-1.5">
+						<div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+						<span class="visitante-tiempo text-base font-mono font-semibold text-gray-900 dark:text-white"></span>
 					</div>
 				</div>
 				<div class="text-xs text-gray-500 dark:text-gray-500 mt-1">
 					Ingresó: <span class="visitante-hora-entrada"></span>
 				</div>
 				<!-- Costo acumulado del vehículo (solo si tiene vehículo) -->
-				<div class="vehiculo-costo hidden mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+				<div class="vehiculo-costo hidden mt-1.5 pt-1.5 border-t border-gray-200 dark:border-gray-600">
 					<div class="flex items-center justify-between">
 						<span class="text-sm text-gray-600 dark:text-gray-400">Costo acumulado:</span>
 						<span class="costo-valor text-lg font-semibold text-orange-600 dark:text-orange-400"></span>
@@ -186,12 +186,20 @@ import FormularioVisitante from '../components/FormularioVisitante.astro';
 			</div>
 
 			<!-- Información del vehículo (solo si tiene vehículo) -->
-			<div class="vehiculo-info hidden bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 mb-4 border border-blue-200 dark:border-blue-800">
-				<div class="flex items-center mb-2">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-4 h-4 text-blue-600 dark:text-blue-400 mr-2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.4 9H5.6L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-					<span class="text-sm font-medium text-blue-800 dark:text-blue-200">Vehículo</span>
+			<div class="vehiculo-info hidden bg-blue-50 dark:bg-blue-900/30 rounded-lg p-2.5 mb-4 border border-blue-200 dark:border-blue-800">
+				<div class="flex items-center mb-1.5">
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-car w-3.5 h-3.5 text-blue-600 dark:text-blue-400 mr-1.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.4 9H5.6L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+					<span class="text-xs font-medium text-blue-800 dark:text-blue-200">Vehículo</span>
 				</div>
-				<div class="space-y-1 text-sm">
+				<div class="space-y-0.5 text-xs">
+					<!-- Parqueadero asignado (solo si tiene parqueadero) -->
+					<div class="vehiculo-parqueadero hidden justify-between items-center">
+						<div class="flex items-center">
+							
+							<span class="text-blue-700 dark:text-blue-300">Ubicación:</span>
+						</div>
+						<span class="vehiculo-parqueadero-valor font-semibold text-blue-900 dark:text-blue-100"></span>
+					</div>
 					<div class="flex justify-between">
 						<span class="text-blue-700 dark:text-blue-300">Tipo:</span>
 						<span class="vehiculo-tipo font-medium text-blue-900 dark:text-blue-100"></span>
@@ -212,9 +220,9 @@ import FormularioVisitante from '../components/FormularioVisitante.astro';
 			</div>
 
 			<!-- Botón de salida -->
-			<button class="btn-dar-salida w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center">
+			<button class="btn-dar-salida w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm">
 				Dar Salida
-				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out ml-2"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out ml-1.5"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
 			</button>
 		</div>
 	</div>

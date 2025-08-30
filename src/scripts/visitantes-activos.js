@@ -1,5 +1,5 @@
 // Cliente para obtener visitantes activos desde Firestore - GestCloud
-import { collection, query, where, onSnapshot, doc, serverTimestamp, runTransaction } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, serverTimestamp, runTransaction, getDocs, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 // Función auxiliar para formatear tiempo
@@ -76,7 +76,6 @@ export async function darSalidaVisitante(visitanteId) {
     }
 
     // MÉTODO TEMPORAL: Solo actualizar el visitante existente
-    const { getDoc, updateDoc } = await import('firebase/firestore');
     
     // 1. Obtener visitante activo
     const visitanteRef = doc(db, 'visitantes', visitanteId);
@@ -126,8 +125,34 @@ export async function darSalidaVisitante(visitanteId) {
       actualizacion.costoVehiculo = costoVehiculo;
     }
     
-    // 4. Actualizar el documento existente
+    // 5. Actualizar el documento existente
     await updateDoc(visitanteRef, actualizacion);
+    
+    // 6. Liberar parqueadero si el visitante tenía vehículo con parqueadero asignado
+    if (datosVisitante.vehiculo && datosVisitante.vehiculo.parqueadero) {
+      try {
+        const parqueaderosQuery = query(
+          collection(db, 'parqueaderos_visitantes'),
+          where('id', '==', datosVisitante.vehiculo.parqueadero)
+        );
+        const parqueaderosSnapshot = await getDocs(parqueaderosQuery);
+        
+        if (!parqueaderosSnapshot.empty) {
+          const parqueaderoDoc = parqueaderosSnapshot.docs[0];
+          if (parqueaderoDoc) {
+            await updateDoc(doc(db, 'parqueaderos_visitantes', parqueaderoDoc.id), {
+              estado: 'libre',
+              visitante: null,
+              vehiculo: null,
+              apartamento: null
+            });
+          }
+        }
+      } catch (parqueaderoError) {
+        // Si hay error liberando el parqueadero, no fallar toda la operación
+        // Error silencioso para no afectar la salida del visitante
+      }
+    }
     
     const resultado = {
       success: true,

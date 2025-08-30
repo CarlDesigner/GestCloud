@@ -23,10 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Configuración de Fuse.js para búsqueda inteligente en visitantes activos
 	const fuseOptions = {
 		keys: [
-			{ name: 'nombre', weight: 0.4 },
-			{ name: 'cedula', weight: 0.3 },
+			{ name: 'nombre', weight: 0.3 },
+			{ name: 'cedula', weight: 0.25 },
 			{ name: 'apartamento', weight: 0.2 },
-			{ name: 'vehiculo.placa', weight: 0.1 }
+			{ name: 'vehiculo.placa', weight: 0.15 },
+			{ name: 'vehiculo.parqueadero', weight: 0.1 }
 		],
 		threshold: 0.3,
 		includeScore: true,
@@ -118,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				   (visitante.vehiculo && (
 				   		visitante.vehiculo.placa.toLowerCase().includes(terminoLower) ||
 				   		visitante.vehiculo.tipo.toLowerCase().includes(terminoLower) ||
-				   		visitante.vehiculo.color.toLowerCase().includes(terminoLower)
+				   		visitante.vehiculo.color.toLowerCase().includes(terminoLower) ||
+				   		(visitante.vehiculo.parqueadero && visitante.vehiculo.parqueadero.toLowerCase().includes(terminoLower))
 				   ));
 		});
 
@@ -174,207 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Mostrar carga inicial
 	mostrarCarga();
 
-	// Función para aplicar filtros con búsqueda mejorada
-	function aplicarFiltro() {
-		let resultado = [...visitantesActivos];
-		
-		// Aplicar búsqueda primero si hay términos
-		const termino = buscarVisitante?.value?.trim() || '';
-		if (termino) {
-			resultado = buscarVisitantes(termino);
-		}
-		
-		// Luego aplicar filtro por tipo
-		switch(filtroActual) {
-			case 'con-vehiculo':
-				visitantesFiltrados = resultado.filter(v => v.vehiculo);
-				break;
-			case 'sin-vehiculo':
-				visitantesFiltrados = resultado.filter(v => !v.vehiculo);
-				break;
-			default:
-				visitantesFiltrados = resultado;
-		}
-		renderizarCards();
-	}
-
-	// Función para actualizar contadores de filtros
-	function actualizarContadoresFiltros() {
-		const totalVisitantes = visitantesActivos.length;
-		const conVehiculo = visitantesActivos.filter(v => v.vehiculo).length;
-		const sinVehiculo = visitantesActivos.filter(v => !v.vehiculo).length;
-		
-		// Actualizar contadores en los botones
-		const contadorTodos = document.getElementById('contador-todos');
-		const contadorConVehiculo = document.getElementById('contador-con-vehiculo');
-		const contadorSinVehiculo = document.getElementById('contador-sin-vehiculo');
-		
-		if (contadorTodos) contadorTodos.textContent = `(${totalVisitantes})`;
-		if (contadorConVehiculo) contadorConVehiculo.textContent = `(${conVehiculo})`;
-		if (contadorSinVehiculo) contadorSinVehiculo.textContent = `(${sinVehiculo})`;
-	}
-
-	// Función para renderizar las cards filtradas
-	function renderizarCards() {
-		// Actualizar contador principal
-		if (contadorVisitantes) {
-			contadorVisitantes.textContent = String(visitantesFiltrados.length);
-		}
-		
-		// Actualizar contadores de filtros
-		actualizarContadoresFiltros();
-		
-		if (isLoading) isLoading = false;
-		
-		if (visitantesFiltrados.length === 0) {
-			if (sinVisitantes && gridVisitantes) {
-				restaurarEstadoVacio();
-				sinVisitantes.classList.remove('hidden');
-				gridVisitantes.classList.add('hidden');
-			}
-		} else if (sinVisitantes && gridVisitantes) {
-			sinVisitantes.classList.add('hidden');
-			gridVisitantes.classList.remove('hidden');
-			gridVisitantes.innerHTML = '';
-			
-			visitantesFiltrados.forEach(visitante => {
-				const card = crearCardVisitante(visitante);
-				gridVisitantes.appendChild(card);
-			});
-		}
-	}
-
-	// Event listeners para los filtros
-	const filtroTodos = document.getElementById('filtro-todos');
-	const filtroConVehiculo = document.getElementById('filtro-con-vehiculo');
-	const filtroSinVehiculo = document.getElementById('filtro-sin-vehiculo');
-
-	function actualizarEstadoFiltros() {
-		// Remover clases active de todos los botones y aplicar estilo outline
-		document.querySelectorAll('.filtro-btn').forEach(btn => {
-			btn.classList.remove('active', 'bg-primary-500', 'text-white', 'shadow-md');
-			
-			// Determinar el color base del botón
-			if (btn.id === 'filtro-todos') {
-				btn.classList.add('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
-				btn.classList.remove('border-primary-500');
-			} else if (btn.id === 'filtro-con-vehiculo') {
-				btn.classList.add('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
-			} else if (btn.id === 'filtro-sin-vehiculo') {
-				btn.classList.add('border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent');
-			}
-		});
-
-		// Aplicar estilo activo al botón seleccionado
-		const btnActivo = document.getElementById(`filtro-${filtroActual}`);
-		if (btnActivo) {
-			btnActivo.classList.add('active', 'shadow-md');
-			
-			if (filtroActual === 'todos') {
-				btnActivo.classList.remove('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
-				btnActivo.classList.add('border-primary-500', 'bg-primary-500', 'text-white');
-			} else if (filtroActual === 'con-vehiculo') {
-				btnActivo.classList.remove('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
-				btnActivo.classList.add('border-primary-500', 'bg-primary-500', 'text-white');
-			} else if (filtroActual === 'sin-vehiculo') {
-				btnActivo.classList.remove('border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent');
-				btnActivo.classList.add('border-gray-500', 'bg-gray-500', 'text-white');
-			}
-		}
-	}
-
-	// Configurar event listeners para filtros
-	if (filtroTodos) {
-		filtroTodos.addEventListener('click', () => {
-			filtroActual = 'todos';
-			actualizarEstadoFiltros();
-			aplicarFiltro();
-		});
-	}
-
-	// Función para resaltar texto de búsqueda en resultados
-	function resaltarTexto(texto, termino) {
-		if (!termino || termino.length < 2) {
-			return texto;
-		}
-		
-		// Limpiar término de búsqueda para cédulas y celulares (remover puntos, espacios y guiones)
-		const terminoLimpio = termino.replace(/[.\s-]/g, '');
-		
-		// Si es una búsqueda de solo números (cédula o celular), resaltar coincidencias en ambos
-		if (/^\d+$/.test(terminoLimpio)) {
-			// Escapar caracteres especiales para regex
-			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-			const terminoLimpioEscapado = terminoLimpio.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-			// Crear regex para buscar tanto el término original como el limpio (sin puntos)
-			const regexOriginal = new RegExp(`(${terminoEscapado})`, 'gi');
-			const regexLimpio = new RegExp(`(${terminoLimpioEscapado})`, 'gi');
-
-			// Primero intentar con el término original
-			let resultado = texto.replace(regexOriginal, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
-
-			// Si no hay cambios, intentar con el término limpio (sin puntos/espacios)
-			if (resultado === texto) {
-				// Eliminar puntos y espacios del texto para buscar coincidencia sin formato
-				const textoLimpio = texto.replace(/[.\s-]/g, '');
-				resultado = textoLimpio.replace(regexLimpio, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
-				// Volver a formatear el texto con los <mark> en la posición correcta
-				if (resultado !== textoLimpio) {
-					// Encontrar el índice de la coincidencia en el texto limpio
-					const match = textoLimpio.match(regexLimpio);
-					if (match && match.index !== undefined) {
-						// Calcular la posición en el texto original
-						const start = match.index;
-						const end = start + match[0].length;
-						// Buscar la posición correspondiente en el texto original
-						let count = 0, i = 0, startOrig = -1, endOrig = -1;
-						for (; i < texto.length; i++) {
-							if (/[0-9]/.test(texto[i])) {
-								if (count === start) startOrig = i;
-								if (count === end - 1) endOrig = i;
-								count++;
-							}
-						}
-						if (startOrig !== -1 && endOrig !== -1) {
-							return (
-								texto.slice(0, startOrig) +
-								'<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">' +
-								texto.slice(startOrig, endOrig + 1) +
-								'</mark>' +
-								texto.slice(endOrig + 1)
-							);
-						}
-					}
-				}
-			}
-			return resultado;
-		}
-
-		// Para búsquedas normales de texto
-		const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-		const regex = new RegExp(`(${terminoEscapado})`, 'gi');
-
-		// Resaltar el texto con un span amarillo
-		return texto.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
-	}
-
-	if (filtroConVehiculo) {
-		filtroConVehiculo.addEventListener('click', () => {
-			filtroActual = 'con-vehiculo';
-			actualizarEstadoFiltros();
-			aplicarFiltro();
-		});
-	}
-
-	if (filtroSinVehiculo) {
-		filtroSinVehiculo.addEventListener('click', () => {
-			filtroActual = 'sin-vehiculo';
-			actualizarEstadoFiltros();
-			aplicarFiltro();
-		});
-	}
-
+	// ===== FUNCIONES DE UTILIDAD =====
+	
 	// Función para capitalizar nombres (primera letra de cada palabra en mayúscula)
 	function capitalizarNombre(nombre) {
 		return nombre
@@ -469,58 +272,91 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// Función para crear una card de visitante
-	function crearCardVisitante(visitante) {
-		const card = templateCard.content.cloneNode(true);
-		
-		// Obtener término de búsqueda actual para resaltado
-		const termino = buscarVisitante?.value?.trim() || '';
-		
-		// Llenar datos con formato mejorado y resaltado
-		card.querySelector('.visitante-nombre').innerHTML = resaltarTexto(capitalizarNombre(visitante.nombre), termino);
-		card.querySelector('.visitante-cedula').innerHTML = `CC: ${resaltarTexto(formatearCedula(visitante.cedula), termino)}`;
-		card.querySelector('.visitante-celular').innerHTML = resaltarTexto(formatearCelular(visitante.celular), termino);
-		card.querySelector('.visitante-apartamento').innerHTML = `Apto: ${resaltarTexto(formatearApartamento(visitante.apartamento), termino)}`;
-		card.querySelector('.visitante-autorizado').innerHTML = `Por: ${resaltarTexto(capitalizarNombre(visitante.autorizadoPor), termino)}`;
-		card.querySelector('.visitante-tiempo').textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
-		card.querySelector('.visitante-hora-entrada').textContent = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
-		
-		// Manejar información del vehículo
-		if (visitante.vehiculo) {
-			// Mostrar sección del vehículo
-			const vehiculoInfo = card.querySelector('.vehiculo-info');
-			const vehiculoCosto = card.querySelector('.vehiculo-costo');
-			
-			if (vehiculoInfo) {
-				vehiculoInfo.classList.remove('hidden');
-				card.querySelector('.vehiculo-tipo').innerHTML = resaltarTexto(visitante.vehiculo.tipo.toUpperCase(), termino);
-				card.querySelector('.vehiculo-placa').innerHTML = resaltarTexto(formatearPlaca(visitante.vehiculo.placa), termino);
-				card.querySelector('.vehiculo-color').innerHTML = resaltarTexto(visitante.vehiculo.color, termino);
-				card.querySelector('.vehiculo-tarifa').textContent = `$${visitante.vehiculo.tarifa}/min`;
-			}
-			
-			if (vehiculoCosto) {
-				vehiculoCosto.classList.remove('hidden');
-				// El costo se actualizará con el cronómetro
-				card.querySelector('.costo-valor').textContent = calcularCostoVehiculo(visitante);
-			}
+	// Función para resaltar texto de búsqueda en resultados
+	function resaltarTexto(texto, termino) {
+		if (!termino || termino.length < 2) {
+			return texto;
 		}
 		
-		// Agregar ID para identificar la card
-		card.querySelector('.visitante-card').dataset.visitanteId = visitante.id;
+		// Limpiar término de búsqueda para cédulas y celulares (remover puntos, espacios y guiones)
+		const terminoLimpio = termino.replace(/[.\s-]/g, '');
 		
-		// Evento para el botón de salida
-		card.querySelector('.btn-dar-salida').addEventListener('click', async () => {
-			// Mostrar modal de confirmación en lugar de ejecutar directamente
-			if (window.mostrarConfirmSalida) {
-				window.mostrarConfirmSalida(visitante.id, capitalizarNombre(visitante.nombre), ejecutarSalidaVisitante, visitante);
-			} else {
-				// Fallback si el modal no está disponible
-				await ejecutarSalidaVisitante(visitante.id, capitalizarNombre(visitante.nombre));
+		// Si es una búsqueda de solo números (cédula o celular), resaltar coincidencias en ambos
+		if (/^\d+$/.test(terminoLimpio)) {
+			// Escapar caracteres especiales para regex
+			const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const terminoLimpioEscapado = terminoLimpio.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+			// Crear regex para buscar tanto el término original como el limpio (sin puntos)
+			const regexOriginal = new RegExp(`(${terminoEscapado})`, 'gi');
+			const regexLimpio = new RegExp(`(${terminoLimpioEscapado})`, 'gi');
+
+			// Primero intentar con el término original
+			let resultado = texto.replace(regexOriginal, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+
+			// Si no hay cambios, intentar con el término limpio (sin puntos/espacios)
+			if (resultado === texto) {
+				// Eliminar puntos y espacios del texto para buscar coincidencia sin formato
+				const textoLimpio = texto.replace(/[.\s-]/g, '');
+				resultado = textoLimpio.replace(regexLimpio, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+				// Volver a formatear el texto con los <mark> en la posición correcta
+				if (resultado !== textoLimpio) {
+					// Encontrar el índice de la coincidencia en el texto limpio
+					const match = textoLimpio.match(regexLimpio);
+					if (match && match.index !== undefined) {
+						// Calcular la posición en el texto original
+						const start = match.index;
+						const end = start + match[0].length;
+						// Buscar la posición correspondiente en el texto original
+						let count = 0;
+						let i = 0;
+						let startOrig = -1;
+						let endOrig = -1;
+						for (; i < texto.length; i += 1) {
+							if (/[0-9]/.test(texto[i])) {
+								if (count === start) startOrig = i;
+								if (count === end - 1) endOrig = i;
+								count += 1;
+							}
+						}
+						if (startOrig !== -1 && endOrig !== -1) {
+							return `${texto.slice(0, startOrig)}<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">${texto.slice(startOrig, endOrig + 1)}</mark>${texto.slice(endOrig + 1)}`;
+						}
+					}
+				}
 			}
-		});
+			return resultado;
+		}
+
+		// Para búsquedas normales de texto
+		const terminoEscapado = termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		const regex = new RegExp(`(${terminoEscapado})`, 'gi');
+
+		// Resaltar el texto con un span amarillo
+		return texto.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 px-1 rounded">$1</mark>');
+	}
+
+	// Función para calcular el costo acumulado del vehículo
+	function calcularCostoVehiculo(visitante) {
+		if (!visitante.vehiculo) return '$0';
 		
-		return card;
+		const ahora = new Date();
+		let entrada;
+		
+		// Manejar diferentes formatos de fecha
+		if (visitante.tiempoEntrada?.toDate) {
+			entrada = visitante.tiempoEntrada.toDate();
+		} else if (typeof visitante.tiempoEntrada === 'string') {
+			entrada = new Date(visitante.tiempoEntrada);
+		} else {
+			entrada = new Date(visitante.tiempoEntrada || visitante.fechaCreacion);
+		}
+		
+		const diferenciaMilis = ahora - entrada;
+		const minutos = Math.floor(diferenciaMilis / (1000 * 60));
+		const costo = minutos * visitante.vehiculo.tarifa;
+		
+		return `$${costo.toLocaleString('es-CO')}`;
 	}
 
 	// Función para ejecutar la salida del visitante (llamada después de confirmación)
@@ -579,27 +415,206 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	// Función para calcular el costo acumulado del vehículo
-	function calcularCostoVehiculo(visitante) {
-		if (!visitante.vehiculo) return '$0';
+	// Función para crear una card de visitante
+	function crearCardVisitante(visitante) {
+		const card = templateCard.content.cloneNode(true);
 		
-		const ahora = new Date();
-		let entrada;
+		// Obtener término de búsqueda actual para resaltado
+		const termino = buscarVisitante?.value?.trim() || '';
 		
-		// Manejar diferentes formatos de fecha
-		if (visitante.tiempoEntrada?.toDate) {
-			entrada = visitante.tiempoEntrada.toDate();
-		} else if (typeof visitante.tiempoEntrada === 'string') {
-			entrada = new Date(visitante.tiempoEntrada);
-		} else {
-			entrada = new Date(visitante.tiempoEntrada || visitante.fechaCreacion);
+		// Llenar datos con formato mejorado y resaltado
+		card.querySelector('.visitante-nombre').innerHTML = resaltarTexto(capitalizarNombre(visitante.nombre), termino);
+		card.querySelector('.visitante-cedula').innerHTML = `CC: ${resaltarTexto(formatearCedula(visitante.cedula), termino)}`;
+		card.querySelector('.visitante-celular').innerHTML = resaltarTexto(formatearCelular(visitante.celular), termino);
+		card.querySelector('.visitante-apartamento').innerHTML = `Apto: ${resaltarTexto(formatearApartamento(visitante.apartamento), termino)}`;
+		card.querySelector('.visitante-autorizado').innerHTML = `Por: ${resaltarTexto(capitalizarNombre(visitante.autorizadoPor), termino)}`;
+		card.querySelector('.visitante-tiempo').textContent = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
+		card.querySelector('.visitante-hora-entrada').textContent = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
+		
+		// Manejar información del vehículo
+		if (visitante.vehiculo) {
+			// Mostrar sección del vehículo
+			const vehiculoInfo = card.querySelector('.vehiculo-info');
+			const vehiculoCosto = card.querySelector('.vehiculo-costo');
+			
+			if (vehiculoInfo) {
+				vehiculoInfo.classList.remove('hidden');
+				card.querySelector('.vehiculo-tipo').innerHTML = resaltarTexto(visitante.vehiculo.tipo.toUpperCase(), termino);
+				card.querySelector('.vehiculo-placa').innerHTML = resaltarTexto(formatearPlaca(visitante.vehiculo.placa), termino);
+				card.querySelector('.vehiculo-color').innerHTML = resaltarTexto(visitante.vehiculo.color.toUpperCase(), termino);
+				card.querySelector('.vehiculo-tarifa').textContent = `$${visitante.vehiculo.tarifa}/min`;
+				
+				// Mostrar parqueadero si está asignado
+				const parqueaderoElement = card.querySelector('.vehiculo-parqueadero');
+				const parqueaderoValorElement = card.querySelector('.vehiculo-parqueadero-valor');
+				if (parqueaderoElement && parqueaderoValorElement && visitante.vehiculo.parqueadero) {
+					parqueaderoValorElement.innerHTML = resaltarTexto(visitante.vehiculo.parqueadero, termino);
+					parqueaderoElement.classList.remove('hidden');
+					parqueaderoElement.classList.add('flex');
+				} else if (parqueaderoElement) {
+					parqueaderoElement.classList.add('hidden');
+					parqueaderoElement.classList.remove('flex');
+				}
+			}
+			
+			if (vehiculoCosto) {
+				vehiculoCosto.classList.remove('hidden');
+				// El costo se actualizará con el cronómetro
+				card.querySelector('.costo-valor').textContent = calcularCostoVehiculo(visitante);
+			}
 		}
 		
-		const diferenciaMilis = ahora - entrada;
-		const minutos = Math.floor(diferenciaMilis / (1000 * 60));
-		const costo = minutos * visitante.vehiculo.tarifa;
+		// Agregar ID para identificar la card
+		card.querySelector('.visitante-card').dataset.visitanteId = visitante.id;
 		
-		return `$${costo.toLocaleString('es-CO')}`;
+		// Evento para el botón de salida
+		card.querySelector('.btn-dar-salida').addEventListener('click', async () => {
+			// Mostrar modal de confirmación en lugar de ejecutar directamente
+			if (window.mostrarConfirmSalida) {
+				window.mostrarConfirmSalida(visitante.id, capitalizarNombre(visitante.nombre), ejecutarSalidaVisitante, visitante);
+			} else {
+				// Fallback si el modal no está disponible
+				await ejecutarSalidaVisitante(visitante.id, capitalizarNombre(visitante.nombre));
+			}
+		});
+		
+		return card;
+	}
+
+	// ===== FUNCIONES PRINCIPALES =====
+
+	// Función para actualizar contadores de filtros
+	function actualizarContadoresFiltros() {
+		const totalVisitantes = visitantesActivos.length;
+		const conVehiculo = visitantesActivos.filter(v => v.vehiculo).length;
+		const sinVehiculo = visitantesActivos.filter(v => !v.vehiculo).length;
+		
+		// Actualizar contadores en los botones
+		const contadorTodos = document.getElementById('contador-todos');
+		const contadorConVehiculo = document.getElementById('contador-con-vehiculo');
+		const contadorSinVehiculo = document.getElementById('contador-sin-vehiculo');
+		
+		if (contadorTodos) contadorTodos.textContent = `(${totalVisitantes})`;
+		if (contadorConVehiculo) contadorConVehiculo.textContent = `(${conVehiculo})`;
+		if (contadorSinVehiculo) contadorSinVehiculo.textContent = `(${sinVehiculo})`;
+	}
+
+	// Función para renderizar las cards filtradas
+	function renderizarCards() {
+		// Actualizar contador principal
+		if (contadorVisitantes) {
+			contadorVisitantes.textContent = String(visitantesFiltrados.length);
+		}
+		
+		// Actualizar contadores de filtros
+		actualizarContadoresFiltros();
+		
+		if (isLoading) isLoading = false;
+		
+		if (visitantesFiltrados.length === 0) {
+			if (sinVisitantes && gridVisitantes) {
+				restaurarEstadoVacio();
+				sinVisitantes.classList.remove('hidden');
+				gridVisitantes.classList.add('hidden');
+			}
+		} else if (sinVisitantes && gridVisitantes) {
+			sinVisitantes.classList.add('hidden');
+			gridVisitantes.classList.remove('hidden');
+			gridVisitantes.innerHTML = '';
+			
+			visitantesFiltrados.forEach(visitante => {
+				const card = crearCardVisitante(visitante);
+				gridVisitantes.appendChild(card);
+			});
+		}
+	}
+
+	// Función para aplicar filtros con búsqueda mejorada
+	function aplicarFiltro() {
+		let resultado = [...visitantesActivos];
+		
+		// Aplicar búsqueda primero si hay términos
+		const termino = buscarVisitante?.value?.trim() || '';
+		if (termino) {
+			resultado = buscarVisitantes(termino);
+		}
+		
+		// Luego aplicar filtro por tipo
+		switch(filtroActual) {
+			case 'con-vehiculo':
+				visitantesFiltrados = resultado.filter(v => v.vehiculo);
+				break;
+			case 'sin-vehiculo':
+				visitantesFiltrados = resultado.filter(v => !v.vehiculo);
+				break;
+			default:
+				visitantesFiltrados = resultado;
+		}
+		renderizarCards();
+	}
+
+	// Event listeners para los filtros
+	const filtroTodos = document.getElementById('filtro-todos');
+	const filtroConVehiculo = document.getElementById('filtro-con-vehiculo');
+	const filtroSinVehiculo = document.getElementById('filtro-sin-vehiculo');
+
+	function actualizarEstadoFiltros() {
+		// Remover clases active de todos los botones y aplicar estilo outline
+		document.querySelectorAll('.filtro-btn').forEach(btn => {
+			btn.classList.remove('active', 'bg-primary-500', 'text-white', 'shadow-md');
+			
+			// Determinar el color base del botón
+			if (btn.id === 'filtro-todos') {
+				btn.classList.add('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
+				btn.classList.remove('border-primary-500');
+			} else if (btn.id === 'filtro-con-vehiculo') {
+				btn.classList.add('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
+			} else if (btn.id === 'filtro-sin-vehiculo') {
+				btn.classList.add('border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent');
+			}
+		});
+
+		// Aplicar estilo activo al botón seleccionado
+		const btnActivo = document.getElementById(`filtro-${filtroActual}`);
+		if (btnActivo) {
+			btnActivo.classList.add('active', 'shadow-md');
+			
+			if (filtroActual === 'todos') {
+				btnActivo.classList.remove('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
+				btnActivo.classList.add('border-primary-500', 'bg-primary-500', 'text-white');
+			} else if (filtroActual === 'con-vehiculo') {
+				btnActivo.classList.remove('border-primary-300', 'dark:border-primary-600', 'text-primary-600', 'dark:text-primary-400', 'bg-transparent');
+				btnActivo.classList.add('border-primary-500', 'bg-primary-500', 'text-white');
+			} else if (filtroActual === 'sin-vehiculo') {
+				btnActivo.classList.remove('border-gray-300', 'dark:border-gray-600', 'text-gray-600', 'dark:text-gray-400', 'bg-transparent');
+				btnActivo.classList.add('border-gray-500', 'bg-gray-500', 'text-white');
+			}
+		}
+	}
+
+	// Configurar event listeners para filtros
+	if (filtroTodos) {
+		filtroTodos.addEventListener('click', () => {
+			filtroActual = 'todos';
+			actualizarEstadoFiltros();
+			aplicarFiltro();
+		});
+	}
+
+	if (filtroConVehiculo) {
+		filtroConVehiculo.addEventListener('click', () => {
+			filtroActual = 'con-vehiculo';
+			actualizarEstadoFiltros();
+			aplicarFiltro();
+		});
+	}
+
+	if (filtroSinVehiculo) {
+		filtroSinVehiculo.addEventListener('click', () => {
+			filtroActual = 'sin-vehiculo';
+			actualizarEstadoFiltros();
+			aplicarFiltro();
+		});
 	}
 
 	// Función principal de renderizado
@@ -658,7 +673,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				const tiempo = calcularTiempo(visitante.tiempoEntrada || visitante.fechaCreacion);
 				const horaEntrada = formatearFecha(visitante.tiempoEntrada || visitante.fechaCreacion);
 				
-				contenidoHTML += `<tr><td><strong>${formatearPlaca(visitante.vehiculo.placa) || 'N/A'}</strong></td><td>${capitalizarNombre(visitante.nombre)}</td><td>${visitante.vehiculo.tipo || 'N/A'}</td><td>${visitante.vehiculo.color || 'N/A'}</td><td>${horaEntrada}</td><td>${tiempo}</td><td class="verificado"></td></tr>`;
+				contenidoHTML += `<tr><td><strong>${formatearPlaca(visitante.vehiculo.placa) || 'N/A'}</strong></td><td>${capitalizarNombre(visitante.nombre)}</td><td>${visitante.vehiculo.tipo || 'N/A'}</td><td>${(visitante.vehiculo.color || 'N/A').toUpperCase()}</td><td>${horaEntrada}</td><td>${tiempo}</td><td class="verificado"></td></tr>`;
 			});
 
 			contenidoHTML += `</tbody></table><div class="footer"><p>Documento generado automáticamente para verificación física del parqueadero</p><p>Marque la columna ✓ al verificar cada vehículo físicamente</p></div></body></html>`;
