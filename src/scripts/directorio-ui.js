@@ -728,28 +728,28 @@ async function renderTabla(datos) {
     }
     // Crear celdas y usar innerHTML para aplicar el resaltado
     const tdNumero = document.createElement('td');
-    tdNumero.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdNumero.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 align-middle';
     tdNumero.innerHTML = badgeNumero;
 
     const tdEstado = document.createElement('td');
-    tdEstado.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdEstado.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 align-middle';
     tdEstado.innerHTML = badgeEstado;
 
     const tdNombre = document.createElement('td');
-    tdNombre.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdNombre.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 align-middle';
     tdNombre.innerHTML = resaltar(capitalizarNombre(apto.nombre) || '', 'nombre', apto.id);
 
     const tdContacto = document.createElement('td');
-    tdContacto.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdContacto.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 align-middle';
     tdContacto.textContent = apto.contacto || '';
 
     const tdRol = document.createElement('td');
-    tdRol.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdRol.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 align-middle';
     tdRol.innerHTML = badgeRol;
 
     // Nueva columna para parqueadero
     const tdParqueadero = document.createElement('td');
-    tdParqueadero.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdParqueadero.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 align-middle';
     const parqueaderoAsignado = parqueaderosData[apto.numero];
     if (parqueaderoAsignado) {
       tdParqueadero.innerHTML = `<span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-lg dark:bg-blue-900 dark:text-blue-300">${parqueaderoAsignado}</span>`;
@@ -758,7 +758,7 @@ async function renderTabla(datos) {
     }
 
     const tdObs = document.createElement('td');
-    tdObs.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
+    tdObs.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 align-middle';
     
     // Limitar observaciones a 50 caracteres en la tabla
     const observacionCompleta = capitalizarObservacion(apto.observaciones) || '';
@@ -771,29 +771,28 @@ async function renderTabla(datos) {
       : '<span class="text-gray-400 dark:text-gray-500 italic">Sin observaciones</span>';
 
     const tdHistorial = document.createElement('td');
-    tdHistorial.className = 'px-4 py-2 border-b border-gray-200 dark:border-gray-700';
-    tdHistorial.innerHTML = `<div class="flex items-center justify-center">
+    tdHistorial.className = 'px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-center align-middle';
+    tdHistorial.innerHTML = `
       <button 
-        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-center text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-800 transition-colors" 
+        class="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200" 
         onclick="mostrarHistorialApartamento('${apto.id}', '${apto.numero}')"
         title="Ver historial de cambios"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history mr-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
           <path d="M3 3v5h5"></path>
           <path d="M12 7v5l4 2"></path>  
         </svg>
-        
       </button>
-    </div>`;
+    `;
 
     const tdAcciones = document.createElement('td');
-    tdAcciones.className = 'px-4 py-2 w-16 border-b border-gray-200 dark:border-gray-700';
-    tdAcciones.innerHTML = `<div class="flex items-center justify-end">
+    tdAcciones.className = 'px-4 py-3 w-16 border-b border-gray-200 dark:border-gray-700 text-center align-middle';
+    tdAcciones.innerHTML = `
       <button class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" onclick="mostrarMenuAccionesDirectorio(event, '${apto.id}')">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-horizontal w-5 h-5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
       </button>
-    </div>`;
+    `;
 
     tr.appendChild(tdNumero);
     tr.appendChild(tdEstado);
@@ -914,8 +913,80 @@ window.eliminarApartamento = async function eliminarApartamento(apartamentoId) {
         // Eliminar también todo el historial asociado
         await eliminarHistorialApartamento(apartamentoId);
         
-        // Actualizar la tabla
-        await actualizarTabla();
+        // *** ACTUALIZACIÓN EN TIEMPO REAL SIN RECARGA ***
+        // 1. Eliminar de los datos globales
+        const index = datosGlobal.findIndex(a => a.id === apartamentoId);
+        if (index !== -1) {
+          datosGlobal.splice(index, 1);
+        }
+        
+        // 2. Eliminar de los datos filtrados si existen
+        const filteredIndex = datosFiltrados.findIndex(a => a.id === apartamentoId);
+        if (filteredIndex !== -1) {
+          datosFiltrados.splice(filteredIndex, 1);
+        }
+        
+        // 3. Encontrar y eliminar la fila del DOM
+        const tbody = document.getElementById('tabla-directorio-body');
+        const filas = tbody.getElementsByTagName('tr');
+        for (let i = 0; i < filas.length; i += 1) {
+          const fila = filas[i];
+          // Buscar por el botón de acciones que contiene el apartamentoId
+          const botonAcciones = fila.querySelector(`button[onclick*="${apartamentoId}"]`);
+          if (botonAcciones) {
+            // Animar la eliminación más rápida
+            fila.style.transition = 'opacity 0.15s ease-out, transform 0.15s ease-out';
+            fila.style.opacity = '0';
+            fila.style.transform = 'translateX(-20px)';
+            setTimeout(() => {
+              if (fila.parentNode) {
+                fila.parentNode.removeChild(fila);
+              }
+            }, 150);
+            break;
+          }
+        }
+        
+        // 4. Actualizar contadores sin recargar tabla
+        actualizarContadoresDirectorio(datosGlobal);
+        
+        // 5. Actualizar total de apartamentos
+        const totalApartamentos = document.getElementById('total-apartamentos');
+        if (totalApartamentos) {
+          totalApartamentos.textContent = datosGlobal.length;
+        }
+        
+        // 6. Actualizar paginación si es necesario
+        const registrosPorPagina = 20;
+        const paginasTotal = Math.ceil(datosFiltrados.length / registrosPorPagina) || 1;
+        if (currentPage > paginasTotal) {
+          currentPage = Math.max(1, paginasTotal);
+          await renderTabla(datosFiltrados);
+        } else {
+          // Actualizar solo los números de paginación
+          const inicioRango = document.getElementById('inicio-rango-directorio');
+          const finRango = document.getElementById('fin-rango-directorio');
+          const totalItems = document.getElementById('total-items-directorio');
+          const numeroPagina = document.getElementById('numero-pagina-directorio');
+          
+          if (inicioRango && finRango && totalItems && numeroPagina) {
+            const inicio = (currentPage - 1) * registrosPorPagina;
+            const inicioMostrar = datosFiltrados.length === 0 ? 0 : inicio + 1;
+            const registrosEnPagina = Math.min(registrosPorPagina, datosFiltrados.length - inicio);
+            const finMostrar = datosFiltrados.length === 0 ? 0 : inicio + registrosEnPagina;
+            
+            inicioRango.textContent = inicioMostrar;
+            finRango.textContent = finMostrar;
+            totalItems.textContent = datosFiltrados.length;
+            numeroPagina.textContent = currentPage;
+          }
+        }
+        
+        // 7. Mostrar estado sin datos si es necesario
+        const sinDirectorio = document.getElementById('sin-directorio');
+        if (sinDirectorio && datosGlobal.length === 0) {
+          sinDirectorio.classList.remove('hidden');
+        }
         
         window.mostrarAlert(`Apartamento ${numeroApartamento} eliminado correctamente`, 'success');
       } catch (error) {
@@ -1093,12 +1164,32 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const modal = document.getElementById('modal-apartamento');
   const btnAbrir = document.getElementById('btn-abrir-modal-apto');
+  const btnAbrir2 = document.getElementById('btn-abrir-modal-apto-2');
   const btnCerrar = document.getElementById('cerrar-modal-apto');
   const btnCancelar = document.getElementById('cancelar-modal-apto');
   const form = document.getElementById('form-apartamento');
 
   if (btnAbrir && modal) {
     btnAbrir.addEventListener('click', async () => {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      // Habilitar campo número al crear
+      const formApto = document.getElementById('form-apartamento');
+      if (formApto && formApto.elements.numero) {
+        formApto.elements.numero.disabled = false;
+      }
+      
+      // Cargar parqueaderos disponibles cuando se abre el modal
+      poblarSelectParqueaderos();
+      setTimeout(() => {
+        document.addEventListener('keydown', cerrarModalPrincipalConEsc);
+      }, 100);
+    });
+  }
+
+  // Event listener para el segundo botón (cuando no hay apartamentos)
+  if (btnAbrir2 && modal) {
+    btnAbrir2.addEventListener('click', async () => {
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       // Habilitar campo número al crear

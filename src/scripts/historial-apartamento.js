@@ -242,7 +242,7 @@ export function generarElementoTimeline(item, esUltimo = false) {
             <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-100 dark:bg-yellow-900/10 dark:border-yellow-800/30">
               <span class="text-sm font-medium text-yellow-700 dark:text-yellow-300">Residente</span>
               <span class="px-2.5 py-1 text-xs font-bold bg-yellow-600 text-white rounded-full shadow-sm">
-                ${datos.nombre}
+                ${datos.nombre.toUpperCase()}
               </span>
             </div>
             <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-100 dark:bg-yellow-900/10 dark:border-yellow-800/30">
@@ -253,7 +253,7 @@ export function generarElementoTimeline(item, esUltimo = false) {
             </div>
             <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-100 dark:bg-yellow-900/10 dark:border-yellow-800/30">
               <span class="text-sm font-medium text-yellow-700 dark:text-yellow-300">Parqueadero</span>
-              <span class="px-2.5 py-1 text-xs font-bold ${datos.parqueadero && datos.parqueadero !== 'No asignado' ? 'bg-blue-600' : 'bg-gray-600'} text-white rounded-full shadow-sm">
+              <span class="px-2.5 py-1 text-xs font-bold ${datos.parqueadero && datos.parqueadero !== 'No asignado' ? 'bg-yellow-600' : 'bg-gray-600'} text-white rounded-full shadow-sm">
                 ${datos.parqueadero || 'No asignado'}
               </span>
             </div>

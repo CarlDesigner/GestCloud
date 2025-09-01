@@ -2,10 +2,11 @@
 /* eslint max-lines: 'off' */
 
 import NavPagination from '../components/NavPagination.astro';
-import { asset, fetchData } from '../lib/data.js';
+import { asset } from '../lib/data.js';
 
 const { class: clazz } = Astro.props;
-const users = await fetchData('users');
+// Datos mock para la página de usuarios (parte del template original)
+const users: any[] = [];
 ---
 
 <entities-crud

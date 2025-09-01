@@ -161,14 +161,14 @@ document.addEventListener('DOMContentLoaded', () => {
 				</svg>
 				<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay visitantes activos</h3>
 				<p class="text-gray-500 dark:text-gray-400 mb-6">Cuando se registre un visitante aparecerá aquí en tiempo real</p>
-				<a href="/inicio" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+				<button onclick="abrirModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
 					 Registrar Visitante &nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus">
 										<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
 										<circle cx="9" cy="7" r="4"/>
 										<line x1="19" x2="19" y1="8" y2="14"/>
 										<line x1="22" x2="16" y1="11" y2="11"/>
 									</svg>
-				</a>
+				</button>
 			`;
 		}
 	}
@@ -782,32 +782,46 @@ document.addEventListener('DOMContentLoaded', () => {
 	const modal = document.getElementById('modal-visitante');
 	const cerrar = document.getElementById('cerrar-modal-visitante');
 
-	function abrirModal() {
-		modal.classList.remove('opacity-0', 'pointer-events-none');
-		modal.classList.add('opacity-100');
-		modal.querySelector('div').classList.remove('scale-95');
-		modal.querySelector('div').classList.add('scale-100');
-	}
+	// Función global para abrir modal (accesible desde onclick)
+	window.abrirModal = function abrirModal() {
+		const modalElement = document.getElementById('modal-visitante');
+		if (modalElement) {
+			modalElement.classList.remove('opacity-0', 'pointer-events-none');
+			modalElement.classList.add('opacity-100');
+			const modalContent = modalElement.querySelector('div');
+			if (modalContent) {
+				modalContent.classList.remove('scale-95');
+				modalContent.classList.add('scale-100');
+			}
+		}
+	};
 	
-	function cerrarModal() {
-		modal.classList.add('opacity-0', 'pointer-events-none');
-		modal.classList.remove('opacity-100');
-		modal.querySelector('div').classList.add('scale-95');
-		modal.querySelector('div').classList.remove('scale-100');
-	}
+	// Función global para cerrar modal
+	window.cerrarModal = function cerrarModal() {
+		const modalElement = document.getElementById('modal-visitante');
+		if (modalElement) {
+			modalElement.classList.add('opacity-0', 'pointer-events-none');
+			modalElement.classList.remove('opacity-100');
+			const modalContent = modalElement.querySelector('div');
+			if (modalContent) {
+				modalContent.classList.add('scale-95');
+				modalContent.classList.remove('scale-100');
+			}
+		}
+	};
 	
 	if (btnAgregar && modal && cerrar) {
-		btnAgregar.addEventListener('click', abrirModal);
-		cerrar.addEventListener('click', cerrarModal);
+		btnAgregar.addEventListener('click', window.abrirModal);
+		cerrar.addEventListener('click', window.cerrarModal);
 		
 		// Cerrar con fondo
 		modal.addEventListener('click', (e) => {
-			if (e.target === modal) cerrarModal();
+			if (e.target === modal) window.cerrarModal();
 		});
 		
 		// Cerrar con Escape
 		document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape' && !modal.classList.contains('opacity-0')) cerrarModal();
+			if (e.key === 'Escape' && !modal.classList.contains('opacity-0')) window.cerrarModal();
 		});
 	}
 
